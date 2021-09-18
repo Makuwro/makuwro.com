@@ -1,0 +1,214 @@
+/* Everything */
+
+:root {
+  --background-blue: rgb(165, 184, 240);
+}
+
+* {
+  font-family: "Lexend Deca";
+}
+
+body {
+  margin: 0;
+  line-height: 1.5;
+  background-color: var(--background-blue);
+}
+
+/* Header */
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 3.5rem;
+  background-color: rgb(240, 241, 245);
+  border-bottom: 1px solid rgb(197, 200, 202);
+  padding: 0 1.2rem;
+  position: fixed;
+  width: calc(100% - 2.4rem);
+  margin-top: -3.5rem;
+}
+
+#wiki-name {
+  margin: 0;
+  font-size: 1.15rem;
+  color: rgb(68, 69, 73);
+  margin-left: 0.75rem;
+}
+
+#search-box {
+  width: 50%;
+  display: none;
+}
+
+#search-box > input {
+  border: none;
+  background-color: var(--background-blue);
+  height: 2rem;
+  width: 100%;
+  font-size: 0.875rem;
+  padding: 0 0.75rem;
+}
+
+#search-box > input::placeholder {
+  color: rgb(90, 107, 159);
+}
+
+header > section {
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+#menu-button {
+  border: none;
+}
+
+#menu-button > img {
+  width: 1.5rem;
+  height: 1.5rem;
+  position: relative;
+  top: 1px;
+  filter: invert(23%) sepia(6%) saturate(521%) hue-rotate(191deg) brightness(94%) contrast(82%);
+}
+
+#search-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  filter: invert(23%) sepia(6%) saturate(521%) hue-rotate(191deg) brightness(94%) contrast(82%);
+}
+
+#account-button {
+  position: relative;
+  border: none;
+  border-radius: 100%;
+  height: 2rem;
+  width: 2rem;
+  background-color: rgb(165, 184, 240);
+  margin-left: 1rem;
+}
+
+/* Article content */
+
+article {
+  margin-top: 3.5rem;
+  background-color: rgb(213, 220, 237);
+  padding: 1.2rem 1.8rem;
+  max-width: 700px;
+}
+
+#controls {
+  float: right;
+}
+
+#controls > button {
+  border: none;
+  background-color: #f0f1f5;
+  padding: 0.5rem 0.75rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin-left: 5px;
+}
+
+#article-header-name {
+  font-size: 2rem;
+  margin: 0;
+  font-weight: bold;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 1rem 0;
+  font-weight: normal;
+}
+
+h1 {
+  font-size: 1.75rem;
+}
+
+div {
+  margin-bottom: 1rem;
+  font-size: .875rem;
+}
+
+#root {
+  margin: 0;
+}
+
+#article-footer {
+  border-top: 1px solid gray;
+  margin-top: 2rem;
+  padding-top: 2rem;
+}
+
+#last-edited {
+  text-align: center;
+  color: rgb(68, 69, 73);
+}
+
+/* Outline */
+#outline {
+  width: 17%;
+  max-width: 245px;
+  display: none;
+}
+
+#outline > nav {
+  border-radius: 5px;
+  padding: 1.2rem 1.8rem;
+  background-color: #5a75bf;
+  color: white;
+  position: fixed;
+  border-left: none;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+#outline > nav > h1 {
+  font-size: 1.25rem;
+}
+
+/* Media declarations */
+
+/* Tablet */
+@media only screen and (min-width: 768px) {
+  header {
+    z-index: 2;
+    margin-top: -6.5rem;
+  }
+
+  article {
+    border-radius: 5px;
+    width: 60%;
+    position: relative;
+    margin: 6.5rem auto 3.5rem auto;
+    max-width: 700px;
+  }
+
+  #search-box {
+    display: block;
+  }
+
+  #last-edited {
+    text-align: right;
+  }
+}
+
+/* Laptop */
+@media only screen and (min-width: 1024px) {
+
+  main {
+    margin: 6.5rem auto 3.5rem auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  article {
+    margin: 0;
+    border-top-right-radius: 0;
+  }
+
+  #outline {
+    display: inline-block;
+  }
+}
