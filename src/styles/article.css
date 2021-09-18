@@ -1,0 +1,82 @@
+article {
+  margin-top: 3.5rem;
+  background-color: rgb(213, 220, 237);
+  padding: 1.2rem 1.8rem;
+}
+
+#controls {
+  float: right;
+}
+
+#controls > button {
+  border: none;
+  background-color: #f0f1f5;
+  padding: 0.5rem 0.75rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin-left: 5px;
+}
+
+#article-header-name {
+  font-size: 2rem;
+  margin: 0;
+  font-weight: bold;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 1rem 0;
+  font-weight: normal;
+}
+
+h1 {
+  font-size: 1.75rem;
+}
+
+div {
+  margin-bottom: 1rem;
+  font-size: .875rem;
+}
+
+#root {
+  margin: 0;
+}
+
+#article-footer {
+  border-top: 1px solid gray;
+  margin-top: 2rem;
+  padding-top: 2rem;
+}
+
+#last-edited {
+  text-align: center;
+  color: rgb(68, 69, 73);
+}
+
+/* Tablet */
+@media only screen and (min-width: 768px) {
+  article {
+    border-radius: 5px;
+    width: 50%;
+    position: relative;
+    margin: 6.5rem auto 3.5rem auto;
+  }
+
+  #last-edited {
+    text-align: right;
+  }
+}
+
+/* Laptop */
+@media only screen and (min-width: 1024px) {
+  main {
+    margin: 6.5rem auto 3.5rem auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  article {
+    margin: 0;
+    border-top-right-radius: 0;
+  }
+}
