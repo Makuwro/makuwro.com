@@ -20,6 +20,10 @@
   font-size: 1.25rem;
 }
 
+#outline > nav > h2 {
+  font-size: 1.1rem;
+}
+
 @media only screen and (min-width: 1024px) {
   #outline {
     display: inline-block;
