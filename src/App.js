@@ -4,11 +4,12 @@ import Header from "./comps/Header";
 import MenuOverlay from "./comps/MenuOverlay";
 import Login from "./comps/Login";
 import {Switch, Route, BrowserRouter as Router, useParams, Redirect} from "react-router-dom";
-import { useState, React } from "react";
+import { useState, React, useEffect } from "react";
 
 function App() {
 
   const [articleName, setArticleName] = useState();
+  const [article, setArticle] = useState(null);
 
   function PrepareArticle() {
     
@@ -21,9 +22,6 @@ function App() {
 
     }
 
-    // Get the article content
-
-
     // Show the article name
     const displayName = underscoreInternalName.replaceAll("_", " ");
     setArticleName(displayName);
@@ -33,6 +31,29 @@ function App() {
 
   }
 
+  useEffect(async () => {
+
+    try {
+
+      // Get the article info
+      //setArticleData({content: "Test"});
+      //let articleInfo = await fetch("https://efoifhu");
+
+      const articleData = {content: "# Description\n## Role in the story\n**Your Mom**, also known as *The Monster of the Weekend*, is here. Right behind you. **LOOK OUT!!**\n# Did I scare you?\nJuuuust kidding. I wouldn't actually do that...\n\nOr would I?"};
+      setArticle(<>
+        <MenuOverlay />
+        <Header />
+        <Article name={articleName} data={articleData} />
+      </>);
+
+    } catch (err) {
+
+      return <Redirect to="/login" />;
+
+    }
+
+  }, [articleName]);
+
   return (
     <Router>
       <Switch>
@@ -41,10 +62,7 @@ function App() {
           <Login />
         </Route>
         <Route exact path="/articles/:internalName">
-          <PrepareArticle />
-          <MenuOverlay />
-          <Header />
-          <Article name={articleName} contributors={["Christian Toney", "coin"]} />
+          <PrepareArticle />{article}
         </Route>
       </Switch>
     </Router>
