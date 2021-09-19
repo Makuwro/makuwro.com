@@ -3,28 +3,87 @@ import "../styles/article.css";
 import Outline from "./Outline.js";
 import PropTypes from "prop-types";
 
+const markupRegex = /(# (?<h1>.+))|(## (?<h2>.+))|(### (?<h3>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(\[\[(?<aBracket>.+?)\]\])|(?<b>\*\*[^*]+\*\*)|{{((?<template>\S+)}})|\n+?(?<div>[^#\n]+)/gm;
+const subMarkupRegex = /(\*\*(?<b>[^*]+)\*\*)|(\*(?<i>[^*]+)\*)/gm;
+
 class Article extends React.Component {
   
   constructor(props) {
 
     super(props);
     
-    // Prepare contributors
-    const contributors = props.contributors && props.contributors.map((contributorName, index, contributorArray) => {
+    let contributors, formattedContent;
+    let content = props.data.content;
+    let headers = [];
+    if (content) {
 
-      return (<>
-        <a href={"/collaborators/" + contributorName}>{contributorName}</a>
-        <span>{(index + 1 === contributorArray.length ? "" : (index + 2 === contributorArray.length ? (contributorArray.length === 2 ? "" : ",") + " and " : ""))}</span>
-      </>);
+      // Make the content look pretty
+      const matches = [...content.matchAll(new RegExp(markupRegex.source + "|(?<begin>.+){1}", "gm"))];
+      const componentsToFormat = [];
+      for (let i = 0; matches.length > i; i++) {
 
-    });
+        // Get the match
+        const match = matches[i];
+        const matchType = Object.keys(match.groups).filter(key => match.groups[key])[0];
+        let matchText = match.groups[matchType];
+
+        // Check if it's a new line
+        if (matchType === "div") {
+
+          // Get the matches inside the new line
+          matchText = matchText.split(subMarkupRegex);
+          for (let x = 0; matchText.length > x; x++) {
+
+            if (matchText[x]) {
+
+              const subMatch = [...matchText[x].matchAll(subMarkupRegex)][0];
+              if (subMatch) {
+                
+                const subMatchType = Object.keys(subMatch.groups).filter(key => subMatch.groups[key])[0];
+                matchText.splice(x, 1);
+
+                matchText[x] = React.createElement(subMatchType, null, matchText[x]);
+                
+              }
+
+            }
+
+          }
+
+        }
+
+        // Create the element and add it to the header list, if necessary
+        const Element = React.createElement(matchType, {key: i, id: {"h1": 1, "h2": 1, "h3": 1, "h4": 1, "h5": 1, "h6": 1}[matchType] && matchText.replaceAll(" ", "_")}, matchText);
+        if (Element.props.id) headers.push(Element);
+
+        // Add the component to the list
+        componentsToFormat.push(Element);
+
+      }
+
+      // Format the components
+      formattedContent = componentsToFormat.map(component => component);
+      
+      // Prepare contributors
+      contributors = props.data.contributors && props.data.contributors.map((contributorName, index, contributorArray) => {
+
+        return (<>
+          <a href={"/collaborators/" + contributorName}>{contributorName}</a>
+          <span>{(index + 1 === contributorArray.length ? "" : (index + 2 === contributorArray.length ? (contributorArray.length === 2 ? "" : ",") + " and " : ""))}</span>
+        </>);
+
+      }) || "The Showrunners Team";
+
+    }
 
     this.state = {
-      contributors: contributors
+      content: formattedContent,
+      contributors: contributors,
+      headers: headers
     };
 
   }
-  
+
   render() {
 
     return (
@@ -32,32 +91,22 @@ class Article extends React.Component {
         <article>
           <section id="article-header">
             <div id="controls">
-              <button>Edit</button>
+              <button>{this.state.content ? "Edit" : "Create"}</button>
             </div>
             <div>
               <h1 id="article-header-name">{this.props.name}</h1>
-              <div id="article-header-contributors">by {this.state.contributors}</div>
+              {this.state.content && (<><div id="article-header-contributors">by {this.state.contributors}</div></>)}
             </div>
           </section>
 
-          <section id="article-content">
-            
-            <h1>Description</h1>
-            <div><b>Trust Fall</b>, also known as “TSR001” to Dream, is the first season of The Showrunners game.</div>
-            <h1>Plot</h1>
-            {/* eslint-disable-next-line react/no-unescaped-entities*/}
-            <div>The season involves Ruby Endaend finally being able to defend worlds from <a href="/wiki/Demons">demons</a> with Toasty. He's been very anxious and has been doing her job for her most of the time. She hasn't questioned him because she had no idea how any of the "host junk" worked. That changes after Zeal, Lust of the Elite Seven, offers to give Ruby a glimpse of clarity on how she became the host. During their explanation, Zeal falsely accuses Toasty of killing Ruby and torturing her as a demon, rebooting the timeline whenever she stepped out of line. With the mysterious attitude of Toasty, she didn't know who to believe, but Zeal told her that she had the choice to draw her own conclusions and gave her a key to an unknown room. ...Before secretly taking a strand of her hair.</div>
-            <div>Ruby had the protection of the plot armor, an invisible barrier usually given to makers. As the host, she was unable to be physically damaged by demons. Coin, the leader of the Elite Seven, was curious about this ability. Despite being only one strand of hair, it contained a significant amount of plot armor. He was going to take the power of the plot armor and distribute it to all demons, and put it in 6 bombs that could easily destroy not just worlds, but also Toasty and Ruby. Demons were constantly bested by Toasty alone, so this seemed like an opportunity for demons to get the upper hand against worldbuilders.</div>
-            {/* eslint-disable-next-line react/no-unescaped-entities*/}
-            <div>Zeal left the world, giving Toasty the false pretense that the demons had backed down, so Ruby and Toasty went back to the Overworld. Ruby started to investigate by asking around for what the key went to. She encounters Lithicus Drakarox, a worldbuilder who never really got a feel for construction over destruction. After listening to Ruby's story, he becomes even more upset with how secretive Toasty is. He offers to help her find where the key goes.</div>
-          </section>
+          <section id="article-content">{this.state.content || <>This article doesn't exist... <i>but it always will in our hearts ♥</i></>}</section>
 
-          <section id="article-footer">
-            <div id="last-edited">LAST EDITED ON JANUARY 1, 2021</div>
-          </section>
+          {this.state.content && (<section id="article-footer">
+            <div id="last-edited">Last edited on January 1, 2021</div>
+          </section>)}
         </article>
 
-        <Outline />
+        <Outline headers={this.state.headers} />
       </main>
     );
 
@@ -67,7 +116,7 @@ class Article extends React.Component {
 
 Article.propTypes = {
   name: PropTypes.string,
-  contributors: PropTypes.array
+  data: PropTypes.object
 };
 
 export default Article;
