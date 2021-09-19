@@ -4,10 +4,13 @@ import "../styles/header.css";
 class Header extends React.Component {
   
   constructor(props) {
+
     super(props);
-  };
+
+  }
   
   render() {
+
     return (
       <header>
         <section>
@@ -28,7 +31,9 @@ class Header extends React.Component {
         </section>
       </header>
     );
-  };
-};
+
+  }
+
+}
 
 export default Header;

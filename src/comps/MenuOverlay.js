@@ -4,10 +4,13 @@ import "../styles/menu.css";
 class MenuOverlay extends React.Component {
   
   constructor(props) {
+
     super(props);
-  };
+
+  }
   
   render() {
+
     return (
       <div id="menu-overlay">
         <nav>
@@ -32,7 +35,9 @@ class MenuOverlay extends React.Component {
         <div id="menu-overlay-bg"></div>
       </div>
     );
-  };
-};
+
+  }
+
+}
 
 export default MenuOverlay;

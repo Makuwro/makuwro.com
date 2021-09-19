@@ -1,7 +1,8 @@
 article {
-  margin-top: 3.5rem;
   background-color: rgb(213, 220, 237);
-  padding: 1.2rem 1.8rem;
+  padding: 1.2rem 1.8rem;       
+  position: relative;
+  margin: 0 auto;
 }
 
 #controls {
@@ -55,11 +56,15 @@ div {
 
 /* Tablet */
 @media only screen and (min-width: 768px) {
+  #article-container {
+    padding-bottom: 3.5rem;
+    top: 7.5rem;
+  }
+
   article {
     border-radius: 5px;
     width: 50%;
     position: relative;
-    margin: 6.5rem auto 3.5rem auto;
   }
 
   #last-edited {
@@ -69,8 +74,7 @@ div {
 
 /* Laptop */
 @media only screen and (min-width: 1024px) {
-  main {
-    margin: 6.5rem auto 3.5rem auto;
+  #article-container {
     display: flex;
     justify-content: center;
   }
