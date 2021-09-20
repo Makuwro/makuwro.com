@@ -1,1 +1,1 @@
-test
+This is the client for the collaborators of The Showrunners Wiki.
