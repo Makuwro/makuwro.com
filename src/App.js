@@ -1,7 +1,6 @@
 import "./styles/global.css";
 import Article from "./comps/Article";
 import Header from "./comps/Header";
-import MenuOverlay from "./comps/MenuOverlay";
 import Login from "./comps/Login";
 import {Switch, Route, BrowserRouter as Router, useParams, Redirect} from "react-router-dom";
 import { useState, React, useEffect } from "react";
@@ -41,7 +40,6 @@ function App() {
 
       const articleData = {content: "# Description\n## Role in the story\n**Your Mom**, also known as *The Monster of the Weekend*, is here. Right behind you. **LOOK OUT!!**\n# Did I scare you?\nJuuuust kidding. I wouldn't actually do that...\n\nOr would I?"};
       setArticle(<>
-        <MenuOverlay />
         <Header />
         <Article name={articleName} data={articleData} />
       </>);
