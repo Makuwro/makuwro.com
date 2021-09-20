@@ -11,14 +11,14 @@ class Article extends React.Component {
   constructor(props) {
 
     super(props);
-    
+
     let contributors, formattedContent;
     let content = props.data.content;
     let headers = [];
     if (content) {
 
       // Make the content look pretty
-      const matches = [...content.matchAll(new RegExp(markupRegex.source + "|(?<begin>.+){1}", "gm"))];
+      const matches = [...content.matchAll(markupRegex)];
       const componentsToFormat = [];
       for (let i = 0; matches.length > i; i++) {
 
