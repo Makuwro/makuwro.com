@@ -26,6 +26,7 @@
     "react/no-unescaped-entities": ["warn", {"forbid": [">", "}"]}],
     "react/react-in-jsx-scope": "warn",
     "padded-blocks": "warn",
-    "no-empty": "warn"
+    "no-empty": "warn",
+    "no-case-declarations": "warn"
   }
 }
