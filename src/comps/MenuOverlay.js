@@ -1,6 +1,7 @@
 import React from "react";
 import "../styles/menu.css";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
 function MenuOverlay(props) {
   
@@ -8,21 +9,21 @@ function MenuOverlay(props) {
     <div id="menu-overlay" className={props.visible ? "block" : null}>
       <nav>
         <div>
-          <a href="/">Home</a>
-          <a href="/">Blog</a>
-          <a href="/">Articles</a>
+          <Link to="/">Home</Link>
+          <a href="/blog">Blog</a>
+          <Link to="/articles">Articles</Link>
         </div>
         <div>
-          <a href="/">Characters</a>
-          <a href="/">Seasons</a>
-          <a href="/">Worlds</a>
-          <a href="/">Objects</a>
-          <a href="/">Music</a>
+          <Link to="/categories/Characters">Characters</Link>
+          <Link to="/categories/Seasons">Seasons</Link>
+          <Link to="/categories/Worlds">Worlds</Link>
+          <Link to="/categories/Objects">Objects</Link>
+          <Link to="/categories/Music">Music</Link>
         </div>
         <div>
-          <a href="/">Collaborator Discord</a>
-          <a href="/">Report an issue</a>
-          <a href="/">Beastslash collaborator policy</a>
+          <a href="https://discord.gg/gMeWeEUQeE" target="_blank" rel="noreferrer">Collaborator Discord</a>
+          <a href="/" target="_blank" rel="noreferrer">Report an issue</a>
+          <a href="https://beastslash.com/policy/collaborators" target="_blank" rel="noreferrer">Beastslash collaborator policy</a>
         </div>
       </nav>
       <div id="menu-overlay-bg"></div>
