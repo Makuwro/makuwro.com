@@ -4,6 +4,7 @@ import Header from "./comps/Header";
 import Login from "./comps/Login";
 import {Switch, Route, BrowserRouter as Router, useParams, Redirect, useLocation} from "react-router-dom";
 import { useState, React, useEffect } from "react";
+import PropTypes from "prop-types";
 
 function App() {
 
@@ -13,7 +14,7 @@ function App() {
   const [pageType, setPageType] = useState();
   const [internalName, setInternalName] = useState();
 
-  function PrepareArticle() {
+  function PreparePage(props) {
     
     // Make sure we're using underscores instead of spaces
     const {internalName} = useParams();
@@ -31,10 +32,14 @@ function App() {
     document.title = displayName + " - The Showrunners Wiki";
 
     // Set page type to article
-    setPageType(0);
+    setPageType(props.type);
     return null;
 
   }
+
+  PreparePage.propTypes = {
+    type: PropTypes.string
+  };
 
   function Callback() {
 
@@ -44,7 +49,7 @@ function App() {
 
       // We need to use async, so let's pass the code to the effect
       setCallbackCode(code);
-      setPageType(1);
+      setPageType("callback");
       return null;
 
     }
@@ -60,8 +65,8 @@ function App() {
 
       switch (pageType) {
 
-        // Article
-        case 0: {
+        case "category":
+        case "article": {
 
           // Get the cookie
           const value = `; ${document.cookie}`;
@@ -69,27 +74,43 @@ function App() {
           const token = parts.length === 2 && parts.pop().split(";")[0];
 
           // Check if we ran into any problems 
-          const articleResponse = await fetch("https://api.wiki.showrunners.net/api/contents/articles/" + internalName + ".md", {
+          const pageResponse = await fetch("https://api.wiki.showrunners.net/api/contents/" + (pageType === "article" ? "articles/" + internalName + ".md" : "categories.json"), {
             headers: {
               token: token
             }
           });
 
-          const articleJson = articleResponse.ok ? await articleResponse.json() : {};
+          const articleJson = pageResponse.ok ? await pageResponse.json() : {};
 
-          switch (articleResponse.status) {
+          switch (pageResponse.status) {
 
             case 401:
               setPage(<Redirect to="/login" />);
               return;
 
             case 404:
-            case 200:
+            case 200: {
+
+              const allCategories = pageType === "category" && JSON.parse(articleJson.content);
+              const category = allCategories && allCategories[articleName];
+              articleJson.content = allCategories ? (category ? `Below are articles in the "${articleName}" category:\n` : "") : articleJson.content;
+              if (category) {
+
+                for (const [articleName, inCategory] of Object.entries(category)) {
+
+                  articleJson.content = articleJson.content + (inCategory ? `* [[${articleName}]]\n` : "");
+
+                }
+
+              }
+
               setPage(<>
                 <Header />
                 <Article name={articleName} data={articleJson} />
               </>);
               break;
+              
+            }
 
             default:
               break;
@@ -99,8 +120,7 @@ function App() {
 
         }
 
-        // Callback
-        case 1: {
+        case "callback": {
 
           try {
 
@@ -163,7 +183,20 @@ function App() {
           <Callback />
         </Route>
         <Route exact path="/articles/:internalName">
-          <PrepareArticle />{page}
+          <PreparePage type="article" />{page}
+        </Route>
+        <Route exact path="/articles">
+          <Redirect to="/" />
+        </Route>
+        <Route exact path="/categories/:internalName">
+          <PreparePage type="category" />{page}
+        </Route>
+        <Route exact path="/categories">
+          <Redirect to="/" />
+        </Route>
+        <Route exact path="/">
+          <Header />
+          <Home />
         </Route>
       </Switch>
     </Router>
