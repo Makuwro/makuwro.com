@@ -4,6 +4,7 @@ import Header from "./comps/Header";
 import Login from "./comps/Login";
 import {Switch, Route, BrowserRouter as Router, useParams, Redirect, useLocation} from "react-router-dom";
 import { useState, React, useEffect } from "react";
+import LoadingScreen from "./comps/LoadingScreen";
 import PropTypes from "prop-types";
 
 function App() {
