@@ -2,9 +2,9 @@ import React from "react";
 import "../styles/article.css";
 import Outline from "./Outline.js";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
-const markupRegex = /(# (?<h1>.+))|(## (?<h2>.+))|(### (?<h3>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(\[\[(?<aBracket>.+?)\]\])|(?<b>\*\*[^*]+\*\*)|{{((?<template>\S+)}})|\n+?(?<div>[^#\n]+)/gm;
-const subMarkupRegex = /(\*\*(?<b>[^*]+)\*\*)|(\*(?<i>[^*]+)\*)/gm;
+const markupRegex = /\n*(?<li>\* (?<licontent>[^\n]+))|(# (?<h1>.+))|(## (?<h2>.+))|(### (?<h3>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(?<b>\*\*(?<bContent>[^*]+)\*\*)|(?<i>\*(?<iContent>[^*]+)\*)|{{((?<template>\S+)}})|\n+(?<div>[^#\n]+)|(?<link>\[\[(?<linkContent>[^\]]+)\]\])/gm;
 
 class Article extends React.Component {
   
@@ -24,31 +24,83 @@ class Article extends React.Component {
 
         // Get the match
         const match = matches[i];
-        const matchType = Object.keys(match.groups).filter(key => match.groups[key])[0];
+        let matchType = Object.keys(match.groups).filter(key => match.groups[key])[0];
         let matchText = match.groups[matchType];
-
+ 
         // Check if it's a new line
-        if (matchType === "div") {
+        switch (matchType) {
 
-          // Get the matches inside the new line
-          matchText = matchText.split(subMarkupRegex);
-          for (let x = 0; matchText.length > x; x++) {
+          case "li":
+          case "div":
 
-            if (matchText[x]) {
+            // Get the matches inside the new line
+            matchText = (match.groups.licontent !== undefined ? match.groups.licontent : matchText).split(markupRegex);
+            for (let x = 0; matchText.length > x; x++) {
 
-              const subMatch = [...matchText[x].matchAll(subMarkupRegex)][0];
-              if (subMatch) {
-                
-                const subMatchType = Object.keys(subMatch.groups).filter(key => subMatch.groups[key])[0];
-                matchText.splice(x, 1);
+              if (matchText[x]) {
 
-                matchText[x] = React.createElement(subMatchType, null, matchText[x]);
-                
+                const subMatch = [...matchText[x].matchAll(markupRegex)][0];
+                if (subMatch) {
+                  
+                  const subMatchType = Object.keys(subMatch.groups).filter(key => subMatch.groups[key])[0];
+                  const subMatchText = matchText[x];
+                  matchText.splice(x, 1);
+
+                  switch (subMatchType) {
+
+                    case "link":
+                      matchText[x] = <Link to={`/articles/${subMatch.groups.linkContent}`}>{subMatch.groups.linkContent.replaceAll("_", " ")}</Link>;
+                      break;
+
+                    case "div": {
+
+                      const childSubArray = subMatchText.split();
+
+                      for (let a = 0; childSubArray.length > a; a++) {
+
+                        const childSubMatchText = childSubArray[a];
+                        const childSubMatch = [...childSubMatchText.matchAll(markupRegex)][0];
+                        if (childSubMatch) {
+
+                          const childSubMatchType = Object.keys(childSubMatch.groups).filter(key => childSubMatch.groups[key])[0];
+                          childSubArray.splice(a, 1);
+
+                          switch (childSubMatchType) {
+
+                            case "link":
+                              childSubArray[a] = <Link to={`/articles/${childSubMatchText}`}>{childSubMatchText}</Link>;
+                              break;
+
+                            default:
+                              childSubArray[a] = React.createElement(childSubMatchType, {}, childSubMatchText);
+                              break;
+
+                          }
+
+                        }
+
+                      }
+
+                      matchText[x] = <>{childSubArray}</>;
+                      break;
+
+                    }
+
+                    default:
+                      matchText[x] = React.createElement(subMatchType, null, {b: 1, i: 1}[subMatchType] ? subMatch.groups[subMatchType + "Content"] : subMatchText);
+                      break;
+
+                  }
+                  
+                }
+
               }
 
             }
+            break;
 
-          }
+          default:
+            break;
 
         }
 
