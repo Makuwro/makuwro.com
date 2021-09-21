@@ -5,6 +5,7 @@ import Login from "./comps/Login";
 import {Switch, Route, BrowserRouter as Router, useParams, Redirect, useLocation} from "react-router-dom";
 import { useState, React, useEffect } from "react";
 import LoadingScreen from "./comps/LoadingScreen";
+import Home from "./comps/Home";
 import PropTypes from "prop-types";
 
 function App() {
@@ -75,6 +76,7 @@ function App() {
           const token = parts.length === 2 && parts.pop().split(";")[0];
 
           // Check if we ran into any problems 
+          setPage(<><Header /><LoadingScreen /></>);
           const pageResponse = await fetch("https://api.wiki.showrunners.net/api/contents/" + (pageType === "article" ? "articles/" + internalName + ".md" : "categories.json"), {
             headers: {
               token: token
