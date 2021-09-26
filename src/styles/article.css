@@ -1,8 +1,14 @@
-article {
-  background-color: rgb(213, 220, 237);
-  padding: 1.2rem 1.8rem;       
+article {       
   position: relative;
-  margin: 0 auto;
+}
+
+#article-header {
+  background-color: var(--showtime-yellow);
+  padding: 3rem 3rem;
+}
+
+#article-content {
+  padding: 2rem 3rem;
 }
 
 #controls {
@@ -56,15 +62,13 @@ div {
 
 /* Tablet */
 @media only screen and (min-width: 768px) {
-  #article-container {
-    padding-bottom: 3.5rem;
-    top: 7.5rem;
-  }
 
-  article {
-    border-radius: 5px;
-    width: 50%;
-    position: relative;
+  #article-header {
+    padding: 3rem 10rem;
+  }
+  
+  #article-content {
+    padding: 2rem 10rem;
   }
 
   #last-edited {
@@ -74,13 +78,5 @@ div {
 
 /* Laptop */
 @media only screen and (min-width: 1024px) {
-  #article-container {
-    display: flex;
-    justify-content: center;
-  }
 
-  article {
-    margin: 0;
-    border-top-right-radius: 0;
-  }
 }
