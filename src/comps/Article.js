@@ -114,7 +114,7 @@ class Article extends React.Component {
           }
 
           default:
-            console.warn("Unknown match type: " + matchType)
+            console.warn("Unknown match type: " + matchType);
             break;
 
         }
