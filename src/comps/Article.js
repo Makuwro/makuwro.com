@@ -4,7 +4,9 @@ import Outline from "./Outline.js";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
-const markupRegex = /\n*(?<li>\* (?<licontent>[^\n]+))|(# (?<h1>.+))|(## (?<h2>.+))|(### (?<h3>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(?<b>\*\*(?<bContent>[^*]+)\*\*)|(?<i>\*(?<iContent>[^*]+)\*)|{{((?<template>\S+)}})|\n+(?<div>[^#\n]+)|(?<link>\[\[(?<linkContent>[^\]]+)\]\])/gm;
+const markupRegex = /(?<li>\* (?<licontent>[^\n]+)(?<liEnd>))|(?<h1># (?<h1Content>.+))|(?<h2>## (?<h2Content>.+))|(?<h3>### (?<h3Content>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(?<b>\*\*(?<bContent>.+?)\*\*)|(?<i>\*(?<iContent>.+?)\*)|{{((?<template>\S+)}})|(?<link>\[(?<linkText>.*?)\]\((?<linkURL>[^[\]]*)\))|(?<del>~~(?<delText>.+)~~)|(?<newLine>\n)/gm;
+
+const headerDictionary = {"h1": 1, "h2": 1, "h3": 1, "h4": 1, "h5": 1, "h6": 1};
 
 class Article extends React.Component {
   
@@ -14,102 +16,131 @@ class Article extends React.Component {
 
     let contributors, formattedContent;
     let content = props.data.content;
+
     let headers = [];
     if (content) {
 
       // Make the content look pretty
       const matches = [...content.matchAll(markupRegex)];
       const componentsToFormat = [];
+      let currentDiv = [];
+      let currentPosition = 0;
       for (let i = 0; matches.length > i; i++) {
 
         // Get the match
         const match = matches[i];
         let matchType = Object.keys(match.groups).filter(key => match.groups[key])[0];
         let matchText = match.groups[matchType];
- 
+
+        // Add previous text
+        const stringToAdd = content.substring(currentPosition, match.index);
+        if (stringToAdd) currentDiv.push(React.Fragment, null, stringToAdd);
+        currentPosition += stringToAdd.length;
+
         // Check if it's a new line
         switch (matchType) {
 
-          case "li":
-          case "div":
-
-            // Get the matches inside the new line
-            matchText = (match.groups.licontent !== undefined ? match.groups.licontent : matchText).split(markupRegex);
-            for (let x = 0; matchText.length > x; x++) {
-
-              if (matchText[x]) {
-
-                const subMatch = [...matchText[x].matchAll(markupRegex)][0];
-                if (subMatch) {
-                  
-                  const subMatchType = Object.keys(subMatch.groups).filter(key => subMatch.groups[key])[0];
-                  const subMatchText = matchText[x];
-                  matchText.splice(x, 1);
-
-                  switch (subMatchType) {
-
-                    case "link":
-                      matchText[x] = <Link to={`/articles/${subMatch.groups.linkContent}`}>{subMatch.groups.linkContent.replaceAll("_", " ")}</Link>;
-                      break;
-
-                    case "div": {
-
-                      const childSubArray = subMatchText.split();
-
-                      for (let a = 0; childSubArray.length > a; a++) {
-
-                        const childSubMatchText = childSubArray[a];
-                        const childSubMatch = [...childSubMatchText.matchAll(markupRegex)][0];
-                        if (childSubMatch) {
-
-                          const childSubMatchType = Object.keys(childSubMatch.groups).filter(key => childSubMatch.groups[key])[0];
-                          childSubArray.splice(a, 1);
-
-                          switch (childSubMatchType) {
-
-                            case "link":
-                              childSubArray[a] = <Link to={`/articles/${childSubMatchText}`}>{childSubMatchText}</Link>;
-                              break;
-
-                            default:
-                              childSubArray[a] = React.createElement(childSubMatchType, {}, childSubMatchText);
-                              break;
-
-                          }
-
-                        }
-
-                      }
-
-                      matchText[x] = <>{childSubArray}</>;
-                      break;
-
-                    }
-
-                    default:
-                      matchText[x] = React.createElement(subMatchType, null, {b: 1, i: 1}[subMatchType] ? subMatch.groups[subMatchType + "Content"] : subMatchText);
-                      break;
-
-                  }
-                  
-                }
-
-              }
-
-            }
+          case "i":
+          case "b":
+            matchText = matchType === "i" ? match.groups.iContent : match.groups.bContent;
             break;
 
+          case "h1":
+          case "h2":
+          case "h3":
+            matchText = match.groups[matchType + "Content"];
+            break;
+
+          case "link": 
+
+            matchText = match.groups.linkText;
+            break;
+
+          case "del": {
+
+            matchText = match.groups.delText;
+            break;
+
+          }
+
+          case "newLine": {
+
+            const stringToAdd = content.substring(currentPosition, match.index);
+            if (stringToAdd) currentDiv.push(React.Fragment, null, stringToAdd);
+            currentPosition += stringToAdd.length;
+
+            // Wrap it in a div
+            componentsToFormat.push(<div>{currentDiv}</div>);
+            currentDiv = [];
+
+            break;
+
+          }
+
+          case "li": {
+
+            // Get the matches inside the new line
+            const subMatchText = match.groups.licontent || matchText;
+            const subMatchArray = [...subMatchText.matchAll(markupRegex)];
+            const listChildren = [];
+            let subMatchIndex = 0;
+            for (let x = 0; subMatchArray.length > x; x++) {
+
+              const subMatch = subMatchArray[x];
+              const subMatchType = Object.keys(subMatch.groups).filter(key => subMatch.groups[key])[0];
+
+              listChildren.push(React.Fragment, null, subMatchText.substring(subMatchIndex, subMatch.index));
+              switch (subMatchType) {
+
+                case "link":
+                  subMatchIndex = subMatch.index;
+                  listChildren.push(React.createElement(Link, {to: "/articles/" + subMatch.groups.linkURL}, subMatch.groups.linkText.replace("_", " ")));
+                  break;
+
+                default:
+                  break;
+
+              }
+              subMatchIndex += subMatch.groups.link.length;
+
+            }
+
+            // Add the rest of the line
+            listChildren.push(subMatchText.substring(subMatchIndex, subMatchText.length));
+
+            matchText = listChildren;
+            break;
+
+          }
+
           default:
+            console.warn("Unknown match type: " + matchType)
             break;
 
         }
+        
+        // Keep track of the index
+        currentPosition += (match.groups[matchType] || match.groups[matchType.toLowerCase()]).length;
 
-        // Create the element and add it to the header list, if necessary
-        const Element = React.createElement(matchType, {key: i, id: {"h1": 1, "h2": 1, "h3": 1, "h4": 1, "h5": 1, "h6": 1}[matchType] && matchText.replaceAll(" ", "_")}, matchText);
-        if (Element.props.id) headers.push(Element);
+        if (matchType !== "newLine") {
 
-        // Add the component to the list
-        componentsToFormat.push(Element);
+          matchType = matchType === "link" ? Link : matchType;
+
+          // Create the element and add it to the header list, if necessary
+          const isHeader = headerDictionary[matchType];
+          const Element = React.createElement(matchType, {key: i, id: isHeader && matchText.replaceAll(" ", "_"), to: matchType === Link && (`/articles/${match.groups.linkURL}`)}, matchText);
+          if (Element.props.id) headers.push(Element);
+          currentDiv.push(Element);
+
+          // Check if it's a header
+          if (isHeader) {
+
+            componentsToFormat.push(currentDiv);
+            currentDiv = [];
+            
+          }
+
+        }
 
       }
 
@@ -151,14 +182,16 @@ class Article extends React.Component {
             </div>
           </section>
 
+          {/* 
+            <Outline headers={this.state.headers} /> 
+          */}
+
           <section id="article-content">{this.state.content || <>This article doesn't exist... <i>but it always will in our hearts ♥</i></>}</section>
 
           {this.state.content && (<section id="article-footer">
             <div id="last-edited">Last edited on January 1, 2021</div>
           </section>)}
         </article>
-
-        <Outline headers={this.state.headers} />
       </main>
     );
 

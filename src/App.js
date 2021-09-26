@@ -101,7 +101,7 @@ function App() {
 
                 for (const [articleName, inCategory] of Object.entries(category)) {
 
-                  articleJson.content = articleJson.content + (inCategory ? `* [[${articleName}]]\n` : "");
+                  articleJson.content = articleJson.content + (inCategory ? `* [${articleName}](${articleName})\n` : "");
 
                 }
 
