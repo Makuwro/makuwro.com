@@ -1,5 +1,5 @@
 :root {
-  --background-blue: rgb(165, 184, 240);
+  --showtime-yellow: rgb(246, 226, 109);
 }
 
 * {
@@ -9,7 +9,7 @@
 body {
   margin: 0;
   line-height: 1.5;
-  background-color: var(--background-blue);
+  background-color: white;
 }
 
 a {
