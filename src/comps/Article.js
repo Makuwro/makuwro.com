@@ -33,7 +33,7 @@ class Article extends React.Component {
         let matchText = match.groups[matchType];
 
         // Add previous text
-        const stringToAdd = content.substring(currentPosition, match.index);
+        let stringToAdd = content.substring(currentPosition, match.index);
         if (stringToAdd) currentDiv.push(React.Fragment, null, stringToAdd);
         currentPosition += stringToAdd.length;
 
@@ -70,7 +70,7 @@ class Article extends React.Component {
             currentPosition += stringToAdd.length;
 
             // Wrap it in a div
-            componentsToFormat.push(<div>{currentDiv}</div>);
+            if (currentDiv.length > 0) componentsToFormat.push(<div>{currentDiv}</div>);
             currentDiv = [];
 
             break;
@@ -89,7 +89,9 @@ class Article extends React.Component {
               const subMatch = subMatchArray[x];
               const subMatchType = Object.keys(subMatch.groups).filter(key => subMatch.groups[key])[0];
 
-              listChildren.push(React.Fragment, null, subMatchText.substring(subMatchIndex, subMatch.index));
+              stringToAdd = subMatchText.substring(subMatchIndex, subMatch.index);
+              if (stringToAdd.length > 0) listChildren.push(<>{stringToAdd}</>);
+              console.log(subMatchText.substring(subMatchIndex, subMatch.index));
               switch (subMatchType) {
 
                 case "link":
@@ -101,12 +103,13 @@ class Article extends React.Component {
                   break;
 
               }
+
               subMatchIndex += subMatch.groups.link.length;
 
             }
 
             // Add the rest of the line
-            listChildren.push(subMatchText.substring(subMatchIndex, subMatchText.length));
+            listChildren.push(<>{subMatchText.substring(subMatchIndex, subMatchText.length)}</>);
 
             matchText = listChildren;
             break;
@@ -128,12 +131,12 @@ class Article extends React.Component {
 
           // Create the element and add it to the header list, if necessary
           const isHeader = headerDictionary[matchType];
-          const Element = React.createElement(matchType, {key: i, id: isHeader && matchText.replaceAll(" ", "_"), to: matchType === Link && (`/articles/${match.groups.linkURL}`)}, matchText);
+          const Element = React.createElement(matchType, {key: i, id: isHeader && matchText.replaceAll(" ", "_"), to: matchType === Link ? (`/articles/${match.groups.linkURL}`) : undefined}, matchText);
           if (Element.props.id) headers.push(Element);
           currentDiv.push(Element);
 
           // Check if it's a header
-          if (isHeader) {
+          if (isHeader || matchType === "li") {
 
             componentsToFormat.push(currentDiv);
             currentDiv = [];
