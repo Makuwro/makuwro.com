@@ -107,8 +107,14 @@ function App() {
 
               }
 
+              const userResponse = await fetch("https://api.github.com/user", {
+                headers: {
+                  Authorization: "Bearer " + token
+                }
+              });
+
               setPage(<>
-                <Header />
+                <Header token={token} userInfo={userResponse.ok && await userResponse.json()} />
                 <Article name={articleName} data={articleJson} />
               </>);
               break;

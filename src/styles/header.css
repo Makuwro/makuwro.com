@@ -3,11 +3,11 @@ header {
   justify-content: space-between;
   align-items: center;
   height: 3.5rem;
-  background-color: rgb(240, 241, 245);
-  border-bottom: 1px solid rgb(197, 200, 202);
+  background-color: var(--showtime-yellow);
   padding: 0 1.2rem;
   position: fixed;
   width: calc(100% - 2.4rem);
+  z-index: 2;
 }
 
 #wiki-name {
@@ -20,11 +20,12 @@ header {
 #search-box {
   width: 50%;
   display: none;
+  position: relative;
 }
 
 #search-box > input {
   border: none;
-  background-color: var(--showtime-yellow);
+  background-color: white;
   height: 2rem;
   width: 100%;
   font-size: 0.875rem;
@@ -33,6 +34,27 @@ header {
 
 #search-box > input::placeholder {
   color: rgb(156, 163, 59);
+}
+
+#search-box > ul {
+  position: absolute;
+  width: calc(100% + 1.5rem);
+  padding: 0;
+  list-style-type: none;
+  margin: 0;
+}
+
+#search-results > li {
+  margin-top: 5px;
+  background-color: #fff6c0;
+  border-radius: 2px;
+}
+
+#search-results > li > a {
+  display: block;
+  color: inherit;
+  border: none;
+  padding: 0.35rem 0.75rem;
 }
 
 header > section {
