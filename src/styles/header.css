@@ -7,7 +7,7 @@ header {
   padding: 0 1.2rem;
   position: fixed;
   width: calc(100% - 2.4rem);
-  z-index: 2;
+  z-index: 4;
 }
 
 #wiki-name {
