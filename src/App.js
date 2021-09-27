@@ -88,7 +88,7 @@ function App() {
           switch (pageResponse.status) {
 
             case 401:
-              setPage(<Redirect to="/login" />);
+              setPage(<Redirect to={`/login?redirect=/articles/${internalName}`} />);
               return;
 
             case 404:

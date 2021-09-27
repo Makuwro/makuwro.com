@@ -22,7 +22,9 @@ function Login() {
         const parts = value.split("; access_token=");
         if (parts.length === 2 && parts.pop().split(";")[0]) {
 
-          history.push("/");
+          const urlSearchParams = new URLSearchParams(window.location.search);
+          const redirect = urlSearchParams.get("redirect");
+          history.push(redirect || "/");
 
         }
 
