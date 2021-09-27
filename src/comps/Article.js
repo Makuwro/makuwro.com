@@ -23,6 +23,7 @@ class Article extends React.Component {
       // Make the content look pretty
       const matches = [...content.matchAll(markupRegex)];
       const componentsToFormat = [];
+      if (matches.length === 0) componentsToFormat.push(<div>{content}</div>)
       let currentDiv = [];
       let currentPosition = 0;
       for (let i = 0; matches.length > i; i++) {
@@ -69,9 +70,14 @@ class Article extends React.Component {
             if (stringToAdd) currentDiv.push(React.Fragment, null, stringToAdd);
             currentPosition += stringToAdd.length;
 
-            // Wrap it in a div
-            if (currentDiv.length > 0) componentsToFormat.push(<div>{currentDiv}</div>);
-            currentDiv = [];
+            if (!currentDiv.find(element => element && element.type === "li")) {
+
+              // Wrap it in a container
+              const nextMatches = [matches[i + 1], matches[i + 2]];
+              if (currentDiv.length > 0) componentsToFormat.push(React.createElement(currentDiv.find(element => element && element.type === "li") ? "ul" : "p", null, currentDiv));
+              currentDiv = [];
+
+            }
 
             break;
 
@@ -113,7 +119,8 @@ class Article extends React.Component {
             }
 
             // Add the rest of the line
-            listChildren.push(<>{subMatchText.substring(subMatchIndex, subMatchText.length)}</>);
+            const excessString = subMatchText.substring(subMatchIndex, subMatchText.length);
+            if (excessString) listChildren.push(<>{excessString}</>);
 
             matchText = listChildren;
             break;
@@ -139,10 +146,9 @@ class Article extends React.Component {
           if (Element.props.id) headers.push(Element);
           currentDiv.push(Element);
 
-          // Check if it's a header
-          if (isHeader || matchType === "li") {
+          if (isHeader) {
 
-            componentsToFormat.push(currentDiv);
+            componentsToFormat.push(React.createElement(isHeader ? React.Fragment : "ul", null, currentDiv));
             currentDiv = [];
             
           }
