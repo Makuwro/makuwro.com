@@ -94,10 +94,14 @@ class Article extends React.Component {
               console.log(subMatchText.substring(subMatchIndex, subMatch.index));
               switch (subMatchType) {
 
-                case "link":
+                case "link": {
+
                   subMatchIndex = subMatch.index;
-                  listChildren.push(React.createElement(Link, {to: "/articles/" + subMatch.groups.linkURL}, subMatch.groups.linkText.replace("_", " ")));
+                  const url = subMatch.groups.linkURL;
+                  listChildren.push(React.createElement(url.match(/^(http|www.)/g) ? "a" : Link, {to: `/articles/${url}`, href: url}, subMatch.groups.linkText.replace("_", " ")));
                   break;
+
+                }
 
                 default:
                   break;
