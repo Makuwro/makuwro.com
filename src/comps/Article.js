@@ -16,7 +16,7 @@ class Article extends React.Component {
 
     let contributors, formattedContent;
     let content = props.data.content;
-
+ 
     let headers = [];
     if (content) {
 
@@ -70,14 +70,10 @@ class Article extends React.Component {
             if (stringToAdd) currentDiv.push(React.Fragment, null, stringToAdd);
             currentPosition += stringToAdd.length;
 
-            if (!currentDiv.find(element => element && element.type === "li")) {
-
-              // Wrap it in a container
-              const nextMatches = [matches[i + 1], matches[i + 2]];
-              if (currentDiv.length > 0) componentsToFormat.push(React.createElement(currentDiv.find(element => element && element.type === "li") ? "ul" : "p", null, currentDiv));
-              currentDiv = [];
-
-            }
+            // Wrap it in a container
+            // TODO: ul should include previous li elements
+            if (currentDiv.length > 0) componentsToFormat.push(React.createElement(currentDiv.find(element => element && element.type === "li") ? "ul" : "p", null, currentDiv));
+            currentDiv = [];
 
             break;
 
@@ -180,10 +176,16 @@ class Article extends React.Component {
 
   }
 
+  CloseSearchResults() {
+
+    document.getElementById("search-results").classList.remove("block");
+
+  }
+
   render() {
 
     return (
-      <main id="article-container">
+      <main id="article-container" onClick={this.CloseSearchResults}>
         <article>
           <section id="article-header">
             <div id="controls">
