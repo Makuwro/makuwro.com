@@ -17,6 +17,12 @@ function Header(props) {
 
   }
   
+  function CloseSearchResults() {
+    
+    document.getElementById("search-results").classList.remove("block");
+
+  }
+
   async function userSearching() {
 
     const inputBox = document.getElementById("search-box").firstChild;
@@ -45,13 +51,20 @@ function Header(props) {
 
           const rawName = nearMatches[i].path.replaceAll(".md", "");
           elements.push(
-            <li key={i}><Link to={`/articles/${rawName}`}>{rawName.replaceAll("_", " ")}</Link></li>
+            <li key={i}><Link onClick={CloseSearchResults} to={`/articles/${rawName}`}>{rawName.replaceAll("_", " ")}</Link></li>
           );
 
         }
 
         // Finally, show the matches
         setSearchResults(elements);
+
+        // Show the results
+        document.getElementById("search-results").classList.add("block");
+
+      } else {
+
+        setSearchResults();
 
       }
 
