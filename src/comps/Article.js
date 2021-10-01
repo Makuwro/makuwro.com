@@ -23,7 +23,7 @@ class Article extends React.Component {
       // Make the content look pretty
       const matches = [...content.matchAll(markupRegex)];
       const componentsToFormat = [];
-      if (matches.length === 0) componentsToFormat.push(<div>{content}</div>)
+      if (matches.length === 0) componentsToFormat.push(<div>{content}</div>);
       let currentDiv = [];
       let currentPosition = 0;
       for (let i = 0; matches.length > i; i++) {
@@ -110,12 +110,13 @@ class Article extends React.Component {
 
               }
 
-              subMatchIndex += subMatch.groups.link.length;
+              subMatchIndex += subMatch.groups[subMatchType].length;
 
             }
 
             // Add the rest of the line
             const excessString = subMatchText.substring(subMatchIndex, subMatchText.length);
+            console.log(excessString)
             if (excessString) listChildren.push(<>{excessString}</>);
 
             matchText = listChildren;
@@ -142,7 +143,7 @@ class Article extends React.Component {
           if (Element.props.id) headers.push(Element);
           currentDiv.push(Element);
 
-          if (isHeader) {
+          if (isHeader || matchType === "li") {
 
             componentsToFormat.push(React.createElement(isHeader ? React.Fragment : "ul", null, currentDiv));
             currentDiv = [];
@@ -152,6 +153,9 @@ class Article extends React.Component {
         }
 
       }
+
+      // Add the rest of the string, if needed
+      componentsToFormat.push(<div>{content.substring(currentPosition, content.length)}</div>);
 
       // Format the components
       formattedContent = componentsToFormat.map(component => component);
