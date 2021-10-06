@@ -8,12 +8,17 @@ header {
   position: fixed;
   width: calc(100% - 2.4rem);
   z-index: 4;
+  color: var(--commercial-gray);
+}
+
+.dark-header {
+  background-color: var(--commercial-gray);
+  color: var(--showtime-yellow);
 }
 
 #wiki-name {
   margin: 0;
   font-size: 1.15rem;
-  color: rgb(68, 69, 73);
   margin-left: 0.75rem;
 }
 

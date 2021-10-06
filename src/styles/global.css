@@ -1,5 +1,6 @@
 :root {
   --showtime-yellow: rgb(246, 226, 109);
+  --commercial-gray: rgb(68, 69, 73);
 }
 
 * {
@@ -14,12 +15,14 @@ body {
 
 a {
   text-decoration: none;
-  border-bottom: 1px solid;
-  color: #0000f1;
+  border-bottom: 2px solid;
+  color: #5c5cf5;
 }
 
 a:hover {
   border-bottom: none;
+  font-weight: bold;
+  border-bottom: 3px solid;
 }
 
 main {

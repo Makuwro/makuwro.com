@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../styles/header.css";
 import MenuOverlay from "./MenuOverlay";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
 let cachedUserInfo;
 let cachedResults;
@@ -68,8 +69,6 @@ function Header(props) {
 
       }
 
-    } else {
-
     }
 
   }
@@ -106,5 +105,10 @@ function Header(props) {
   );
 
 }
+
+Header.propTypes = {
+  userInfo: PropTypes.object,
+  token: PropTypes.string
+};
 
 export default Header;

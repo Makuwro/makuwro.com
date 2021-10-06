@@ -11,6 +11,20 @@ article {
   padding: 2rem 3rem;
 }
 
+.dark-article > #article-header {
+  background-color: var(--commercial-gray);
+  color: var(--showtime-yellow);
+}
+
+.dark-article > #article-content {
+  background-color: #2e2e2e;
+  color: white;
+}
+
+.dark-article > #article-content a {
+  color: #b6b6f1;
+}
+
 #controls {
   float: right;
 }
@@ -40,9 +54,9 @@ h1 {
   font-size: 1.75rem;
 }
 
-div {
+p {
   margin-bottom: 1rem;
-  font-size: .875rem;
+  font-size: 1rem;
 }
 
 #root {

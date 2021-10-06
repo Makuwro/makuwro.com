@@ -1,6 +1,5 @@
 import React from "react";
 import "../styles/article.css";
-import Outline from "./Outline.js";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
@@ -14,9 +13,9 @@ class Article extends React.Component {
 
     super(props);
 
-    let contributors, formattedContent;
+    let contributors = [], formattedContent;
     let content = props.data.content;
- 
+
     let headers = [];
     if (content) {
 
@@ -116,7 +115,6 @@ class Article extends React.Component {
 
             // Add the rest of the line
             const excessString = subMatchText.substring(subMatchIndex, subMatchText.length);
-            console.log(excessString)
             if (excessString) listChildren.push(<>{excessString}</>);
 
             matchText = listChildren;
@@ -160,15 +158,15 @@ class Article extends React.Component {
       // Format the components
       formattedContent = componentsToFormat.map(component => component);
       
-      // Prepare contributors
-      contributors = props.data.contributors && props.data.contributors.map((contributorName, index, contributorArray) => {
+      // Put the contributors in a list
+      contributors = props.data.commits ? [] : "The Showrunners Team";
+      const commits = props.data.commits;
+      for (let i = 0; commits.length > i; i++) {
 
-        return (<>
-          <a href={"/collaborators/" + contributorName}>{contributorName}</a>
-          <span>{(index + 1 === contributorArray.length ? "" : (index + 2 === contributorArray.length ? (contributorArray.length === 2 ? "" : ",") + " and " : ""))}</span>
-        </>);
+        const contributorName = commits[i].author.login;
+        if (!contributors.find(existingName => existingName === contributorName)) contributors.push(contributorName);
 
-      }) || "The Showrunners Team";
+      }
 
     }
 

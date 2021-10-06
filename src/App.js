@@ -8,6 +8,9 @@ import LoadingScreen from "./comps/LoadingScreen";
 import Home from "./comps/Home";
 import PropTypes from "prop-types";
 
+const PageContentCache = {};
+let UserCache;
+
 function App() {
 
   const [articleName, setArticleName] = useState();
@@ -77,13 +80,14 @@ function App() {
 
           // Check if we ran into any problems 
           setPage(<><Header /><LoadingScreen /></>);
-          const pageResponse = await fetch("https://api.wiki.showrunners.net/api/contents/" + (pageType === "article" ? "articles/" + internalName + ".md" : "categories.json"), {
+          const cachedJson = PageContentCache[pageType + internalName];
+          const pageResponse = cachedJson ? {status: 200} : await fetch("https://api.wiki.showrunners.net/api/contents/" + (pageType === "article" ? "articles/" + internalName + ".md" : "categories.json"), {
             headers: {
               token: token
             }
           });
 
-          const articleJson = pageResponse.ok ? await pageResponse.json() : {};
+          const articleJson = cachedJson || (pageResponse.ok ? await pageResponse.json() : {});
 
           switch (pageResponse.status) {
 
@@ -93,7 +97,11 @@ function App() {
 
             case 404:
             case 200: {
+            
+              // Save the content to lower the chance we get rate-limited
+              PageContentCache[pageType + internalName] = articleJson;
 
+              // Prepare category page, if necessary
               const allCategories = pageType === "category" && JSON.parse(articleJson.content);
               const category = allCategories && allCategories[articleName];
               articleJson.content = allCategories ? (category ? `Below are articles in the "${articleName}" category:\n` : "") : articleJson.content;
@@ -107,6 +115,7 @@ function App() {
 
               }
 
+              // Get current user info
               const userResponse = await fetch("https://api.github.com/user", {
                 headers: {
                   Authorization: "Bearer " + token
