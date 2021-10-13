@@ -3,7 +3,7 @@ article {
 }
 
 #article-header {
-  background-color: var(--showtime-yellow);
+  background-color: var(--showtime-orange);
   padding: 3rem 3rem;
 }
 
@@ -13,7 +13,7 @@ article {
 
 .dark-article > #article-header {
   background-color: var(--commercial-gray);
-  color: var(--showtime-yellow);
+  color: var(--showtime-orange);
 }
 
 .dark-article > #article-content {
