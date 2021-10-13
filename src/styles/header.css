@@ -35,10 +35,16 @@ header {
   width: 100%;
   font-size: 0.875rem;
   padding: 0 0.75rem;
+  caret-color: white;
+  color: white;
+}
+
+#search-box > input:focus-visible {
+  outline: none;
 }
 
 #search-box > input::placeholder {
-  color: rgb(156, 163, 59);
+  color: white;
 }
 
 #search-results {

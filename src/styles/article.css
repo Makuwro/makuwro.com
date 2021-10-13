@@ -5,6 +5,7 @@ article {
 #article-header {
   background-color: var(--showtime-orange);
   padding: 3rem 3rem;
+  color: white;
 }
 
 #article-content {
@@ -13,7 +14,6 @@ article {
 
 .dark-article > #article-header {
   background-color: var(--commercial-gray);
-  color: white;
 }
 
 .dark-article > #article-content {
@@ -43,6 +43,7 @@ article {
   font-size: 2rem;
   margin: 0;
   font-weight: bold;
+  color: white;
 }
 
 h1, h2, h3, h4, h5, h6 {
