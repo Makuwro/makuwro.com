@@ -13,7 +13,7 @@ article {
 
 .dark-article > #article-header {
   background-color: var(--commercial-gray);
-  color: var(--showtime-orange);
+  color: white;
 }
 
 .dark-article > #article-content {

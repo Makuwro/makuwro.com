@@ -8,7 +8,7 @@ header {
   position: fixed;
   width: calc(100% - 2.4rem);
   z-index: 4;
-  color: var(--commercial-gray);
+  color: white;
 }
 
 .dark-header {
@@ -29,8 +29,8 @@ header {
 }
 
 #search-box > input {
-  border: none;
-  background-color: white;
+  border: 1px solid white;
+  background-color: var(--showtime-orange);
   height: 2rem;
   width: 100%;
   font-size: 0.875rem;
@@ -47,17 +47,17 @@ header {
   padding: 0;
   list-style-type: none;
   margin: 0;
-  border-bottom: 5px solid #f6e26d;
-  border-left: 5px solid #f6e26d;
-  border-right: 5px solid #f6e26d;
-  background-color: #f6e26d;
+  border-bottom: 5px solid var(--showtime-orange);
+  border-left: 5px solid var(--showtime-orange);
+  border-right: 5px solid var(--showtime-orange);
+  background-color: var(--showtime-orange);
   margin: 0 -5px;
   display: none;
 }
 
 #search-results > li {
   margin-top: 5px;
-  background-color: #fff6c0;
+  background-color: var(--showtime-orange);
   border-radius: 2px;
 }
 
