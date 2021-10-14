@@ -97,7 +97,6 @@ class Article extends React.Component {
 
             stringToAdd = subMatchText.substring(subMatchIndex, subMatch.index);
             if (stringToAdd.length > 0) listChildren.push(<>{stringToAdd}</>);
-            console.log(subMatchText.substring(subMatchIndex, subMatch.index));
             switch (subMatchType) {
 
               case "link": {
