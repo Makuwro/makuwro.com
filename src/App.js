@@ -4,12 +4,12 @@ import Header from "./comps/Header";
 import Login from "./comps/Login";
 import {Switch, Route, BrowserRouter as Router, useParams, Redirect, useLocation} from "react-router-dom";
 import { useState, React, useEffect } from "react";
-import LoadingScreen from "./comps/LoadingScreen";
 import Home from "./comps/Home";
 import PropTypes from "prop-types";
 
-const PageContentCache = {};
-let UserCache;
+const wikiServer = process.env.REACT_APP_WIKI_SERVER;
+const pageContentCache = {};
+let userCache;
 
 function App() {
 
@@ -78,15 +78,13 @@ function App() {
           const parts = value.split("; access_token=");
           const token = parts.length === 2 && parts.pop().split(";")[0];
 
-          // Check if we ran into any problems 
-          setPage(<><Header /><LoadingScreen /></>);
-          const cachedJson = PageContentCache[pageType + internalName];
-          const pageResponse = cachedJson ? {status: 200} : await fetch("https://api.wiki.showrunners.net/api/contents/" + (pageType === "article" ? "articles/" + internalName + ".md" : "categories.json"), {
+          // Check if we ran into any problems
+          const cachedJson = pageContentCache[pageType + internalName];
+          const pageResponse = cachedJson ? {status: 200} : await fetch(wikiServer + "/api/contents/" + (pageType === "article" ? "articles/" + internalName + ".md" : "categories.json"), {
             headers: {
               token: token
             }
           });
-
           const articleJson = cachedJson || (pageResponse.ok ? await pageResponse.json() : {});
 
           switch (pageResponse.status) {
@@ -99,7 +97,7 @@ function App() {
             case 200: {
             
               // Save the content to lower the chance we get rate-limited
-              PageContentCache[pageType + internalName] = articleJson;
+              pageContentCache[pageType + internalName] = articleJson;
 
               // Prepare category page, if necessary
               const allCategories = pageType === "category" && JSON.parse(articleJson.content);
@@ -116,14 +114,15 @@ function App() {
               }
 
               // Get current user info
-              const userResponse = await fetch("https://api.github.com/user", {
+              const userResponse = !userCache && await fetch("https://api.github.com/user", {
                 headers: {
                   Authorization: "Bearer " + token
                 }
               });
+              userCache = userCache || (userResponse.ok && await userResponse.json());
 
               setPage(<>
-                <Header token={token} userInfo={userResponse.ok && await userResponse.json()} />
+                <Header token={token} userInfo={userCache} />
                 <Article name={articleName} data={articleJson} />
               </>);
               break;
@@ -143,7 +142,7 @@ function App() {
           try {
 
             // Send the code to the server and get a token
-            const tokenResponse = await fetch("https://api.wiki.showrunners.net/api/callback?code=" + callbackCode, {
+            const tokenResponse = await fetch(wikiServer + "/api/callback?code=" + callbackCode, {
               method: "PUT"
             });
             const jsonResponse = await tokenResponse.json();
