@@ -18,13 +18,14 @@ function Header(props) {
 
   }
   
-  function CloseSearchResults() {
+  function CloseSearchResults(articleName) {
     
     document.getElementById("search-results").classList.remove("block");
+    if (articleName) document.getElementById("search-box").firstChild.value = articleName;
 
   }
 
-  async function userSearching() {
+  async function UserSearching() {
 
     const inputBox = document.getElementById("search-box").firstChild;
     
@@ -51,8 +52,9 @@ function Header(props) {
         for (let i = 0; (nearMatches.length > 5 ? 5 : nearMatches.length) > i; i++) {
 
           const rawName = nearMatches[i].path.replaceAll(".md", "");
+          const shownName = rawName.replaceAll("_", " ");
           elements.push(
-            <li key={i}><Link onClick={CloseSearchResults} to={`/articles/${rawName}`}>{rawName.replaceAll("_", " ")}</Link></li>
+            <li key={i}><Link onClick={() => CloseSearchResults(shownName)} to={`/articles/${rawName}`}>{shownName}</Link></li>
           );
 
         }
@@ -86,7 +88,7 @@ function Header(props) {
           <div id="wiki-name">The Showrunners</div>
         </section>
         <form id="search-box">
-          <input type="text" onInput={userSearching} placeholder="Search for a page..." />
+          <input type="text" onInput={UserSearching} placeholder="Search for a page..." />
           <ul id="search-results">
             {searchResults}
           </ul>
