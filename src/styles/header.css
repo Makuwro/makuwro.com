@@ -26,17 +26,29 @@ header {
   width: 50%;
   display: none;
   position: relative;
+  font-size: 0.875rem;
 }
 
 #search-box > input {
-  border: 1px solid white;
+  border: 1px solid var(--input-orange);
   background-color: var(--showtime-orange);
   height: 2rem;
   width: 100%;
-  font-size: 0.875rem;
   padding: 0 0.75rem;
   caret-color: white;
   color: white;
+  border-radius: 20px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+#search-box > input:hover {
+  border-color: white;
+}
+
+#search-box > input:focus {
+  background-color: var(--input-orange);
+  border-color: var(--input-orange);
 }
 
 #search-box > input:focus-visible {
@@ -49,22 +61,30 @@ header {
 
 #search-results {
   position: absolute;
-  width: calc(100% + 1.5rem);
+  width: calc(100% + 1.5rem + 2px);
   padding: 0;
   list-style-type: none;
   margin: 0;
-  border-bottom: 5px solid var(--showtime-orange);
-  border-left: 5px solid var(--showtime-orange);
-  border-right: 5px solid var(--showtime-orange);
-  background-color: var(--showtime-orange);
-  margin: 0 -5px;
   display: none;
 }
 
+#search-results > li:first-of-type {
+  margin-top: 0;
+}
+
+#search-results > li:last-child {
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
 #search-results > li {
-  margin-top: 5px;
-  background-color: var(--showtime-orange);
-  border-radius: 2px;
+  background-color: var(--input-orange);
+  border-radius: 0;
+}
+
+#search-results > li:hover {
+  background-color: white;
+  color: var(--input-orange);
 }
 
 #search-results > li > a {
@@ -72,6 +92,10 @@ header {
   color: inherit;
   border: none;
   padding: 0.35rem 0.75rem;
+}
+
+#search-results > li > a:hover {
+  font-weight: normal;
 }
 
 header > section {
