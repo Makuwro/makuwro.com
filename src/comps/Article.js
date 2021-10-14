@@ -3,7 +3,7 @@ import "../styles/article.css";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
-const markupRegex = /(?<li>\* (?<licontent>[^\n]+)(?<liEnd>))|(?<h1># (?<h1Content>.+))|(?<h2>## (?<h2Content>.+))|(?<h3>### (?<h3Content>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(?<b>\*\*(?<bContent>.+?)\*\*)|(?<i>\*(?<iContent>.+?)\*)|{{((?<template>\S+)}})|(?<link>\[(?<linkText>.*?)\]\((?<linkURL>[^[\]]*)\))|(?<del>~~(?<delText>.+)~~)|(?<newLine>\n)/gm;
+const markupRegex = /(?<li>\* (?<licontent>[^\n]+)(?<liEnd>))|(?<h1># (?<h1Content>.+))|(?<h2>## (?<h2Content>.+))|(?<h3>### (?<h3Content>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(?<b>\*\*(?<bContent>.+?)\*\*)|(?<i>\*(?<iContent>.+?)\*)|{{((?<template>\S+)}})|(?<link>\[(?<linkText>.*?)\]\((?<linkURL>[^[\])]*\)?)\))|(?<del>~~(?<delText>.+)~~)|(?<newLine>\n)/gm;
 
 const headerDictionary = {"h1": 1, "h2": 1, "h3": 1, "h4": 1, "h5": 1, "h6": 1};
 
@@ -188,7 +188,7 @@ class Article extends React.Component {
 
     return (
       <main id="article-container" onClick={this.CloseSearchResults}>
-        <article>
+        <article className="dark-article">
           <section id="article-header">
             <div id="controls">
               <button>{this.state.content ? "Edit" : "Create"}</button>
