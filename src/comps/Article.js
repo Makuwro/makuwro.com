@@ -3,7 +3,7 @@ import "../styles/article.css";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
-const markupRegex = /(?<li>\* (?<licontent>[^\n]+)(?<liEnd>))|(?<h1># (?<h1Content>.+))|(?<h2>## (?<h2Content>.+))|(?<h3>### (?<h3Content>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(?<b>\*\*(?<bContent>.+?)\*\*)|(?<i>\*(?<iContent>.+?)\*)|{{((?<template>\S+)}})|(?<link>\[(?<linkText>.*?)\]\((?<linkURL>[^[\])]*\)?)\))|(?<del>~~(?<delText>.+)~~)|(?<newLine>\n)/gm;
+const markupRegex = /(?<li>\* (?<licontent>[^\n]+)(?<liEnd>))|(?<h1># (?<h1Content>.+))|(?<h2>## (?<h2Content>.+))|(?<h3>### (?<h3Content>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(?<b>\*\*(?<bContent>.+?)\*\*)|(?<i>\*(?<iContent>.+?)\*)|(?<template>{{(?<templateName>[^|]+)\|?(?<parameters>.+)?}})|(?<link>\[(?<linkText>.*?)\]\((?<linkURL>[^[\])]*\)?)\))|(?<del>~~(?<delText>.+)~~)|(?<newLine>\n)/gm;
 const headerDictionary = {"h1": 1, "h2": 1, "h3": 1, "h4": 1, "h5": 1, "h6": 1};
 let nicknameData;
 let contributorData;
@@ -64,6 +64,22 @@ class Article extends React.Component {
         case "del": {
 
           matchText = match.groups.delText;
+          break;
+
+        }
+
+        case "template": {
+
+          // Get the template info
+          const templateName = match.groups.templateName;
+          const parameters = match.groups.parameters;
+          const matchedParams = parameters && [...parameters.matchAll(/(?<param>[^|=]+)=?(?<value>[^|]*)\|?/gm)];
+
+          // Get the template data from the server
+
+          // Replace the template
+          matchText = <></>;
+
           break;
 
         }
@@ -137,17 +153,17 @@ class Article extends React.Component {
 
       if (matchType !== "newLine") {
 
-        matchType = matchType === "link" ? Link : matchType;
+        const elementType = matchType === "link" ? Link : (matchType === "template" ? React.Fragment : matchType);
 
         // Create the element and add it to the header list, if necessary
-        const isHeader = headerDictionary[matchType];
-        const Element = React.createElement(matchType, {key: i, id: isHeader && matchText.replaceAll(" ", "_"), to: matchType === Link ? (`/articles/${match.groups.linkURL}`) : undefined}, matchText);
+        const isHeader = headerDictionary[elementType];
+        const Element = React.createElement(elementType, {key: i, id: isHeader && matchText.replaceAll(" ", "_"), to: elementType === Link ? (`/articles/${match.groups.linkURL}`) : undefined}, matchText);
         if (Element.props.id) headers.push(Element);
         currentDiv.push(Element);
 
-        if (isHeader || matchType === "li") {
+        if (isHeader || {li: 1, template: 1}[matchType]) {
 
-          componentsToFormat.push(React.createElement(isHeader ? React.Fragment : "ul", null, currentDiv));
+          componentsToFormat.push(React.createElement(matchType === "li" ? "ul" : React.Fragment, null, currentDiv));
           currentDiv = [];
           
         }
@@ -157,7 +173,7 @@ class Article extends React.Component {
     }
 
     // Add the rest of the string, if needed
-    if (content) componentsToFormat.push(<div>{content.substring(currentPosition, content.length)}</div>);
+    if (content && currentPosition !== content.length) componentsToFormat.push(<div>{content.substring(currentPosition, content.length)}</div>);
 
     // Format the components
     formattedContent = content && componentsToFormat.map(component => component);

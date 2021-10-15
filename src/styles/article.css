@@ -1,7 +1,3 @@
-article {       
-  position: relative;
-}
-
 #article-header {
   background-color: var(--showtime-orange);
   padding: 3rem 3rem;

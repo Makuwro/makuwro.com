@@ -5,11 +5,11 @@ import Login from "./comps/Login";
 import {Switch, Route, BrowserRouter as Router, useParams, Redirect, useLocation} from "react-router-dom";
 import { useState, React, useEffect } from "react";
 import Home from "./comps/Home";
+import Preferences from "./comps/Preferences";
 import PropTypes from "prop-types";
 
 const wikiServer = process.env.REACT_APP_WIKI_SERVER;
 const pageContentCache = {};
-let userCache;
 
 function App() {
 
@@ -113,16 +113,8 @@ function App() {
 
               }
 
-              // Get current user info
-              const userResponse = !userCache && await fetch("https://api.github.com/user", {
-                headers: {
-                  Authorization: "Bearer " + token
-                }
-              });
-              userCache = userCache || (userResponse.ok && await userResponse.json());
-
               setPage(<>
-                <Header token={token} userInfo={userCache} />
+                <Header />
                 <Article name={articleName} data={articleJson} />
               </>);
               break;
@@ -210,6 +202,10 @@ function App() {
         </Route>
         <Route exact path="/categories">
           <Redirect to="/" />
+        </Route>
+        <Route exact path="/preferences">
+          <Header />
+          <Preferences />
         </Route>
         <Route exact path="/">
           <Header />
