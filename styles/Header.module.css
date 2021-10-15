@@ -33,7 +33,7 @@
   border-color: white;
 }
 
-#search-box > input:focus {
+#search-box:focus-within > input {
   background-color: var(--input-orange);
   border-color: var(--input-orange);
 }
@@ -121,6 +121,10 @@
   width: 2rem;
   background-color: var(--showtime-orange);
   margin-left: 1rem;
+}
+
+#search-box:focus-within > #search-results {
+  display: block;
 }
 
 @media only screen and (min-width: 768px) {

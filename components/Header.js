@@ -1,8 +1,9 @@
 import React from "react";
-import "../styles/Header.module.css";
-import MenuOverlay from "./menu-overlay";
+import styles from "../styles/Header.module.css";
+import MenuOverlay from "./MenuOverlay";
 import PropTypes from "prop-types";
 import Link from "next/link";
+import router from "next/router";
 
 let cachedResults;
 
@@ -15,13 +16,17 @@ class Header extends React.Component {
 
     // Bind functions
     this.userSearching = this.userSearching.bind(this);
-    this.closeSearchResults = this.closeSearchResults.bind(this);
     this.toggleOverlayVisibility = this.toggleOverlayVisibility.bind(this);
+
+    // Create refs
+    this.searchBox = React.createRef();
+    this.searchResults = React.createRef();
 
     // Set initial state
     this.state = {
       overlayVisible: false,
-      searchResults: null
+      searchResults: null,
+      userInfo: null
     };
 
   }
@@ -52,17 +57,10 @@ class Header extends React.Component {
     this.setState((state) => ({overlayVisible: !state.overlayVisible}));
 
   }
-  
-  closeSearchResults(articleName) {
-    
-    document.getElementById("search-results").classList.remove("block");
-    if (articleName) document.getElementById("search-box").firstChild.value = articleName;
-
-  }
 
   async userSearching() {
 
-    const inputBox = document.getElementById("search-box").firstChild;
+    const inputBox = this.searchBox.current.firstChild;
     
     // Get all article names
     const articleResponse = !cachedResults && await fetch("https://api.wiki.showrunners.net/api/articles", {
@@ -89,16 +87,20 @@ class Header extends React.Component {
           const rawName = nearMatches[i].path.replaceAll(".md", "");
           const shownName = rawName.replaceAll("_", " ");
           elements.push(
-            <li key={i}><Link onClick={() => this.closeSearchResults(shownName)} to={`/articles/${rawName}`}>{shownName}</Link></li>
+            <li key={i}><a onClick={(e) => {
+
+              e.preventDefault();
+              inputBox.value = shownName;
+              document.activeElement.blur();
+              router.push(`/articles/${rawName}`);
+              
+            }} href={`/articles/${rawName}`}>{shownName}</a></li>
           );
 
         }
 
         // Finally, show the matches
         this.setState({searchResults: elements});
-
-        // Show the results
-        document.getElementById("search-results").classList.add("block");
 
       } else {
 
@@ -117,21 +119,21 @@ class Header extends React.Component {
         <MenuOverlay visible={this.state.overlayVisible} />
         <header>
           <section>
-            <button id="menu-button" onClick={this.toggleOverlayVisibility}>
+            <button id={styles["menu-button"]} onClick={this.toggleOverlayVisibility}>
               <img src="/icons8-menu.svg" />
             </button>
-            <div id="wiki-name">The Showrunners</div>
+            <div id={styles["wiki-name"]}>The Showrunners</div>
           </section>
-          <form id="search-box">
+          <form ref={this.searchBox} id={styles["search-box"]}>
             <input type="text" onInput={this.userSearching} placeholder="Search for a page..." />
-            <ul id="search-results">
+            <ul ref={this.searchResults} id={styles["search-results"]}>
               {this.state.searchResults}
             </ul>
           </form>
           <section>
-            <img id="search-icon" src="/Search-icon.svg" />
+            <img id={styles["search-icon"]} src="/Search-icon.svg" />
             {this.state.userCache ? (
-              <button id="account-button" style={{
+              <button id={styles["account-button"]} style={{
                 backgroundImage: `url(${this.props.userInfo ? this.props.userInfo.avatar_url : this.state.userCache.avatar_url})`,
                 backgroundSize: "cover"
               }}></button>
@@ -147,7 +149,8 @@ class Header extends React.Component {
 
 Header.propTypes = {
   userInfo: PropTypes.object,
-  token: PropTypes.string
+  token: PropTypes.string,
+  articleContainer: PropTypes.any
 };
 
 export default Header;

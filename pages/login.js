@@ -1,13 +1,12 @@
+import router from "next/router";
 import React from "react";
-import "../styles/Login.module.css";
+import Header from "../components/Header";
+import styles from "../styles/Login.module.css";
 
 function Login() {
-
-  document.title = "Login to The Showrunners Wiki";
-
-  const history = useHistory();
+  
   function openAuthWindow() {
-    
+      
     const loginWindow = window.open("https://github.com/login/oauth/authorize?client_id=1583e1bf2395769aeee6&scope=repo,user:email", "The Showrunners Wiki", "height=400,width=400"); 
     const timer = setInterval(function() {
 
@@ -23,7 +22,7 @@ function Login() {
 
           const urlSearchParams = new URLSearchParams(window.location.search);
           const redirect = urlSearchParams.get("redirect");
-          history.push(redirect || "/");
+          router.push(redirect || "/");
 
         }
 
@@ -33,12 +32,23 @@ function Login() {
 
   }
 
-  return (
-    <main id="login-container">
-      <div>Shh...</div>
-      <button id="login-button" onClick={openAuthWindow}>Login with GitHub</button>
-    </main>
-  );
+  if (typeof document !== "undefined") {
+    
+    document.title = "Login to The Showrunners Wiki";
+
+    return (
+      <>
+        <Header />
+        <main id={styles["login-container"]}>
+          <div>Shh...</div>
+          <button id={styles["login-button"]} onClick={openAuthWindow}>Login with GitHub</button>
+        </main>
+      </>
+    );
+
+  }
+
+  return null;
 
 }
 
