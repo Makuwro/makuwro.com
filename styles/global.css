@@ -1,0 +1,67 @@
+:root {
+  --showtime-orange: rgb(225, 106, 2);
+  --commercial-gray: rgb(68, 69, 73);
+  --input-orange: rgb(249, 150, 62);
+}
+
+* {
+  font-family: "Lexend Deca";
+}
+
+body {
+  margin: 0;
+  line-height: 1.5;
+  background-color: white;
+}
+
+a {
+  text-decoration: none;
+  border-bottom: 2px solid;
+  color: #5c5cf5;
+}
+
+a:hover {
+  border-bottom: none;
+  font-weight: bold;
+  border-bottom: 3px solid;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 1rem 0;
+  font-weight: normal;
+}
+
+h1 {
+  font-size: 1.75rem;
+}
+
+p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+main {
+  top: 3.5rem;
+  position: absolute;
+  width: 100%;
+}
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 3.5rem;
+  background-color: var(--showtime-orange);
+  padding: 0 1.2rem;
+  position: fixed;
+  width: calc(100% - 2.4rem);
+  z-index: 4;
+  color: white;
+}
+
+header > section {
+  margin: 0;
+  display: flex;
+  align-items: center;
+}

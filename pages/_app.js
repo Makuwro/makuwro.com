@@ -1,33 +1,28 @@
-import "./styles/global.css";
-import Article from "./comps/Article";
-import Header from "./comps/Header";
-import Login from "./comps/Login";
-import {Switch, Route, BrowserRouter as Router, useParams, Redirect, useLocation} from "react-router-dom";
+import "../styles/global.css";
+import Article from "./articles/[internalName]";
+import Header from "./header";
+import router from "next/router";
+import Head from "next/head";
 import { useState, React, useEffect } from "react";
-import Home from "./comps/Home";
-import Preferences from "./comps/Preferences";
 import PropTypes from "prop-types";
 
-const wikiServer = process.env.REACT_APP_WIKI_SERVER;
+const wikiServer = process.env.NEXT_PUBLIC_WIKI_SERVER;
 const pageContentCache = {};
 
-function App() {
+function App({ Component, pageProps }) {
 
   const [articleName, setArticleName] = useState();
-  const [page, setPage] = useState(null);
-  const [callbackCode, setCallbackCode] = useState();
   const [pageType, setPageType] = useState();
   const [internalName, setInternalName] = useState();
 
   function PreparePage(props) {
     
     // Make sure we're using underscores instead of spaces
-    const {internalName} = useParams();
     setInternalName(internalName);
     const underscoreInternalName = internalName.replaceAll(" ", "_");
     if (internalName !== underscoreInternalName) {
 
-      return <Redirect to={"/articles/" + underscoreInternalName} />;
+      return router.push(`/articles/${underscoreInternalName}`);
 
     }
 
@@ -45,24 +40,6 @@ function App() {
   PreparePage.propTypes = {
     type: PropTypes.string
   };
-
-  function Callback() {
-
-    // Check if we have a code
-    const code = new URLSearchParams(useLocation().search).get("code");
-    if (code) {
-
-      // We need to use async, so let's pass the code to the effect
-      setCallbackCode(code);
-      setPageType("callback");
-      return null;
-
-    }
-
-    // We don't have a code, so let's take it back
-    return <Redirect to="/" />;
-
-  }
 
   useEffect(async () => {
 
@@ -90,8 +67,7 @@ function App() {
           switch (pageResponse.status) {
 
             case 401:
-              setPage(<Redirect to={`/login?redirect=/articles/${internalName}`} />);
-              return;
+              return router.push(`/login?redirect=/articles/${internalName}`);
 
             case 404:
             case 200: {
@@ -131,38 +107,7 @@ function App() {
 
         case "callback": {
 
-          try {
-
-            // Send the code to the server and get a token
-            const tokenResponse = await fetch(wikiServer + "/api/callback?code=" + callbackCode, {
-              method: "PUT"
-            });
-            const jsonResponse = await tokenResponse.json();
-
-            switch (tokenResponse.status) {
-
-              case 400:
-                break;
-
-              case 200:
-
-                // Save the token as a cookie
-                document.cookie = `access_token=${jsonResponse.access_token};expires_in=${jsonResponse.expires_in};refresh_token=${jsonResponse.refresh_token};refresh_token_expires_in=${jsonResponse.refresh_token_expires_in};token_type=${jsonResponse.token_type}; path=/`;
-
-                // Close the window
-                window.close();
-                break;
-
-              default:
-                break;
-
-            }
-
-          } catch (err) {
-
-            setPage(<Redirect to="/login" />);
-
-          }
+          
 
           break;
 
@@ -175,45 +120,26 @@ function App() {
 
     } catch (err) {
 
-      return <Redirect to="/login" />;
+      return router.push("/login");
 
     }
 
   }, [articleName, pageType]);
 
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/login">
-          <Header />
-          <Login />
-        </Route>
-        <Route exact path="/callback">
-          <Callback />
-        </Route>
-        <Route exact path="/articles/:internalName">
-          <PreparePage type="article" />{page}
-        </Route>
-        <Route exact path="/articles">
-          <Redirect to="/" />
-        </Route>
-        <Route exact path="/categories/:internalName">
-          <PreparePage type="category" />{page}
-        </Route>
-        <Route exact path="/categories">
-          <Redirect to="/" />
-        </Route>
-        <Route exact path="/preferences">
-          <Header />
-          <Preferences />
-        </Route>
-        <Route exact path="/">
-          <Header />
-          <Home />
-        </Route>
-      </Switch>
-    </Router>
-  );
+    <>
+      <Head>
+        <meta charset="utf-8" />
+        <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+        <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+        <link href="https://fonts.googleapis.com/css?family=Lexend+Deca" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" />
+        <title>The Showrunners Wiki</title>
+      </Head>
+      <Component {...pageProps} />
+    </>);
 
 }
 

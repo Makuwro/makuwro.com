@@ -1,12 +1,10 @@
 import React from "react";
-import "../styles/article.css";
+import "../styles/Article.module.css";
+import Link from "next/link";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
 
 const markupRegex = /(?<li>\* (?<licontent>[^\n]+)(?<liEnd>))|(?<h1># (?<h1Content>.+))|(?<h2>## (?<h2Content>.+))|(?<h3>### (?<h3Content>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(?<b>\*\*(?<bContent>.+?)\*\*)|(?<i>\*(?<iContent>.+?)\*)|(?<template>{{(?<templateName>[^|]+)\|?(?<parameters>.+)?}})|(?<link>\[(?<linkText>.*?)\]\((?<linkURL>[^[\])]*\)?)\))|(?<del>~~(?<delText>.+)~~)|(?<newLine>\n)/gm;
 const headerDictionary = {"h1": 1, "h2": 1, "h3": 1, "h4": 1, "h5": 1, "h6": 1};
-let nicknameData;
-let contributorData;
 
 class Article extends React.Component {
   

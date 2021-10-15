@@ -1,8 +1,8 @@
 import React from "react";
-import "../styles/header.css";
-import MenuOverlay from "./MenuOverlay";
-import { Link } from "react-router-dom";
+import "../styles/Header.module.css";
+import MenuOverlay from "./menu-overlay";
 import PropTypes from "prop-types";
+import Link from "next/link";
 
 let cachedResults;
 

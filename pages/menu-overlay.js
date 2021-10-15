@@ -1,7 +1,7 @@
 import React from "react";
-import "../styles/menu.css";
+import "../styles/MenuOverlay.module.css";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 function MenuOverlay(props) {
   

@@ -42,20 +42,6 @@
   color: white;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  margin: 1rem 0;
-  font-weight: normal;
-}
-
-h1 {
-  font-size: 1.75rem;
-}
-
-p {
-  margin-bottom: 1rem;
-  font-size: 1rem;
-}
-
 #root {
   margin: 0;
 }

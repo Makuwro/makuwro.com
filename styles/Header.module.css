@@ -1,16 +1,3 @@
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 3.5rem;
-  background-color: var(--showtime-orange);
-  padding: 0 1.2rem;
-  position: fixed;
-  width: calc(100% - 2.4rem);
-  z-index: 4;
-  color: white;
-}
-
 .dark-header {
   background-color: var(--commercial-gray);
   color: var(--showtime-orange);
@@ -96,12 +83,6 @@ header {
 
 #search-results > li > a:hover {
   font-weight: normal;
-}
-
-header > section {
-  margin: 0;
-  display: flex;
-  align-items: center;
 }
 
 #menu-button {
