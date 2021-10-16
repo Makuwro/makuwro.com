@@ -6,19 +6,16 @@ function Callback() {
 
   if (typeof window !== "undefined") {
 
-    // Check if we have a code
-    const [callbackCode, setCallbackCode] = useState();
-    const code = new URLSearchParams(window.location.search).get("code") || null;
-    setCallbackCode(code);
-
     useEffect(async () => {
       
+      // Check if we have a code
+      const code = new URLSearchParams(window.location.search).get("code") || null;
       if (code) {
 
         try {
 
           // Send the code to the server and get a token
-          const tokenResponse = await fetch(wikiServer + "/api/callback?code=" + callbackCode, {
+          const tokenResponse = await fetch(wikiServer + "/api/callback?code=" + code, {
             method: "PUT"
           });
           const jsonResponse = await tokenResponse.json();
@@ -53,7 +50,7 @@ function Callback() {
       // We don't have a code, so let's take it back
       return router.push("/");
       
-    }, [callbackCode]);
+    });
 
   }
 

@@ -5,7 +5,7 @@ import Link from "next/link";
 import PropTypes from "prop-types";
 import router from "next/router";
 
-const markupRegex = /(?<li>\* (?<licontent>[^\n]+)(?<liEnd>))|(?<h1># (?<h1Content>.+))|(?<h2>## (?<h2Content>.+))|(?<h3>### (?<h3Content>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(?<b>\*\*(?<bContent>.+?)\*\*)|(?<i>\*(?<iContent>.+?)\*)|(?<template>{{(?<templateName>[^|]+)\|?(?<parameters>.+)?}})|(?<link>\[(?<linkText>.*?)\]\((?<linkURL>[^[\])]*\)?)\))|(?<del>~~(?<delText>.+)~~)|(?<newLine>\n)/gm;
+const markupRegex = /(?<li>\* (?<licontent>[^\n]+)(?<liEnd>))|(?<h1># (?<h1Content>.+))|(?<h2>## (?<h2Content>.+))|(?<h3>### (?<h3Content>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(?<b>\*\*(?<bContent>.+?)\*\*)|(?<i>\*(?<iContent>.+?)\*)|(?<template>\{\{(?<templateName>[^|]+)\|?(?<parameters>.+)?\}\})|(?<link>\[(?<linkText>.*?)\]\((?<linkURL>[^[\])]*\)?)\))|(?<del>~~(?<delText>.+)~~)|(?<newLine>\n)/gm;
 const headerDictionary = {"h1": 1, "h2": 1, "h3": 1, "h4": 1, "h5": 1, "h6": 1};
 const wikiServer = process.env.NEXT_PUBLIC_WIKI_SERVER;
 
@@ -19,7 +19,9 @@ class Article extends React.Component {
     this.formatMetadata = this.formatMetadata.bind(this);
     this.setupArticle = this.setupArticle.bind(this);
     this.articleContainer = React.createRef();
-    this.state = {};
+    this.state = {
+      ready: false
+    };
 
   }
 
@@ -196,6 +198,7 @@ class Article extends React.Component {
 
     this.setState({
       content: formattedContent,
+      ready: true,
       contributors: contributors || "The Showrunners Team",
       headers: headers
     });
@@ -209,6 +212,7 @@ class Article extends React.Component {
 
     // Make sure we show the correct name
     const shownName = name.replaceAll("_", " ");
+    document.title = `${shownName} - The Showrunners Wiki`;
     this.setState({name: shownName});
 
     // Get the cookie
@@ -286,6 +290,7 @@ class Article extends React.Component {
   async componentDidUpdate(prevProps) {
 
     if (prevProps.name === this.props.name) return;
+    this.setState({ready: false});
     await this.setupArticle();
 
   }
@@ -295,29 +300,31 @@ class Article extends React.Component {
     return (
       <>
         <Header articleContainer={this.articleContainer} />
-        <main ref={this.articleContainer} id="article-container">
-          <article className={styles["dark-article"]}>
-            <section id={styles["article-header"]}>
-              <div id={styles["controls"]}>
-                <button>{this.state.content ? "Edit" : "Create"}</button>
-              </div>
-              <div>
-                <h1 id={styles["article-header-name"]}>{this.state.name}</h1>
-                {this.state.content && (<><div id="article-header-contributors">by {this.state.contributors}</div></>)}
-              </div>
-            </section>
+        {this.state.ready ? (
+          <main ref={this.articleContainer} id="article-container">
+            <article className={styles["dark-article"]}>
+              <section id={styles["article-header"]}>
+                <div id={styles["controls"]}>
+                  <button>{this.state.content ? "Edit" : "Create"}</button>
+                </div>
+                <div>
+                  <h1 id={styles["article-header-name"]}>{this.state.name}</h1>
+                  {this.state.content && (<><div id="article-header-contributors">by {this.state.contributors}</div></>)}
+                </div>
+              </section>
 
-            {/* 
-              <Outline headers={this.state.headers} /> 
-            */}
+              {/* 
+                <Outline headers={this.state.headers} /> 
+              */}
 
-            <section id={styles["article-content"]}>{this.state.content || <>This article doesn't exist... <i>but it always will in our hearts ♥</i></>}</section>
+              <section id={styles["article-content"]}>{this.state.content || <>This article doesn't exist... <i>but it always will in our hearts ♥</i></>}</section>
 
-            {this.state.content && (<section id={styles["article-footer"]}>
-              <div id={styles["last-edited"]}>Last edited on January 1, 2021</div>
-            </section>)}
-          </article>
-        </main>
+              {this.state.content && (<section id={styles["article-footer"]}>
+                <div id={styles["last-edited"]}>Last edited on January 1, 2021</div>
+              </section>)}
+            </article>
+          </main>
+        ) : null}
       </>
     );
 
