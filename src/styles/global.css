@@ -1,0 +1,152 @@
+:root {
+  --showtime-orange: rgb(225, 106, 2);
+  --nice-blue: #313237;
+  --background-blue: #3c3d44;
+  --input-orange: rgb(249, 150, 62);
+  --button-color: #afa8ff;
+}
+
+:focus-visible {
+  outline: none;
+}
+
+* {
+  font-family: "Lexend Deca";
+}
+
+body {
+  margin: 0;
+  line-height: 1.5;
+  background-color: #26272b;
+  color: white;
+  overflow: hidden;
+}
+
+a {
+  text-decoration: none;
+  border-bottom: 2px solid;
+  color: #5c5cf5;
+}
+
+a:hover {
+  border-bottom: none;
+  font-weight: bold;
+  border-bottom: 3px solid;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 1rem 0;
+  font-weight: normal;
+}
+
+h1 {
+  font-size: 1.75rem;
+  font-weight: bold;
+}
+
+p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+main {
+  width: 100%;
+  height: calc(100vh - 56px);
+}
+
+form > section:first-of-type {
+  margin-top: 0;
+}
+
+form > section {
+  margin-top: 1rem;
+}
+
+form > section > select {
+  user-select: none;
+}
+
+input[type="text"]:read-only {
+  color: gray !important;
+}
+
+form input[type="text"], form input[type="password"], form input[type="email"], form select {
+  padding: 0.6rem;
+  width: 100%;
+  background-color: transparent !important;
+  border: 1px solid gray;
+  color: white;
+  border-radius: 5px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+input[type="checkbox"] {
+  width: 25px;
+  height: 25px;
+}
+
+input[type="checkbox"] + label {
+  display: inline;
+  position: relative;
+  bottom: 7px;
+  left: 7px;
+}
+
+label {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+label > button {
+  border-radius: 100%;
+  border: 1px solid;
+  color: gray;
+  margin-left: 0.5rem;
+  user-select: none;
+  cursor: pointer;
+  background-color: rgb(239, 239, 239);
+  padding: 0;
+  height: 25px;
+  width: 25px;
+}
+
+label > button:hover {
+  background-color: rgb(239, 239, 239);
+}
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 3.5rem;
+  padding: 0 1.2rem;
+  width: calc(100% - 2.4rem);
+  z-index: 4;
+  color: white;
+  background-color: #26272b;
+}
+
+header > section {
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+button, input[type="button"], input[type="submit"] {
+  cursor: pointer;
+  background-color: var(--button-color);
+  border: none;
+  padding: 0.6rem 1rem;
+  color: black;
+  font-size: 1rem;
+}
+
+button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+  background-color: #827add;
+}
+
+input[type="password"] {
+  letter-spacing: 2px;
+}

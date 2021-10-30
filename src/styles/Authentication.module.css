@@ -1,0 +1,29 @@
+#auth-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  box-sizing: border-box;
+}
+
+#auth-main > section {
+  background-color: var(--nice-blue);
+  padding: 2rem;
+  border-radius: 5px;
+  position: relative;
+  width: 80%;
+  max-width: 720px;
+  box-sizing: border-box;
+}
+
+#auth-main > section > section {
+  text-align: center;
+}
+
+#auth-main > section > form {
+  margin-top: 3rem;
+  width: 100%;
+  max-width: 768px;
+}

@@ -1,0 +1,31 @@
+#outline {
+  display: none;
+  position: relative;
+  width: 15.6rem;
+}
+
+#outline > nav {
+  border-radius: 5px;
+  padding: 1.2rem 1.8rem;
+  background-color: #5a75bf;
+  color: white;
+  position: fixed;
+  border-left: none;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  width: 12rem;
+}
+
+#outline > nav > h1 {
+  font-size: 1.25rem;
+}
+
+#outline > nav > h2 {
+  font-size: 1.1rem;
+}
+
+@media only screen and (min-width: 1024px) {
+  #outline {
+    display: inline-block;
+  }
+}

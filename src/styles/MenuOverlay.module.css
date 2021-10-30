@@ -1,0 +1,42 @@
+#menu-overlay {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  z-index: 3;
+  margin-top: 3.5rem;
+  display: none;
+}
+
+.block {
+  display: block !important;
+}
+
+#menu-overlay > nav {
+  overflow-y: auto;
+  position: fixed;
+  width: 15rem;
+  height: calc(100% - 3.5rem);
+  background-color: white;
+  z-index: 1;
+}
+
+#menu-overlay > nav > div > a {
+  display: block;
+  padding: 1rem 2rem;
+  color: black;
+}
+
+#menu-overlay > nav > div > a:active {
+  color: inherit;
+}
+
+#menu-overlay > nav > div > a:hover {
+  background-color: rgb(196, 206, 236);
+}
+
+#menu-overlay-bg {
+  background-color: black;
+  opacity: .4;
+  height: 100%;
+}
