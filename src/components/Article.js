@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import LoadingScreen from "./LoadingScreen";
 import { withRouter, Link } from "react-router-dom";
 import Header from "./Header";
+import FormattingTools from "./FormattingTools";
 
 const markupRegex = /(?<li>\* (?<licontent>[^\n]+)(?<liEnd>))|(?<h1># (?<h1Content>.+))|(?<h2>## (?<h2Content>.+))|(?<h3>### (?<h3Content>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(?<b>\*\*(?<bContent>.+?)\*\*)|(?<i>\*(?<iContent>.+?)\*)|(?<template>\{\{(?<templateName>[^|]+)\|?(?<parameters>.+)?\}\})|(?<link>\[(?<linkText>.*?)\]\((?<linkURL>[^[\])]*\)?)\))|(?<del>~~(?<delText>.+)~~)|(?<newLine>\n)/gm;
 const headerDictionary = {"h1": 1, "h2": 1, "h3": 1, "h4": 1, "h5": 1, "h6": 1};
@@ -19,8 +20,16 @@ class Article extends React.Component {
     this.formatMetadata = this.formatMetadata.bind(this);
     this.setupArticle = this.setupArticle.bind(this);
     this.articleContainer = React.createRef();
+    this.outlineTitle = React.createRef();
+    this.updateMode = this.updateMode.bind(this);
+    this.updateName = this.updateName.bind(this);
+    this.updateContent = this.updateContent.bind(this);
+    this.pageName = React.createRef();
+    this.articleContent = React.createRef();
+    this.firstElement = React.createRef();
     this.state = {
-      ready: false
+      ready: false,
+      mode: new URLSearchParams(document.location.search).get("mode") || "view"
     };
 
   }
@@ -77,9 +86,9 @@ class Article extends React.Component {
         case "template": {
 
           // Get the template info
-          const templateName = match.groups.templateName;
-          const parameters = match.groups.parameters;
-          const matchedParams = parameters && [...parameters.matchAll(/(?<param>[^|=]+)=?(?<value>[^|]*)\|?/gm)];
+          //const templateName = match.groups.templateName;
+          //const parameters = match.groups.parameters;
+          //const matchedParams = parameters && [...parameters.matchAll(/(?<param>[^|=]+)=?(?<value>[^|]*)\|?/gm)];
 
           // Get the template data from the server
 
@@ -207,18 +216,16 @@ class Article extends React.Component {
   async setupArticle() {
 
     // Get article info
-    console.log(1)
     const {match: {params: {name}}, type, history} = this.props;
-    console.log(2)
 
     // Make sure we show the correct name
     const shownName = name.replaceAll("_", " ");
-    document.title = `${shownName} - The Showrunners Wiki`;
     this.setState({name: shownName});
+    this.outlineTitle.current.innerHTML = shownName;
 
     // Get the cookie. If we don't have it, redirect to login page
     const value = `; ${document.cookie}`;
-    const parts = value.split("; access_token=");
+    const parts = value.split("; token=");
     const token = parts.length === 2 && parts.pop().split(";")[0];
     if (!token) {
 
@@ -231,7 +238,7 @@ class Article extends React.Component {
 
       // Get article contents
       const cachedJson = pageContentCache[type + name];
-      const pageResponse = cachedJson ? {status: 200} : await fetch(wikiServer + "/api/contents/" + (type === "normal" ? "articles/" + name + ".md" : "categories.json"), {
+      const pageResponse = cachedJson ? {status: 200} : await fetch(`${wikiServer}/pages/${name}`, {
         headers: {
           token: token
         }
@@ -290,12 +297,12 @@ class Article extends React.Component {
 
     } catch (err) {
 
-      console.log(`[Article]: Couldn't fetch: ${err}`);
+      console.log(`[Article]: Couldn't fetch: ${err.message}`);
       this.setState({
         ready: true,
-        name: "You're offline",
-        content: "And that's fine.",
-        contributors: "The Showrunners Wiki"
+        name: "Timed out",
+        content: "But that's juuuuuuuuust fine.",
+        mode: "view"
       });
 
     }
@@ -307,11 +314,8 @@ class Article extends React.Component {
     // Make sure we're using underscores instead of spaces
     const {match: {params: {name}}, history} = this.props;
     const underscoreInternalName = name.replaceAll(" ", "_");
-    if (name !== underscoreInternalName) {
-
-      return history.replace(`/articles/${underscoreInternalName}${location.hash}`);
-
-    }
+    document.title = `${name} - The Showrunners Wiki`;
+    if (name !== underscoreInternalName) return history.replace(`/articles/${underscoreInternalName}${location.hash}`);
 
     await this.setupArticle();
     
@@ -319,9 +323,49 @@ class Article extends React.Component {
 
   async componentDidUpdate(prevProps) {
 
+    document.title = `${this.state.name} - The Showrunners Wiki`;
     if (prevProps.match.params.name === this.props.match.params.name) return;
     this.setState({ready: false});
     await this.setupArticle();
+
+  }
+
+  async updateMode(mode) {
+
+    this.setState({mode: mode});
+
+  }
+
+  async updateName(e) {
+
+    if (e.keyCode === 13) {
+
+      e.preventDefault();
+      this.pageName.current.blur();
+
+      const name = e.target.innerHTML;
+      this.setState({name: name}, () => history.replaceState(null, null, `/articles/${name.replaceAll(" ", "_")}?mode=edit`));
+
+    }
+
+  }
+
+  async updateContent(e) {
+
+    const firstElement = this.firstElement.current;
+    if (e.keyCode == 8 || e.keyCode == 46) { 
+
+      if (firstElement.children.length === 1) { 
+
+        if (firstElement.children[0].innerText < 1) { 
+
+          e.preventDefault();
+
+        }
+
+      } 
+
+    }
 
   }
 
@@ -332,32 +376,48 @@ class Article extends React.Component {
 
     return (
       <>
-        <Header />
-        {this.state.ready ? (
-          <main ref={this.articleContainer}>
-            <article className={styles["dark-article"]}>
-              <section id={styles["article-header"]}>
-                <div id={styles["controls"]}>
-                  <button>{this.state.content ? "Edit" : "Create"}</button>
-                </div>
-                <div>
-                  <h1 id={styles["article-header-name"]}>{this.state.name}</h1>
-                  {this.state.content && (<><div id="article-header-contributors">by {this.state.contributors}</div></>)}
-                </div>
-              </section>
+        <Header {...this.props} />
+        <main id={styles["settings-main"]} ref={this.articleContainer}>
+          <nav id={styles["settings-nav"]}>
+            <h1 ref={this.outlineTitle}>Title</h1>
+            <section>
+              <h1><a>Heading 1</a></h1>
+              <ul>
+                <li><a>Heading 2</a></li>
+                <li><a>Heading 3</a></li>
+              </ul>
+            </section>
+          </nav>
+          <article className={styles["dark-article"]}>
+            {this.state.mode === "edit" && <FormattingTools />}
+            <section id={styles["article-header"]}>
+              {this.state.ready && this.props.userCache._id && (
+                <section id={styles["article-controls"]}>
+                  <button className={this.state.mode === "edit" ? "unavailable" : null} onClick={() => this.updateMode("edit")}>{this.state.content ? "Edit" : "Create"}</button>
+                </section>
+              )}
+              <div>
+                <h1 id={styles["article-header-name"]} ref={this.pageName} onKeyDown={(e) => this.updateName(e)} suppressContentEditableWarning={true} contentEditable={this.state.mode === "edit"}>{this.state.name}</h1>
+              </div>
+            </section>
 
-              {/* 
-                <Outline headers={this.state.headers} /> 
-              */}
+            {this.state.ready ? (
+              <>
+                <section onKeyDown={this.updateContent} id={styles["article-content"]} suppressContentEditableWarning={true} contentEditable={this.state.mode === "edit"}>
+                  {this.state.content || (this.state.mode === "view" ? (
+                    <p>This article doesn't exist... <i>but it always will in our hearts ♥</i></p>
+                  ) : <p ref={this.firstElement} placeholder="It goes a little something like this..."></p>)}
+                </section>
 
-              <section id={styles["article-content"]}>{this.state.content || <>This article doesn't exist... <i>but it always will in our hearts ♥</i></>}</section>
-
-              {this.state.content && (<section id={styles["article-footer"]}>
-                <div id={styles["last-edited"]}>Last edited on January 1, 2021</div>
-              </section>)}
-            </article>
-          </main>
-        ) : <><Header /><LoadingScreen /></>}
+                {this.state.content && (
+                  <section id={styles["article-footer"]}>
+                    <div id={styles["last-edited"]}>Last edited on January 1, 2021</div>
+                  </section>
+                )}
+              </>
+            ) : <LoadingScreen />}
+          </article>
+        </main>
       </>
     );
 
@@ -368,7 +428,8 @@ class Article extends React.Component {
 Article.propTypes = {
   match: PropTypes.object,
   type: PropTypes.string,
-  history: PropTypes.object
+  history: PropTypes.object,
+  userCache: PropTypes.object
 };
 
 export default withRouter(Article);

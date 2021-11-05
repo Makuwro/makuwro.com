@@ -2,9 +2,7 @@ import React from "react";
 
 function LoadingScreen() {
 
-  return <div id="loading">
-    Loading
-  </div>;
+  return <>One moment please...</>;
 
 }
 

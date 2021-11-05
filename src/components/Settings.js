@@ -2,14 +2,14 @@ import React from "react";
 import Header from "./Header";
 import styles from "../styles/Settings.module.css";
 import { Link } from "react-router-dom";
-import CodeManager from "./CodeManager";
+import CodeManager from "./settings/CodeManager";
 import PropTypes from "prop-types";
-import AccountManager from "./AccountManager";
-import RoleManager from "./RoleManager";
+import AccountManager from "./settings/AccountManager";
+import RoleManager from "./settings/RoleManager";
 import Prompt from "./Prompt";
 
 function Settings(props) {
-  
+
   document.title = "The Showrunners Wiki Settings";
 
   // Generate left bar
@@ -32,7 +32,7 @@ function Settings(props) {
   };
   const navCategories = Object.keys(navigation);
   const navChildren = [];
-  const requestedMenu = props.match.params.menu;
+  const requestedMenu = props.match ? props.match.params.menu : "";
   for (let i = 0; navCategories.length > i; i++) {
 
     // Get every nav item
@@ -48,7 +48,6 @@ function Settings(props) {
     navChildren.push(React.createElement("section", {key: `${navCategoryName}section`}, [<h1 key={`${navCategoryName}heading`}>{navCategoryName}</h1>, navUl]));
 
   }
-  const navElement = React.createElement("nav", {id: styles["settings-nav"]}, navChildren);
 
   // Generate the selectedMenu
   const promptProps = {
@@ -66,9 +65,11 @@ function Settings(props) {
 
   return (
     <>
-      <Header />
+      <Header {...props} />
       <main id={styles["settings-main"]}>
-        {navElement}
+        <nav id={styles["settings-nav"]}>
+          {navChildren}
+        </nav>
         {menuState}
       </main>
       <Prompt {...promptProps} />

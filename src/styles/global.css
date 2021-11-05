@@ -4,6 +4,7 @@
   --background-blue: #3c3d44;
   --input-orange: rgb(249, 150, 62);
   --button-color: #afa8ff;
+  width: 100%;
 }
 
 :focus-visible {
@@ -20,6 +21,7 @@ body {
   background-color: #26272b;
   color: white;
   overflow: hidden;
+  user-select: none;
 }
 
 a {
@@ -66,15 +68,18 @@ form > section > select {
   user-select: none;
 }
 
-input[type="text"]:read-only {
+input[type="text"]:read-only, input[type="password"]:read-only, input:disabled {
   color: gray !important;
+  cursor: not-allowed;
+  background-color: #474748 !important;
+  border-color: #474748;
 }
 
 form input[type="text"], form input[type="password"], form input[type="email"], form select {
   padding: 0.6rem;
   width: 100%;
-  background-color: transparent !important;
-  border: 1px solid gray;
+  background-color: #202021 !important;
+  border: 1px solid #202021;
   color: white;
   border-radius: 5px;
   font-size: 1rem;
@@ -149,4 +154,34 @@ button:hover, input[type="button"]:hover, input[type="submit"]:hover {
 
 input[type="password"] {
   letter-spacing: 2px;
+}
+
+.unavailable {
+  background-color: #6e6e6e !important;
+  cursor: not-allowed !important;
+}
+
+.invalid {
+  border-color: red !important;
+}
+
+.invisible {
+  display: none;
+}
+
+article {
+  user-select: text;
+}
+
+b {
+  color: white;
+}
+
+u {
+  text-decoration: none;
+  border-bottom: 2px solid;
+}
+
+button {
+  border-radius: 5px;
 }

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import styles from "../styles/Settings.module.css";
+import styles from "../../styles/Settings.module.css";
+import SaveButton from "../SaveButton";
 
 function RoleManager() {
 
@@ -8,12 +9,7 @@ function RoleManager() {
 
   return (
     <section>
-      <section id={styles["settings-save-section"]}>
-        <section>
-          <span>Remember to save your changes</span>
-          <button>Save</button>
-        </section>
-      </section>
+      <SaveButton />
       <section style={roleEditorOpen ? {display: "none"} : null}>
         <h1>Roles</h1>
         <p>You can manage role names and permissions here.</p>
