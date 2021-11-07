@@ -3,12 +3,13 @@ import styles from "../styles/Settings.module.css";
 import Dropdown from "./Dropdown";
 import PropTypes from "prop-types";
 
-export default function FormattingTools({onSaveButton, onChange}) {
+export default function FormattingTools({dropdownOption, onSaveButton, onChange, onViewChange}) {
 
   const [status, setStatus] = useState("Save");
   const [savingBlocked, blockSaving] = useState(false);
+  const [view, setView] = useState("Visual");
   let saving = false;
-  function saveData() {
+  const saveData = () => {
 
     if (saving) return;
     saving = true;
@@ -16,7 +17,7 @@ export default function FormattingTools({onSaveButton, onChange}) {
     if (onSaveButton) onSaveButton();
     setStatus("Saved!");
 
-  }
+  };
 
   const optionChanged = () => onChange && onChange();
 
@@ -24,24 +25,33 @@ export default function FormattingTools({onSaveButton, onChange}) {
     <section id={styles["settings-save-section"]}>
       <section>
         <section style={{display: "flex"}}>
-          <Dropdown width={125} defaultOption="Paragraph" onChange={optionChanged}>
+          <Dropdown width={125} option={dropdownOption || "Paragraph"} onChange={optionChanged}>
             <li>Paragraph</li>
             <li>Heading 1</li>
             <li>Heading 2</li>
             <li>Heading 3</li>
           </Dropdown>
-          <button style={{marginLeft: "1rem"}}>
+        </section>
+        <section>
+          <button>
             <b>b</b>
           </button>
-          <button style={{marginLeft: "5px"}}>
+          <button>
             <i>i</i>
           </button>
-          <button style={{marginLeft: "5px"}}>
+          <button>
             <u>u</u>
           </button>
-          <button style={{marginLeft: "5px"}}>Link</button>
+          <button>
+            <s>s</s>
+          </button>
+          <button>Link</button>
+          <button>List</button>
         </section>
-        <button className={savingBlocked ? "unavailable" : null} onClick={saveData}>{status}</button>
+        <section>
+          <button onClick={() => setView("Source")}>{view}</button>
+          <button className={savingBlocked ? "unavailable" : null} onClick={saveData}>{status}</button>
+        </section>
       </section>
     </section>
   );
@@ -50,5 +60,7 @@ export default function FormattingTools({onSaveButton, onChange}) {
 
 FormattingTools.propTypes = {
   onSaveButton: PropTypes.func,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
+  dropdownOption: PropTypes.string,
+  onViewChange: PropTypes.func
 };

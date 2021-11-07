@@ -17,16 +17,16 @@ class Article extends React.Component {
   constructor(props) {
 
     super(props);
-    this.formatMetadata = this.formatMetadata.bind(this);
-    this.setupArticle = this.setupArticle.bind(this);
-    this.articleContainer = React.createRef();
-    this.outlineTitle = React.createRef();
-    this.updateMode = this.updateMode.bind(this);
-    this.updateName = this.updateName.bind(this);
-    this.updateContent = this.updateContent.bind(this);
-    this.pageName = React.createRef();
-    this.articleContent = React.createRef();
-    this.firstElement = React.createRef();
+
+    // Create refs
+    const refs = ["articleContainer", "pageName", "firstElement", "articleContent"];
+    for (let i = 0; refs.length > i; i++) this[refs[i]] = React.createRef();
+
+    // Bind functions
+    const functionNames = ["formatMetadata", "setupArticle", "updateMode", "updateName", "updateContent", "saveArticle", "selectContent"];
+    for (let i = 0; functionNames.length > i; i++) this[functionNames[i]].bind(this);
+
+    // Set initial state
     this.state = {
       ready: false,
       mode: new URLSearchParams(document.location.search).get("mode") || "view"
@@ -36,13 +36,13 @@ class Article extends React.Component {
 
   formatMetadata(data) {
 
-    const content = data.content;
+    const source = data.source;
     let headers = [], formattedContent, contributors;
 
     // Make the content look pretty
-    const matches = content ? [...content.matchAll(markupRegex)] : [];
+    const matches = source ? [...source.matchAll(markupRegex)] : [];
     const componentsToFormat = [];
-    if (matches.length === 0) componentsToFormat.push(<div>{content}</div>);
+    if (matches.length === 0) componentsToFormat.push(<p>{source}</p>);
     let currentDiv = [];
     let currentPosition = 0;
     for (let i = 0; matches.length > i; i++) {
@@ -53,7 +53,7 @@ class Article extends React.Component {
       let matchText = match.groups[matchType];
 
       // Add previous text
-      let stringToAdd = content.substring(currentPosition, match.index);
+      let stringToAdd = source.substring(currentPosition, match.index);
       if (stringToAdd) currentDiv.push(React.Fragment, null, stringToAdd);
       currentPosition += stringToAdd.length;
 
@@ -101,7 +101,7 @@ class Article extends React.Component {
 
         case "newLine": {
 
-          const stringToAdd = content.substring(currentPosition, match.index);
+          const stringToAdd = source.substring(currentPosition, match.index);
           if (stringToAdd) currentDiv.push(React.Fragment, null, stringToAdd);
           currentPosition += stringToAdd.length;
 
@@ -172,7 +172,21 @@ class Article extends React.Component {
         const elementType = matchType === "link" ? Link : (matchType === "template" ? React.Fragment : matchType);
         const isHeader = headerDictionary[elementType];
         const Element = React.createElement(elementType, {key: i, id: isHeader ? matchText.replaceAll(" ", "_") : undefined, href: elementType === Link ? (match.groups.linkURL.match(/^(http|www.)/g) ? match.groups.linkURL : `/articles/${match.groups.linkURL}`) : undefined}, matchText);
-        if (Element.props.id) headers.push(Element);
+        if (Element.props.id) {
+
+          headers.push(elementType === "h1" ? (
+            <h1>
+              <a href={`#${Element.props.id}`}>{matchText}</a>
+            </h1>
+          ) : (
+            <ul>
+              <li style={elementType !== "h2" ? {marginLeft: "0.75rem"} : null}>
+                <a href={`#${Element.props.id}`}>{matchText}</a>
+              </li>
+            </ul>
+          ));
+
+        }
         currentDiv.push(Element);
 
         if (isHeader || {li: 1, template: 1}[matchType]) {
@@ -187,10 +201,10 @@ class Article extends React.Component {
     }
 
     // Add the rest of the string, if needed
-    if (content && currentPosition !== content.length) componentsToFormat.push(<div>{content.substring(currentPosition, content.length)}</div>);
+    if (source && currentPosition !== source.length) componentsToFormat.push(<p>{source.substring(currentPosition, source.length)}</p>);
 
     // Format the components
-    formattedContent = content && componentsToFormat.map((component, index) => <React.Fragment key={index}>{component}</React.Fragment>);
+    formattedContent = source && componentsToFormat.map((component, index) => <React.Fragment key={index}>{component}</React.Fragment>);
     
     // Put the contributors in a list
     /*
@@ -221,7 +235,6 @@ class Article extends React.Component {
     // Make sure we show the correct name
     const shownName = name.replaceAll("_", " ");
     this.setState({name: shownName});
-    this.outlineTitle.current.innerHTML = shownName;
 
     // Get the cookie. If we don't have it, redirect to login page
     const value = `; ${document.cookie}`;
@@ -330,13 +343,13 @@ class Article extends React.Component {
 
   }
 
-  async updateMode(mode) {
+  updateMode(mode) {
 
     this.setState({mode: mode});
 
   }
 
-  async updateName(e) {
+  updateName(e) {
 
     if (e.keyCode === 13) {
 
@@ -350,22 +363,118 @@ class Article extends React.Component {
 
   }
 
-  async updateContent(e) {
+  updateContent(e) {
 
+    // Don't delete the initial element, please
     const firstElement = this.firstElement.current;
-    if (e.keyCode == 8 || e.keyCode == 46) { 
+    if ((e.keyCode == 8 || e.keyCode == 46) && firstElement && firstElement.children.length === 1 && firstElement.children[0].innerText < 1) e.preventDefault();
 
-      if (firstElement.children.length === 1) { 
+  }
 
-        if (firstElement.children[0].innerText < 1) { 
+  async saveArticle() {
 
-          e.preventDefault();
+    console.log("Converting article to source string...");
+    // Convert the elements to a Markdown string
+    const children = this.articleContent.current.children;
+    let source = "";
+    for (let i = 0; children.length > i; i++) {
 
-        }
+      const child = children[i];
+      const nodeName = child.nodeName;
+      switch (nodeName) {
 
-      } 
+        case "P":
+          for (let x = 0; child.childNodes.length > x; x++) {
+
+            const grandChild = child.childNodes[x];
+            const grandNodeName = grandChild.nodeName;
+            if (grandChild.nodeValue !== null && grandChild.nodeValue.trim() === "") continue;
+
+            source += (i !== 0 && x === 0 ? "\n" : "");
+
+            switch (grandNodeName) {
+
+              case "A":
+                source += `[${grandChild.innerText}](${grandChild.href})`;
+                break;
+
+              case "B":
+                source += `**${grandChild.innerText}**`;
+                break;
+
+              case "I":
+                source += `*${grandChild.innerText}*`;
+                break;
+              
+              case "U":
+                source += `__${grandChild.innerText}__`;
+                break;
+
+              default:
+                source += grandChild.nodeValue;
+                break;
+
+            }
+
+          }
+          break;
+
+        case "H1":
+        case "H2":
+        case "H3":
+          source += `${i !== 0 ? "\n" : ""}${(nodeName === "H1" || children[i - 1] && children[i - 1].nodeName !== "H1") && i !== 0 ? "\n" : ""}${"#".repeat(nodeName.substring(1))} ${child.innerText}`;
+          break;
+
+        case "UL":
+          source += `${i !== 0 ? "\n" : ""}* ${child.innerText}`;
+          break;
+
+        default:
+          break;
+
+      }
 
     }
+
+    try {
+
+      // Push the source string to the server
+      console.log("Uploading source string to server...");
+      const response = await fetch(`${wikiServer}/pages/${this.state.name.replaceAll(" ", "_")}`, {
+        method: "PUT",
+        headers: {
+          token: this.props.token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({source: source})
+      });
+
+      if (!response.ok) throw new Error(response.status);
+
+      // Done!
+      console.log("Successfully saved the article!");
+
+    } catch (err) {
+
+      console.log(`Couldn't save article: ${err.message}`);
+
+    }
+
+  }
+
+  pasteContent(e) {
+
+    e.preventDefault();
+    const text = e.clipboardData.getData("text/plain");
+    document.execCommand("insertText", false, text);
+
+  }
+
+  selectContent() {
+
+    const nodeName = document.getSelection().anchorNode.parentElement.nodeName;
+    const dropdownOptions = {H1: "Heading 1", H2: "Heading 2", H3: "Heading 3", P: "Paragraph"};
+    this.setState({dropdownOption: dropdownOptions[nodeName]});
 
   }
 
@@ -374,22 +483,18 @@ class Article extends React.Component {
     // Go to header if it changes
     if (typeof window !== "undefined" && typeof document !== "undefined") window.onhashchange = () => document.getElementById(location.hash.substring(1)) && window.scrollBy(0, -80);
 
+    document.execCommand("defaultParagraphSeparator", false, "p");
+
     return (
       <>
         <Header {...this.props} />
         <main id={styles["settings-main"]} ref={this.articleContainer}>
           <nav id={styles["settings-nav"]}>
-            <h1 ref={this.outlineTitle}>Title</h1>
-            <section>
-              <h1><a>Heading 1</a></h1>
-              <ul>
-                <li><a>Heading 2</a></li>
-                <li><a>Heading 3</a></li>
-              </ul>
-            </section>
+            <h1>{this.state.name}</h1>
+            <section>{this.state.headers}</section>
           </nav>
           <article className={styles["dark-article"]}>
-            {this.state.mode === "edit" && <FormattingTools />}
+            {this.state.mode === "edit" && <FormattingTools dropdownOption={this.state.dropdownOption} onSaveButton={async () => this.saveArticle()} />}
             <section id={styles["article-header"]}>
               {this.state.ready && this.props.userCache._id && (
                 <section id={styles["article-controls"]}>
@@ -403,7 +508,7 @@ class Article extends React.Component {
 
             {this.state.ready ? (
               <>
-                <section onKeyDown={this.updateContent} id={styles["article-content"]} suppressContentEditableWarning={true} contentEditable={this.state.mode === "edit"}>
+                <section onSelect={() => this.selectContent()} onPaste={(e) => this.pasteContent(e)} ref={this.articleContent} onKeyDown={(e) => this.updateContent(e)} id={styles["article-content"]} suppressContentEditableWarning={true} contentEditable={this.state.mode === "edit"}>
                   {this.state.content || (this.state.mode === "view" ? (
                     <p>This article doesn't exist... <i>but it always will in our hearts ♥</i></p>
                   ) : <p ref={this.firstElement} placeholder="It goes a little something like this..."></p>)}
@@ -429,7 +534,8 @@ Article.propTypes = {
   match: PropTypes.object,
   type: PropTypes.string,
   history: PropTypes.object,
-  userCache: PropTypes.object
+  userCache: PropTypes.object,
+  token: PropTypes.string
 };
 
 export default withRouter(Article);

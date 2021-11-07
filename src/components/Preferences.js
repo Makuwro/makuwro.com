@@ -56,7 +56,7 @@ class Preferences extends React.Component {
 
     try {
 
-      const response = await fetch(`${process.env.RAZZLE_WIKI_SERVER}/accounts/me`, {
+      await fetch(`${process.env.RAZZLE_WIKI_SERVER}/accounts/me`, {
         method: "PUT",
         headers: {
           token: this.props.token,
@@ -70,7 +70,7 @@ class Preferences extends React.Component {
       
     } catch (err) {
 
-      console.log(err);
+      console.log(err.message);
 
     }
 
@@ -122,7 +122,7 @@ class Preferences extends React.Component {
                   <form>
                     <section>
                       <label htmlFor="theme">Theme</label>
-                      <Dropdown defaultOption="Night">
+                      <Dropdown option="Night">
                         <li>Day</li>
                         <li>Night</li>
                         <li>System</li>

@@ -27,13 +27,11 @@ body {
 a {
   text-decoration: none;
   border-bottom: 2px solid;
-  color: #5c5cf5;
+  color: #a3c1ff;
 }
 
 a:hover {
-  border-bottom: none;
   font-weight: bold;
-  border-bottom: 3px solid;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -184,4 +182,22 @@ u {
 
 button {
   border-radius: 5px;
+}
+
+p, li {
+  color: #b5b5b5;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: #242424;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #5c5c5c;
 }

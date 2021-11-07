@@ -10,29 +10,14 @@ class Dropdown extends React.Component {
 
     this.dropdownRef = React.createRef();
     this.checkIfFlipNeeded = this.checkIfFlipNeeded.bind(this);
-
-    const children = React.Children.map(this.props.children, (child, index) => {
-
-      const newProps = {
-        ...child, 
-        key: index, 
-        onClick: () => {
-    
-          this.setState({option: child.props.children, open: false, above: false});
-          if (this.props.onChange) this.props.onChange();
-          
-        }
-      };
-      newProps["$$typeof"] = undefined;
-      return React.createElement(child.type, newProps, child.props.children);
-  
-    });
+    this.refresh = this.refresh.bind(this);
 
     this.state = {
-      option: props.defaultOption || props.children[0].props.children,
+      option: null,
       open: false,
       above: false,
-      children: children
+      children: null,
+      key: props.key || 0
     };
 
   }
@@ -45,6 +30,47 @@ class Dropdown extends React.Component {
       this.setState({above: rect.bottom > window.innerHeight, open: open});
 
     });
+
+  }
+
+  refresh() {
+
+    this.setState({children: React.Children.map(this.props.children, (child, index) => {
+
+      if (index === this.state.key) this.setState({option: child.props.children});
+
+      const newProps = {
+        ...child,
+        props: undefined,
+        _owner: undefined,
+        _store: undefined,
+        type: undefined,
+        key: index,
+        className: this.state.key === index ? styles.selected : null,
+        onClick: () => {
+    
+          this.setState({option: child.props.children, key: index, open: false, above: false});
+          if (this.props.onChange) this.props.onChange();
+          
+        }
+      };
+      newProps["$$typeof"] = undefined;
+      return React.createElement(child.type, newProps, child.props.children);
+  
+    })});
+
+  }
+
+  componentDidMount() {
+
+    this.refresh();
+
+  }
+
+  componentDidUpdate(oldProps, oldState) {
+
+    if (this.props.key !== oldProps.key) this.setState({key: this.props.key});
+    if (this.state.key !== oldState.key) this.refresh();
 
   }
 
@@ -62,7 +88,7 @@ class Dropdown extends React.Component {
 }
 
 Dropdown.propTypes = {
-  defaultOption: PropTypes.string,
+  option: PropTypes.string,
   children: PropTypes.any,
   onChange: PropTypes.func,
   width: PropTypes.number

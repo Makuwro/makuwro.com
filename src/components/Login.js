@@ -2,8 +2,9 @@ import React, { useRef } from "react";
 import Header from "./Header";
 import styles from "../styles/Authentication.module.css";
 import { Link, useHistory } from "react-router-dom";
+import PropTypes from "prop-types";
 
-export default function Login() {
+export default function Login({setToken}) {
 
   // Set page title
   document.title = "Sign in to The Showrunners Wiki";
@@ -65,11 +66,12 @@ export default function Login() {
 
       // Save the token as a cookie
       const resJson = await serverResponse.json();
-      document.cookie = `token=${resJson.token};`;
+      const token = resJson.token;
+      document.cookie = `token=${token};`;
       
       // Everything's good!
       console.log("Set token as a cookie. Redirecting...");
-      history.replace(redirect);
+      setToken(token, redirect);
 
     } catch (err) {
 
@@ -112,3 +114,7 @@ export default function Login() {
   );
 
 }
+
+Login.propTypes = {
+  setToken: PropTypes.func
+};

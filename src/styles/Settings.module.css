@@ -25,10 +25,8 @@
   overflow-y: auto;
   background-color: var(--nice-blue);
   border-top-left-radius: 10px;
-}
-
-#settings-main p {
-  color: #b5b5b5;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 #settings-main > section:nth-child(2) > section:first-of-type, #settings-main > section:nth-child(2) > section:nth-child(2), #settings-main > section:nth-child(2) > section:nth-child(3) {
@@ -46,9 +44,9 @@
 }
 
 #settings-nav {
-  display: inline-block;
-  height: 100%;
+  display: none;
   width: 100%;
+  height: 100%;
   padding: 0 1rem;
   box-sizing: border-box;
 }
@@ -200,11 +198,12 @@
   }
 
   #settings-main > section:nth-child(2), #settings-main > article {
-    width: calc(100% - 270px);
+    width: calc(100% - 3.5rem);
     box-sizing: border-box;
   }
 
   #settings-nav {
+    display: block;
     width: 270px;
     overflow-y: auto;
   }
