@@ -7,6 +7,10 @@
   width: 100%;
 }
 
+#root {
+  height: 100%;
+}
+
 :focus-visible {
   outline: none;
 }
@@ -15,7 +19,12 @@
   font-family: "Lexend Deca";
 }
 
+html {
+  height: 100%;
+}
+
 body {
+  height: 100%;
   margin: 0;
   line-height: 1.5;
   background-color: #26272b;
@@ -51,7 +60,7 @@ p {
 
 main {
   width: 100%;
-  height: calc(100vh - 56px);
+  height: calc(100% - 56px);
 }
 
 form > section:first-of-type {
