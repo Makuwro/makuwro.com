@@ -1,9 +1,5 @@
 :root {
-  --showtime-orange: rgb(225, 106, 2);
-  --nice-blue: #313237;
-  --background-blue: #3c3d44;
-  --input-orange: rgb(249, 150, 62);
-  --button-color: #afa8ff;
+  
   width: 100%;
 }
 
@@ -27,8 +23,6 @@ body {
   height: 100%;
   margin: 0;
   line-height: 1.5;
-  background-color: #26272b;
-  color: white;
   overflow: hidden;
   user-select: none;
 }
@@ -37,6 +31,10 @@ a {
   text-decoration: none;
   border-bottom: 2px solid;
   color: #a3c1ff;
+}
+
+.day a {
+  color: #3673ef
 }
 
 a:hover {
@@ -50,7 +48,6 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
   font-size: 1.75rem;
-  font-weight: bold;
 }
 
 p {
@@ -61,6 +58,8 @@ p {
 main {
   width: 100%;
   height: calc(100% - 56px);
+  background-color: #26272b;
+  color: white;
 }
 
 form > section:first-of-type {
@@ -75,17 +74,33 @@ form > section > select {
   user-select: none;
 }
 
+.day input[type="text"]:read-only, input[type="password"]:read-only, input:disabled {
+  background-color: #e6e6e6;
+  border-color: #e6e6e6;
+  color: #474748;
+}
+
 input[type="text"]:read-only, input[type="password"]:read-only, input:disabled {
-  color: gray !important;
+  color: gray;
   cursor: not-allowed;
-  background-color: #474748 !important;
+  background-color: #474748;
   border-color: #474748;
+}
+
+.day form input[type="text"], .day form input[type="password"], .day form input[type="email"], .day form select {
+  background-color: #d3d3d3;
+  border-color: #d3d3d3;
+  color: #474748;
+}
+
+.day form ::placeholder {
+  color: #7c7c7c;
 }
 
 form input[type="text"], form input[type="password"], form input[type="email"], form select {
   padding: 0.6rem;
   width: 100%;
-  background-color: #202021 !important;
+  background-color: #202021;
   border: 1px solid #202021;
   color: white;
   border-radius: 5px;
@@ -140,10 +155,19 @@ header {
   background-color: #26272b;
 }
 
+header.day, main.day {
+  background-color: white;
+  color: #26272b;
+}
+
 header > section {
   margin: 0;
   display: flex;
   align-items: center;
+}
+
+.day button, input[type="button"], input[type="submit"] {
+  background-color: #d2ceff;
 }
 
 button, input[type="button"], input[type="submit"] {
@@ -153,6 +177,10 @@ button, input[type="button"], input[type="submit"] {
   padding: 0.6rem 1rem;
   color: black;
   font-size: 1rem;
+}
+
+.day button:hover, .day input[type="button"]:hover, input[type="submit"]:hover {
+  background-color: #b1acec;
 }
 
 button:hover, input[type="button"]:hover, input[type="submit"]:hover {
@@ -180,6 +208,10 @@ article {
   user-select: text;
 }
 
+.day b {
+  color: black;
+}
+
 b {
   color: white;
 }
@@ -193,8 +225,16 @@ button {
   border-radius: 5px;
 }
 
+li {
+  margin-top: 1rem;
+}
+
 p, li {
   color: #b5b5b5;
+}
+
+.day p, .day li {
+  color: #4f5053;
 }
 
 ::-webkit-scrollbar {
@@ -206,7 +246,19 @@ p, li {
   background-color: #242424;
 }
 
+.day ::-webkit-scrollbar-track {
+  background-color: rgb(212, 212, 212);
+}
+
 ::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background-color: #5c5c5c;
+}
+
+.day ::-webkit-scrollbar-thumb {
+  background-color: #999999;
+}
+
+.day ::-webkit-scrollbar-thumb:hover {
+  background-color: #7a7a7a;
 }

@@ -6,7 +6,7 @@ import { withRouter, Link } from "react-router-dom";
 import Header from "./Header";
 import FormattingTools from "./FormattingTools";
 
-const markupRegex = /(?<li>\* (?<licontent>[^\n]+)(?<liEnd>))|(?<h1># (?<h1Content>.+))|(?<h2>## (?<h2Content>.+))|(?<h3>### (?<h3Content>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(?<b>\*\*(?<bContent>.+?)\*\*)|(?<i>\*(?<iContent>.+?)\*)|(?<template>\{\{(?<templateName>[^|]+)\|?(?<parameters>.+)?\}\})|(?<link>\[(?<linkText>.*?)\]\((?<linkURL>[^[\])]*\)?)\))|(?<del>~~(?<delText>.+)~~)|(?<newLine>\n)/gm;
+const markupRegex = /(?<li>\* (?<licontent>[^\n]+))|(?<h1># (?<h1Content>.+))|(?<h2>## (?<h2Content>.+))|(?<h3>### (?<h3Content>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(?<b>\*\*(?<bContent>.+?)\*\*)|(?<i>\*(?<iContent>.+?)\*)|(?<template>\{\{(?<templateName>[^|]+)\|?(?<parameters>.+)?\}\})|(?<link>\[(?<linkText>.*?)\]\((?<linkURL>[^[\])]*\)?)\))|(?<del>~~(?<delText>.+)~~)|(?<newLine>\n)/gm;
 const headerDictionary = {"h1": 1, "h2": 1, "h3": 1, "h4": 1, "h5": 1, "h6": 1};
 const wikiServer = process.env.RAZZLE_WIKI_SERVER;
 
@@ -42,6 +42,7 @@ class Article extends React.Component {
     // Make the content look pretty
     const matches = source ? [...source.matchAll(markupRegex)] : [];
     const componentsToFormat = [];
+    let currentUl = [];
     if (matches.length === 0) componentsToFormat.push(<p>{source}</p>);
     let currentDiv = [];
     let currentPosition = 0;
@@ -54,7 +55,7 @@ class Article extends React.Component {
 
       // Add previous text
       let stringToAdd = source.substring(currentPosition, match.index);
-      if (stringToAdd) currentDiv.push(React.Fragment, null, stringToAdd);
+      if (stringToAdd.trim() !== "") currentDiv.push(<React.Fragment key={`${i}f`}>{stringToAdd}</React.Fragment>);
       currentPosition += stringToAdd.length;
 
       // Check if it's a new line
@@ -102,13 +103,16 @@ class Article extends React.Component {
         case "newLine": {
 
           const stringToAdd = source.substring(currentPosition, match.index);
-          if (stringToAdd) currentDiv.push(React.Fragment, null, stringToAdd);
+          if (stringToAdd.trim() !== "") currentDiv.push(<React.Fragment key={`${i}f2`}>stringToAdd</React.Fragment>);
           currentPosition += stringToAdd.length;
 
           // Wrap it in a container
-          // TODO: ul should include previous li elements
-          if (currentDiv.length > 0) componentsToFormat.push(React.createElement(currentDiv.find(element => element && element.type === "li") ? "ul" : "p", null, currentDiv));
-          currentDiv = [];
+          if (currentDiv.length > 0 && (typeof(currentDiv[0]) === "object" || (typeof(currentDiv[0]) === "string" && currentDiv[0].trim() !== ""))) {
+            
+            componentsToFormat.push(<p>{currentDiv}</p>);
+            currentDiv = [];
+
+          }
 
           break;
 
@@ -127,17 +131,29 @@ class Article extends React.Component {
             const subMatchType = Object.keys(subMatch.groups).filter(key => subMatch.groups[key])[0];
 
             stringToAdd = subMatchText.substring(subMatchIndex, subMatch.index);
-            if (stringToAdd.length > 0) listChildren.push(<>{stringToAdd}</>);
+            if (stringToAdd.length > 0) listChildren.push(<React.Fragment key={`${x}f`}>{stringToAdd}</React.Fragment>);
+            subMatchIndex = subMatch.index;
             switch (subMatchType) {
 
               case "link": {
 
-                subMatchIndex = subMatch.index;
                 const url = subMatch.groups.linkURL;
-                listChildren.push(React.createElement(url.match(/^(http|www.)/g) ? "a" : Link, {key: i, href: `/articles/${url}`}, subMatch.groups.linkText.replace("_", " ")));
+                const external = url.match(/^(http|www\.)/g);
+                const elementType = external ? "a" : Link;
+                listChildren.push(React.createElement(elementType, {
+                  key: x, 
+                  to: external ? undefined : `/articles/${url}`, 
+                  href: external ? url : undefined,
+                  target: external ? "_blank" : null
+                }, subMatch.groups.linkText.replace("_", " ")));
                 break;
 
               }
+
+              case "b":
+              case "i":
+                listChildren.push(React.createElement(subMatchType, {key: x}, subMatchType === "i" ? match.groups.iContent : match.groups.bContent));
+                break;
 
               default:
                 break;
@@ -150,7 +166,7 @@ class Article extends React.Component {
 
           // Add the rest of the line
           const excessString = subMatchText.substring(subMatchIndex, subMatchText.length);
-          if (excessString) listChildren.push(<React.Fragment key={i}>{excessString}</React.Fragment>);
+          if (excessString) listChildren.push(excessString);
 
           matchText = listChildren;
           break;
@@ -169,17 +185,25 @@ class Article extends React.Component {
       if (matchType !== "newLine") {
 
         // Create the element and add it to the header list, if necessary
-        const elementType = matchType === "link" ? Link : (matchType === "template" ? React.Fragment : matchType);
+        const external = matchType === "link" && match.groups.linkURL.match(/^(http|www\.)/g);
+        const elementType = matchType === "link" ? (external ? "a" : Link) : (matchType === "template" ? React.Fragment : matchType);
         const isHeader = headerDictionary[elementType];
-        const Element = React.createElement(elementType, {key: i, id: isHeader ? matchText.replaceAll(" ", "_") : undefined, href: elementType === Link ? (match.groups.linkURL.match(/^(http|www.)/g) ? match.groups.linkURL : `/articles/${match.groups.linkURL}`) : undefined}, matchText);
+        const Element = React.createElement(elementType, {
+          key: i, 
+          id: isHeader ? matchText.replaceAll(" ", "_") : null, 
+          to: matchType === "link" && !external ?  `/articles/${match.groups.linkURL}` : null,
+          href: matchType === "link" && external ? match.groups.linkURL : null,
+          target: external ? "_blank" : null
+        }, matchText);
+        console.log(Element)
         if (Element.props.id) {
 
           headers.push(elementType === "h1" ? (
-            <h1>
+            <h1 key={headers.length}>
               <a href={`#${Element.props.id}`}>{matchText}</a>
             </h1>
           ) : (
-            <ul>
+            <ul key={headers.length}>
               <li style={elementType !== "h2" ? {marginLeft: "0.75rem"} : null}>
                 <a href={`#${Element.props.id}`}>{matchText}</a>
               </li>
@@ -191,12 +215,33 @@ class Article extends React.Component {
 
         if (isHeader || {li: 1, template: 1}[matchType]) {
 
-          componentsToFormat.push(React.createElement(matchType === "li" ? "ul" : React.Fragment, null, currentDiv));
+          if (matchType === "li") {
+
+            currentUl.push(Element);
+
+          } else {
+
+            if (currentUl[0]) {
+
+              componentsToFormat.push(<ul>{currentUl}</ul>);
+              currentUl = [];
+
+            }
+            componentsToFormat.push(<>{currentDiv}</>);
+
+          }
           currentDiv = [];
           
         }
 
       }
+
+    }
+
+    if (currentUl[0]) {
+
+      componentsToFormat.push(<ul>{currentUl}</ul>);
+      currentUl = [];
 
     }
 
@@ -426,6 +471,12 @@ class Article extends React.Component {
           break;
 
         case "UL":
+          for (let x = 0; child.childNodes.length > x; x++) {
+
+            console.log(child.childNodes[x].nodeName);
+
+          }
+
           source += `${i !== 0 ? "\n" : ""}* ${child.innerText}`;
           break;
 
@@ -488,7 +539,7 @@ class Article extends React.Component {
     return (
       <>
         <Header {...this.props} />
-        <main id={styles["settings-main"]} ref={this.articleContainer}>
+        <main className={this.props.theme !== "night" ? this.props.theme : null} id={styles["settings-main"]} ref={this.articleContainer}>
           <nav id={styles["settings-nav"]}>
             <h1>{this.state.name}</h1>
             <section>{this.state.headers}</section>
@@ -498,12 +549,12 @@ class Article extends React.Component {
             <section id={styles["article-header"]}>
               {this.state.ready && this.props.userCache._id && (
                 <section id={styles["article-controls"]}>
-                  <button className={this.state.mode === "edit" ? "unavailable" : null} onClick={() => this.updateMode("edit")}>{this.state.content ? "Edit" : "Create"}</button>
+                  <button onClick={() => this.updateMode(this.state.mode !== "edit" ? "edit" : "view")}>{this.state.content ? (this.state.mode !== "edit" ? "Edit" : "Finish editing") : "Create"}</button>
                 </section>
               )}
-              <div>
-                <h1 id={styles["article-header-name"]} ref={this.pageName} onKeyDown={(e) => this.updateName(e)} suppressContentEditableWarning={true} contentEditable={this.state.mode === "edit"}>{this.state.name}</h1>
-              </div>
+              <h1 id={styles["article-header-name"]} ref={this.pageName} onKeyDown={(e) => this.updateName(e)} suppressContentEditableWarning={true} contentEditable={this.state.mode === "edit"}>
+                {this.state.name}
+              </h1>
             </section>
 
             {this.state.ready ? (

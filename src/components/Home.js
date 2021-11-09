@@ -9,8 +9,8 @@ export default function Home(props) {
   return (
     <>
       <Header {...props} />
-      <main>
-
+      <main className={props.theme !== "night" ? props.theme : null}>
+      
       </main>
     </>
   );

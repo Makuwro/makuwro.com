@@ -5,7 +5,11 @@
   top: 85%;
   margin-top: 0 !important;
   border-top: 0 !important;
-  z-index: 1;
+  z-index: 3;
+}
+
+:global(.day) #settings-save-section > section {
+  background-color: white;
 }
 
 #settings-save-section > section {
@@ -20,11 +24,16 @@
   box-sizing: border-box;
 }
 
+#settings-main:global(.day) > section:nth-child(2), #settings-main:global(.day) > article {
+  background-color: #f1f1f1;
+}
+
 #settings-main > section:nth-child(2), #settings-main > article {
   padding: 0 1.5rem 1rem;
   overflow-y: auto;
   background-color: var(--nice-blue);
   border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
   height: 100%;
   box-sizing: border-box;
 }
@@ -46,9 +55,10 @@
 #settings-nav {
   display: none;
   width: 100%;
-  height: 100%;
+  height: calc(100% - 2rem);
   padding: 0 1rem;
   box-sizing: border-box;
+  margin: 1rem;
 }
 
 #settings-nav h1 {
@@ -57,6 +67,10 @@
   color: #686972;
   border-bottom: none;
   padding-bottom: 0;
+}
+
+:global(.day) > #settings-nav h1 > a {
+  color: black;
 }
 
 #settings-nav h1 > a {
@@ -76,9 +90,17 @@
   border-radius: 3px;
 }
 
+:global(.day) #settings-nav ul > li:hover {
+  background-color: #d3d3d4;
+}
+
 #settings-nav ul > li:hover {
   background-color: #2d2e34;
   color: white;
+}
+
+:global(.day) #settings-nav ul > li > a {
+  color: #4f5053;
 }
 
 #settings-nav ul > li > a {
@@ -204,7 +226,7 @@
 
   #settings-nav {
     display: block;
-    width: 270px;
+    width: calc(270px + 1rem);
     overflow-y: auto;
   }
 }

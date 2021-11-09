@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import Header from "./Header";
+import Header from "./Header.js";
 import styles from "../styles/Authentication.module.css";
 import { Link, useHistory } from "react-router-dom";
 import PropTypes from "prop-types";

@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch, withRouter } from "react-router-dom";
+import { Route, Switch, withRouter, BrowserRouter } from "react-router-dom";
 import Home from "./components/Home";
 import "./styles/global.css";
 import Article from "./components/Article";
@@ -26,7 +26,8 @@ class App extends React.Component {
       userCache: {},
       userDataObtained: false,
       token: token || undefined,
-      redirect: undefined
+      redirect: undefined,
+      theme: "day"
     };
 
   }
@@ -76,25 +77,27 @@ class App extends React.Component {
   render() {
 
     return (
-      <Switch>
-        <Route exact path="/">
-          <Home {...this.state} />
-        </Route>
-        <Route exact path={["/articles", "/articles/:name", "/categories", "/categories/:name", "/templates", "/templates/:name"]} render={(props) => (
-          <Article {...props} {...this.state} />
-        )} />
-        <Route exact path="/login">
-          <Login setToken={(token, redirect) => this.setState({token: token, redirect: redirect})} />
-        </Route>
-        <Route exact path="/preferences">
-          <Preferences {...this.state} />
-        </Route>
-        <Route exact path="/register" component={Registration} />
-        <Route exact path={["/settings", "/settings/:menu"]} render={(props) => (
-          <Settings {...props} {...this.state} />
-        )} />
-        <Route exact path="/test" component={ShareManager} />
-      </Switch>
+      <BrowserRouter>
+        <Switch>
+          <Route exact path="/">
+            <Home {...this.state} />
+          </Route>
+          <Route exact path={["/articles", "/articles/:name", "/categories", "/categories/:name", "/templates", "/templates/:name"]} render={(props) => (
+            <Article {...props} {...this.state} />
+          )} />
+          <Route exact path="/login">
+            <Login setToken={(token, redirect) => this.setState({token: token, redirect: redirect})} />
+          </Route>
+          <Route exact path="/preferences">
+            <Preferences {...this.state} />
+          </Route>
+          <Route exact path="/register" component={Registration} />
+          <Route exact path={["/settings", "/settings/:menu"]} render={(props) => (
+            <Settings {...props} {...this.state} />
+          )} />
+          <Route exact path="/test" component={ShareManager} />
+        </Switch>
+      </BrowserRouter>
     );
 
   }

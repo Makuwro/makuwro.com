@@ -13,7 +13,8 @@ class Header extends React.Component {
     // Set initial state
     this.state = {
       searchResults: null,
-      query: ""
+      query: props.query || "",
+      inputFocused: false
     };
     
 
@@ -53,7 +54,7 @@ class Header extends React.Component {
 
                   e.preventDefault();
                   document.activeElement.blur();
-                  this.props.history.push(`/articles/${name}`);
+                  this.setState({redirect: spacedName, query: ""}, () => this.props.history.push(`/articles/${name}`));
                   
                 }} href={`/articles/${name}`}>{spacedName}</a></li>
               );
@@ -83,22 +84,22 @@ class Header extends React.Component {
 
   componentDidUpdate(oldProps, oldState) {
 
-    if (oldState.cachedResults === this.state.cachedResults && oldState.query === this.state.query) return;
+    if (oldState.cachedResults === this.state.cachedResults && (oldState.query === this.state.query || oldState.redirect && oldState.query !== "")) return;
     this.userSearching();
 
   }
 
   render() {
 
-    const {userCache} = this.props;
+    const {userCache, theme} = this.props;
     return (
-      <header>
+      <header className={theme !== "night" ? theme : null}>
         <section>
           <div id={styles["wiki-name"]}>The Showrunners</div>
         </section>
-        <form id={styles["search-box"]}>
-          <input type="text" onInput={(e) => this.setState({query: e.target.value})} placeholder="Search for or create a page..." />
-          <ul style={!this.state.searchResults ? {display: "none"} : null} id={styles["search-results"]}>
+        <form onFocus={() => this.setState({inputFocused: true})} onBlur={() => this.setState({inputFocused: false})} id={styles["search-box"]}>
+          <input type="text" className={!this.state.searchResults || !this.state.inputFocused ? styles["no-results"] : null} onInput={(e) => this.setState({query: e.target.value, redirect: undefined})} placeholder={this.state.redirect || "Search for or create a page..."} value={this.state.query} />
+          <ul id={styles["search-results"]}>
             {this.state.searchResults}
           </ul>
         </form>
@@ -108,7 +109,7 @@ class Header extends React.Component {
               <button>
                 Share
               </button>
-              <button onClick={() => this.props.history.push("/preferences")} id={styles["account-button"]} style={{
+              <button title="Preferences" onClick={() => this.props.history.push("/preferences")} id={styles["account-button"]} style={{
                 backgroundImage: `url(${userCache.avatar_url})`,
                 backgroundSize: "cover"
               }}></button>

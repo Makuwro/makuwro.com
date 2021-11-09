@@ -2,7 +2,13 @@ import React from "react";
 
 function LoadingScreen() {
 
-  return <>One moment please...</>;
+  const loadingLines = [
+    "Talking to the power...", 
+    "One moment please...",
+    "Blaming Christian for something..."
+  ];
+
+  return <>{loadingLines[Math.floor(Math.random()*loadingLines.length)]}</>;
 
 }
 

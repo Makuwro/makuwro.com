@@ -84,7 +84,7 @@ class Preferences extends React.Component {
     return (
       <>
         <Header {...this.props} />
-        <main id={styles["settings-main"]}>
+        <main className={this.props.theme !== "night" ? this.props.theme : null} id={styles["settings-main"]}>
           <nav id={styles["settings-nav"]}>
             <h1>Preferences</h1>
           </nav>
@@ -121,12 +121,16 @@ class Preferences extends React.Component {
                   <h1>Appearance</h1>
                   <form>
                     <section>
-                      <label htmlFor="theme">Theme</label>
-                      <Dropdown option="Night">
+                      <label>Theme</label>
+                      <Dropdown key={1}>
                         <li>Day</li>
                         <li>Night</li>
                         <li>System</li>
                       </Dropdown>
+                    </section>
+                    <section>
+                      <input type="checkbox" name="theme-sync" />
+                      <label htmlFor="theme-sync">Sync theme across devices</label>
                     </section>
                   </form>
                 </section>
