@@ -1,5 +1,4 @@
 import React, { useRef } from "react";
-import Header from "./Header.js";
 import styles from "../styles/Authentication.module.css";
 import { Link, useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -84,7 +83,6 @@ export default function Login({setToken}) {
   // Don't return anything if we're already authorized
   return checkAuth() ? null : (
     <>
-      <Header />
       <main id={styles["auth-main"]}>
         <section>
           <section>To view and edit articles, you need an account.</section>

@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "./Header";
 import styles from "../styles/Settings.module.css";
 import LoadingScreen from "./LoadingScreen";
 import Dropdown from "./Dropdown";
@@ -83,76 +82,74 @@ class Preferences extends React.Component {
     const {theme} = this.props;
 
     return (
-      <>
-        <Header {...this.props} />
-        <main className={theme !== 1 ? "day" : null} id={styles["settings-main"]}>
-          <nav id={styles["settings-nav"]}>
-            <h1>Preferences</h1>
-          </nav>
-          <section>
-            {this.state.ready ? (
-              <>
-                <SaveButton onClick={this.savePreferences} />
-                <section>
-                  <h1>Contributing</h1>
-                  <form>
-                    <section>
-                      <label htmlFor="contributorName">Contributor name</label>
-                      <p>This is the name used for crediting you.</p>
-                      <input type="text" name="contributorName" onChange={(e) => updatePreferences(e, "contributorName")} placeholder={properties.username} value={properties.contributorName} />
-                    </section>
-                    <section>
-                      <label htmlFor="username">Username</label>
-                      <p>This is the name used for logging you in.</p>
-                      <input type="text" name="username" onChange={(e) => updatePreferences(e, "username")} value={properties.username} />
-                    </section>
-                    <section>
-                      <label htmlFor="userId">User ID</label>
-                      <p>This is the unique identifier given to you when you signed up. You can't change it.</p>
-                      <input type="text" name="userId" value={properties._id || "Unknown"} readOnly />
-                    </section>
-                    <section>
-                      <label htmlFor="avatar">Profile picture URL</label>
-                      <p>This is the image by your name other contributors will see.</p>
-                      <input type="text" name="avatar" onChange={(e) => updatePreferences(e, "avatar_url")} value={properties.avatar_url} placeholder="https://i.pinimg.com/736x/53/8c/ae/538caebb5de2705ed34c55a17f3a8615.jpg" />
-                    </section>
-                  </form>
-                </section>
-                <section>
-                  <h1>Appearance</h1>
-                  <form>
-                    <section>
-                      <label>Theme</label>
-                      <Dropdown index={theme} onChange={(option) => this.props.onThemeChange(option)}>
-                        <li>Day</li>
-                        <li>Night</li>
-                        <li>System</li>
-                      </Dropdown>
-                    </section>
-                    <section>
-                      <input type="checkbox" name="theme-sync" />
-                      <label htmlFor="theme-sync">Sync theme across devices</label>
-                    </section>
-                  </form>
-                </section>
-                <section>
-                  <h1>Editing</h1>
-                  <form>
-                    <section>
-                      <input type="checkbox" name="warn-unsaved-edits" disabled />
-                      <label htmlFor="warn-unsaved-edits">Warn me if I leave the editor with unsaved changes (WIP)</label>
-                    </section>
-                    <section>
-                      <input type="checkbox" name="auto-collab" disabled />
-                      <label htmlFor="auto-collab">Automatically enable collaboration mode when editing (WIP)</label>
-                    </section>
-                  </form>
-                </section>
-              </>
-            ) : <LoadingScreen />}
-          </section>
-        </main>
-      </>
+
+      <main className={theme !== 1 ? "day" : null} id={styles["settings-main"]}>
+        <nav id={styles["settings-nav"]}>
+          <h1>Preferences</h1>
+        </nav>
+        <section>
+          {this.state.ready ? (
+            <>
+              <SaveButton onClick={this.savePreferences} />
+              <section>
+                <h1>Contributing</h1>
+                <form>
+                  <section>
+                    <label htmlFor="contributorName">Contributor name</label>
+                    <p>This is the name used for crediting you.</p>
+                    <input type="text" name="contributorName" onChange={(e) => updatePreferences(e, "contributorName")} placeholder={properties.username} value={properties.contributorName} />
+                  </section>
+                  <section>
+                    <label htmlFor="username">Username</label>
+                    <p>This is the name used for logging you in.</p>
+                    <input type="text" name="username" onChange={(e) => updatePreferences(e, "username")} value={properties.username} />
+                  </section>
+                  <section>
+                    <label htmlFor="userId">User ID</label>
+                    <p>This is the unique identifier given to you when you signed up. You can't change it.</p>
+                    <input type="text" name="userId" value={properties._id || "Unknown"} readOnly />
+                  </section>
+                  <section>
+                    <label htmlFor="avatar">Profile picture URL</label>
+                    <p>This is the image by your name other contributors will see.</p>
+                    <input type="text" name="avatar" onChange={(e) => updatePreferences(e, "avatar_url")} value={properties.avatar_url} placeholder="https://i.pinimg.com/736x/53/8c/ae/538caebb5de2705ed34c55a17f3a8615.jpg" />
+                  </section>
+                </form>
+              </section>
+              <section>
+                <h1>Appearance</h1>
+                <form>
+                  <section>
+                    <label>Theme</label>
+                    <Dropdown index={theme} onChange={(option) => this.props.onThemeChange(option)}>
+                      <li>Day</li>
+                      <li>Night</li>
+                      <li>System</li>
+                    </Dropdown>
+                  </section>
+                  <section>
+                    <input type="checkbox" name="theme-sync" />
+                    <label htmlFor="theme-sync">Sync theme across devices</label>
+                  </section>
+                </form>
+              </section>
+              <section>
+                <h1>Editing</h1>
+                <form>
+                  <section>
+                    <input type="checkbox" name="warn-unsaved-edits" disabled />
+                    <label htmlFor="warn-unsaved-edits">Warn me if I leave the editor with unsaved changes (WIP)</label>
+                  </section>
+                  <section>
+                    <input type="checkbox" name="auto-collab" disabled />
+                    <label htmlFor="auto-collab">Automatically enable collaboration mode when editing (WIP)</label>
+                  </section>
+                </form>
+              </section>
+            </>
+          ) : <LoadingScreen />}
+        </section>
+      </main>
 
     );
 

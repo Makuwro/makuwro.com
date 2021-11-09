@@ -9,6 +9,7 @@ import Registration from "./components/Registration";
 import Settings from "./components/Settings";
 import ShareManager from "./components/Share";
 import PropTypes from "prop-types";
+import Header from "./components/Header";
 
 class App extends React.Component {
 
@@ -88,6 +89,7 @@ class App extends React.Component {
 
     return (
       <BrowserRouter>
+        <Header {...this.state} />
         <Switch>
           <Route exact path="/">
             <Home {...this.state} />

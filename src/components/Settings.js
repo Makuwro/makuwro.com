@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "./Header";
 import styles from "../styles/Settings.module.css";
 import { Link } from "react-router-dom";
 import CodeManager from "./settings/CodeManager";
@@ -65,7 +64,6 @@ function Settings(props) {
 
   return (
     <>
-      <Header {...props} />
       <main id={styles["settings-main"]}>
         <nav id={styles["settings-nav"]}>
           {navChildren}

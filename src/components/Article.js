@@ -3,7 +3,6 @@ import styles from "../styles/Settings.module.css";
 import PropTypes from "prop-types";
 import LoadingScreen from "./LoadingScreen";
 import { withRouter, Link } from "react-router-dom";
-import Header from "./Header";
 import FormattingTools from "./FormattingTools";
 
 const markupRegex = /(?<li>\* (?<licontent>[^\n]+))|(?<h1># (?<h1Content>.+))|(?<h2>## (?<h2Content>.+))|(?<h3>### (?<h3Content>.+))|(?<element><(\w+?)( (?<elementAttribs>\w+=".+?|")|)>(?<elementText>.+?)<\/\w+?>)|(?<b>\*\*(?<bContent>.+?)\*\*)|(?<i>\*(?<iContent>.+?)\*)|(?<template>\{\{(?<templateName>[^|]+)\|?(?<parameters>.+)?\}\})|(?<link>\[(?<linkText>.*?)\]\((?<linkURL>[^[\])]*\)?)\))|(?<del>~~(?<delText>.+)~~)|(?<newLine>\n)/gm;
@@ -536,44 +535,43 @@ class Article extends React.Component {
     document.execCommand("defaultParagraphSeparator", false, "p");
 
     return (
-      <>
-        <Header {...this.props} />
-        <main className={this.props.theme !== 1 ? "day" : null} id={styles["settings-main"]} ref={this.articleContainer}>
-          <nav id={styles["settings-nav"]}>
-            <h1>{this.state.name}</h1>
-            <section>{this.state.headers}</section>
-          </nav>
-          <article className={styles["dark-article"]}>
-            {this.state.mode === "edit" && <FormattingTools dropdownOption={this.state.dropdownOption} onSaveButton={async () => this.saveArticle()} />}
-            <section id={styles["article-header"]}>
-              {this.state.ready && this.props.userCache._id && (
-                <section id={styles["article-controls"]}>
-                  <button onClick={() => this.updateMode(this.state.mode !== "edit" ? "edit" : "view")}>{this.state.content ? (this.state.mode !== "edit" ? "Edit" : "Finish editing") : "Create"}</button>
+
+      <main className={this.props.theme !== 1 ? "day" : null} id={styles["settings-main"]} ref={this.articleContainer}>
+        <nav id={styles["settings-nav"]}>
+          <h1>{this.state.name}</h1>
+          <section>{this.state.headers}</section>
+        </nav>
+        <article className={styles["dark-article"]}>
+          {this.state.mode === "edit" && <FormattingTools dropdownOption={this.state.dropdownOption} onSaveButton={async () => this.saveArticle()} />}
+          <section id={styles["article-header"]}>
+            {this.state.ready && this.props.userCache._id && (
+              <section id={styles["article-controls"]}>
+                <button onClick={() => this.updateMode(this.state.mode !== "edit" ? "edit" : "view")}>{this.state.content ? (this.state.mode !== "edit" ? "Edit" : "Finish editing") : "Create"}</button>
+              </section>
+            )}
+            <h1 id={styles["article-header-name"]} ref={this.pageName} onKeyDown={(e) => this.updateName(e)} suppressContentEditableWarning={true} contentEditable={this.state.mode === "edit"}>
+              {this.state.name}
+            </h1>
+          </section>
+
+          {this.state.ready ? (
+            <>
+              <section onSelect={() => this.selectContent()} onPaste={(e) => this.pasteContent(e)} ref={this.articleContent} onKeyDown={(e) => this.updateContent(e)} id={styles["article-content"]} suppressContentEditableWarning={true} contentEditable={this.state.mode === "edit"}>
+                {this.state.content || (this.state.mode === "view" ? (
+                  <p>This article doesn't exist... <i>but it always will in our hearts ♥</i></p>
+                ) : <p ref={this.firstElement} placeholder="It goes a little something like this..."></p>)}
+              </section>
+
+              {this.state.content && (
+                <section id={styles["article-footer"]}>
+                  <div id={styles["last-edited"]}>Last edited on January 1, 2021</div>
                 </section>
               )}
-              <h1 id={styles["article-header-name"]} ref={this.pageName} onKeyDown={(e) => this.updateName(e)} suppressContentEditableWarning={true} contentEditable={this.state.mode === "edit"}>
-                {this.state.name}
-              </h1>
-            </section>
-
-            {this.state.ready ? (
-              <>
-                <section onSelect={() => this.selectContent()} onPaste={(e) => this.pasteContent(e)} ref={this.articleContent} onKeyDown={(e) => this.updateContent(e)} id={styles["article-content"]} suppressContentEditableWarning={true} contentEditable={this.state.mode === "edit"}>
-                  {this.state.content || (this.state.mode === "view" ? (
-                    <p>This article doesn't exist... <i>but it always will in our hearts ♥</i></p>
-                  ) : <p ref={this.firstElement} placeholder="It goes a little something like this..."></p>)}
-                </section>
-
-                {this.state.content && (
-                  <section id={styles["article-footer"]}>
-                    <div id={styles["last-edited"]}>Last edited on January 1, 2021</div>
-                  </section>
-                )}
-              </>
-            ) : <LoadingScreen />}
-          </article>
-        </main>
-      </>
+            </>
+          ) : <LoadingScreen />}
+        </article>
+      </main>
+      
     );
 
   }
