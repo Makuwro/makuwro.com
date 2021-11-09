@@ -9,7 +9,7 @@
 }
 
 :global(.day) #settings-save-section > section {
-  background-color: white;
+  background-color: var(--day-background);
 }
 
 #settings-save-section > section {
@@ -17,7 +17,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: var(--background-blue);
+  background-color: var(--night-background);
   width: 100%;
   padding: 0.5rem 1rem;
   border-radius: 5px;
@@ -25,13 +25,13 @@
 }
 
 #settings-main:global(.day) > section:nth-child(2), #settings-main:global(.day) > article {
-  background-color: #f1f1f1;
+  background-color: var(--day-article);
 }
 
 #settings-main > section:nth-child(2), #settings-main > article {
   padding: 0 1.5rem 1rem;
   overflow-y: auto;
-  background-color: var(--nice-blue);
+  background-color: var(--night-article);
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   height: 100%;
@@ -45,11 +45,6 @@
 
 #settings-main > section:nth-child(2) > section:last-of-type {
   padding-bottom: 100px;
-}
-
-#settings-main > section:nth-child(2) > section {
-  border-top: 1px solid gray;
-  margin-top: 2rem;
 }
 
 #settings-nav {

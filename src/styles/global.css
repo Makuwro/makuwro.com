@@ -1,9 +1,20 @@
 :root {
-  
-  width: 100%;
+  --day-background: white;
+  --day-button: #d2ceff;
+  --day-article: #f1f1f1;
+  --day-input-background: #d3d3d3;
+  --day-input-text: #474748;
+  --day-input-placeholder: #7c7c7c;
+  --day-text: #4f5053;
+  --night-background: #26272b;
+  --night-button: #afa8ff;
+  --night-input-background: #202021;
+  --night-article: #313237;
+  --night-text: #b5b5b5;
 }
 
 #root {
+  width: 100%;
   height: 100%;
 }
 
@@ -58,7 +69,7 @@ p {
 main {
   width: 100%;
   height: calc(100% - 56px);
-  background-color: #26272b;
+  background-color: var(--night-background);
   color: white;
 }
 
@@ -87,21 +98,21 @@ input[type="text"]:read-only, input[type="password"]:read-only, input:disabled {
   border-color: #474748;
 }
 
-.day form input[type="text"], .day form input[type="password"], .day form input[type="email"], .day form select {
-  background-color: #d3d3d3;
-  border-color: #d3d3d3;
-  color: #474748;
+.day form input[type="text"], .day form input[type="password"], .day form input[type="email"] {
+  background-color: var(--day-input-background);
+  border-color: var(--day-input-background);
+  color: var(--day-input-text);
 }
 
 .day form ::placeholder {
-  color: #7c7c7c;
+  color: var(--day-input-placeholder);
 }
 
-form input[type="text"], form input[type="password"], form input[type="email"], form select {
+form input[type="text"], form input[type="password"], form input[type="email"] {
   padding: 0.6rem;
   width: 100%;
-  background-color: #202021;
-  border: 1px solid #202021;
+  background-color: var(--night-input-background);
+  border: 1px solid var(--night-input-background);
   color: white;
   border-radius: 5px;
   font-size: 1rem;
@@ -167,12 +178,12 @@ header > section {
 }
 
 .day button, input[type="button"], input[type="submit"] {
-  background-color: #d2ceff;
+  background-color: var(--day-button);
 }
 
 button, input[type="button"], input[type="submit"] {
   cursor: pointer;
-  background-color: var(--button-color);
+  background-color: var(--night-button);
   border: none;
   padding: 0.6rem 1rem;
   color: black;
@@ -230,11 +241,11 @@ li {
 }
 
 p, li {
-  color: #b5b5b5;
+  color: var(--night-text);
 }
 
 .day p, .day li {
-  color: #4f5053;
+  color: var(--day-text);
 }
 
 ::-webkit-scrollbar {
