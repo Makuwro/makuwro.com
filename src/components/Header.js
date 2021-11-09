@@ -132,7 +132,9 @@ Header.propTypes = {
   userCache: PropTypes.object,
   token: PropTypes.string,
   articleContainer: PropTypes.any,
-  history: PropTypes.object
+  history: PropTypes.object,
+  query: PropTypes.string,
+  theme: PropTypes.number
 };
 
 export default withRouter(Header);

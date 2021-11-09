@@ -195,7 +195,6 @@ class Article extends React.Component {
           href: matchType === "link" && external ? match.groups.linkURL : null,
           target: external ? "_blank" : null
         }, matchText);
-        console.log(Element)
         if (Element.props.id) {
 
           headers.push(elementType === "h1" ? (
@@ -586,7 +585,8 @@ Article.propTypes = {
   type: PropTypes.string,
   history: PropTypes.object,
   userCache: PropTypes.object,
-  token: PropTypes.string
+  token: PropTypes.string,
+  theme: PropTypes.number
 };
 
 export default withRouter(Article);

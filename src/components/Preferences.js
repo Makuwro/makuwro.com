@@ -80,11 +80,12 @@ class Preferences extends React.Component {
     
     const updatePreferences = this.updatePreferences;
     const {properties} = this.state;
+    const {theme} = this.props;
 
     return (
       <>
         <Header {...this.props} />
-        <main className={this.props.theme !== 1 ? "day" : null} id={styles["settings-main"]}>
+        <main className={theme !== 1 ? "day" : null} id={styles["settings-main"]}>
           <nav id={styles["settings-nav"]}>
             <h1>Preferences</h1>
           </nav>
@@ -122,7 +123,7 @@ class Preferences extends React.Component {
                   <form>
                     <section>
                       <label>Theme</label>
-                      <Dropdown index={this.props.theme} onChange={(option) => this.props.onThemeChange(option)}>
+                      <Dropdown index={theme} onChange={(option) => this.props.onThemeChange(option)}>
                         <li>Day</li>
                         <li>Night</li>
                         <li>System</li>
@@ -162,7 +163,9 @@ class Preferences extends React.Component {
 Preferences.propTypes = {
   token: PropTypes.string,
   userCache: PropTypes.object,
-  userDataObtained: PropTypes.bool
+  userDataObtained: PropTypes.bool,
+  theme: PropTypes.number,
+  onThemeChange: PropTypes.func
 };
 
 export default Preferences;
