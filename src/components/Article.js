@@ -539,7 +539,7 @@ class Article extends React.Component {
     return (
       <>
         <Header {...this.props} />
-        <main className={this.props.theme !== "night" ? this.props.theme : null} id={styles["settings-main"]} ref={this.articleContainer}>
+        <main className={this.props.theme !== 1 ? "day" : null} id={styles["settings-main"]} ref={this.articleContainer}>
           <nav id={styles["settings-nav"]}>
             <h1>{this.state.name}</h1>
             <section>{this.state.headers}</section>

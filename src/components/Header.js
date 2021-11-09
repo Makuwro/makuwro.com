@@ -92,8 +92,9 @@ class Header extends React.Component {
   render() {
 
     const {userCache, theme} = this.props;
+
     return (
-      <header className={theme !== "night" ? theme : null}>
+      <header className={theme !== 1 ? "day" : null}>
         <section>
           <div id={styles["wiki-name"]}>The Showrunners</div>
         </section>

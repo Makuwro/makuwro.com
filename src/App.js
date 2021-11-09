@@ -17,17 +17,20 @@ class App extends React.Component {
     super();
 
     const value = `; ${document.cookie}`;
-    const parts = value.split("; token=");
-    const token = parts.length === 2 && parts.pop().split(";")[0];
+    const tokenParts = value.split("; token=");
+    const token = tokenParts.length === 2 && tokenParts.pop().split(";")[0];
+    const themeParts = value.split("; theme=");
+    const theme = themeParts.length === 2 && themeParts.pop().split(";")[0];
 
     this.checkUserInfo = this.checkUserInfo.bind(this);
+    this.changeTheme = this.changeTheme.bind(this);
 
     this.state = {
       userCache: {},
       userDataObtained: false,
       token: token || undefined,
       redirect: undefined,
-      theme: "day"
+      theme: theme ? parseInt(theme, 10) : 1
     };
 
   }
@@ -74,6 +77,13 @@ class App extends React.Component {
 
   }
 
+  changeTheme(theme) {
+
+    document.cookie = `theme=${theme}`;
+    this.setState({theme: theme});
+
+  }
+
   render() {
 
     return (
@@ -89,7 +99,7 @@ class App extends React.Component {
             <Login setToken={(token, redirect) => this.setState({token: token, redirect: redirect})} />
           </Route>
           <Route exact path="/preferences">
-            <Preferences {...this.state} />
+            <Preferences {...this.state} onThemeChange={(theme) => this.changeTheme(theme)} />
           </Route>
           <Route exact path="/register" component={Registration} />
           <Route exact path={["/settings", "/settings/:menu"]} render={(props) => (

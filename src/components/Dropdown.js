@@ -17,7 +17,7 @@ class Dropdown extends React.Component {
       open: false,
       above: false,
       children: null,
-      key: props.key || 0
+      index: props.index || 0
     };
 
   }
@@ -37,7 +37,7 @@ class Dropdown extends React.Component {
 
     this.setState({children: React.Children.map(this.props.children, (child, index) => {
 
-      if (index === this.state.key) this.setState({option: child.props.children});
+      if (index === this.state.index) this.setState({option: child.props.children});
 
       const newProps = {
         ...child,
@@ -46,11 +46,10 @@ class Dropdown extends React.Component {
         _store: undefined,
         type: undefined,
         key: index,
-        className: this.state.key === index ? styles.selected : null,
+        className: this.state.index === index ? styles.selected : null,
         onClick: () => {
     
-          this.setState({option: child.props.children, key: index, open: false, above: false});
-          if (this.props.onChange) this.props.onChange();
+          this.setState({option: child.props.children, index: index, open: false, above: false}, () => this.props.onChange && this.props.onChange(index));
           
         }
       };
@@ -69,8 +68,8 @@ class Dropdown extends React.Component {
 
   componentDidUpdate(oldProps, oldState) {
 
-    if (this.props.key !== oldProps.key) this.setState({key: this.props.key});
-    if (this.state.key !== oldState.key) this.refresh();
+    if (this.props.index !== oldProps.index) this.setState({index: this.props.index});
+    if (this.state.index !== oldState.index) this.refresh();
 
   }
 
