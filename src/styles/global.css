@@ -11,6 +11,7 @@
   --night-input-background: #202021;
   --night-article: #313237;
   --night-text: #b5b5b5;
+  --day-box-shadow: 0 2.8px 2.2px rgba(0, 0, 0, 0.034), 0 6.7px 5.3px rgba(0, 0, 0, 0.048), 0 12.5px 10px rgba(0, 0, 0, 0.06), 0 22.3px 17.9px rgba(0, 0, 0, 0.072), 0 41.8px 33.4px rgba(0, 0, 0, 0.086), 0 100px 80px rgba(0, 0, 0, 0.12);
 }
 
 #root {
@@ -96,6 +97,7 @@ input[type="text"]:read-only, input[type="password"]:read-only, input:disabled {
   cursor: not-allowed;
   background-color: #474748;
   border-color: #474748;
+  box-shadow: none;
 }
 
 .day form input[type="text"], .day form input[type="password"], .day form input[type="email"] {
@@ -117,6 +119,7 @@ form input[type="text"], form input[type="password"], form input[type="email"] {
   border-radius: 5px;
   font-size: 1rem;
   box-sizing: border-box;
+  box-shadow: var(--day-box-shadow);
 }
 
 input[type="checkbox"] {

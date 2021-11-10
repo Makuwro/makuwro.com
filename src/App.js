@@ -31,7 +31,8 @@ class App extends React.Component {
       userDataObtained: false,
       token: token || undefined,
       redirect: undefined,
-      theme: theme ? parseInt(theme, 10) : 1
+      theme: theme ? parseInt(theme, 10) : 1,
+      systemDark: window.matchMedia("(prefers-color-scheme: dark)").matches
     };
 
   }
@@ -86,6 +87,9 @@ class App extends React.Component {
   }
 
   render() {
+
+    // Listen for theme changes
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => this.setState({systemDark: event.matches}));
 
     return (
       <BrowserRouter>

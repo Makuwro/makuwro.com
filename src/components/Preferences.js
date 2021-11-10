@@ -79,11 +79,11 @@ class Preferences extends React.Component {
     
     const updatePreferences = this.updatePreferences;
     const {properties} = this.state;
-    const {theme} = this.props;
+    const {theme, systemDark} = this.props;
 
     return (
 
-      <main className={theme !== 1 ? "day" : null} id={styles["settings-main"]}>
+      <main className={theme !== 1 && (theme !== 2 || !systemDark) ? "day" : null} id={styles["settings-main"]}>
         <nav id={styles["settings-nav"]}>
           <h1>Preferences</h1>
         </nav>
@@ -162,7 +162,8 @@ Preferences.propTypes = {
   userCache: PropTypes.object,
   userDataObtained: PropTypes.bool,
   theme: PropTypes.number,
-  onThemeChange: PropTypes.func
+  onThemeChange: PropTypes.func,
+  systemDark: PropTypes.bool
 };
 
 export default Preferences;

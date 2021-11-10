@@ -534,9 +534,11 @@ class Article extends React.Component {
 
     document.execCommand("defaultParagraphSeparator", false, "p");
 
+    const {theme, systemDark} = this.props;
+
     return (
 
-      <main className={this.props.theme !== 1 ? "day" : null} id={styles["settings-main"]} ref={this.articleContainer}>
+      <main className={theme !== 1 && (theme !== 2 || !systemDark) ? "day" : null} id={styles["settings-main"]} ref={this.articleContainer}>
         <nav id={styles["settings-nav"]}>
           <h1>{this.state.name}</h1>
           <section>{this.state.headers}</section>
@@ -584,7 +586,8 @@ Article.propTypes = {
   history: PropTypes.object,
   userCache: PropTypes.object,
   token: PropTypes.string,
-  theme: PropTypes.number
+  theme: PropTypes.number,
+  systemDark: PropTypes.bool
 };
 
 export default withRouter(Article);

@@ -117,7 +117,7 @@
 }
 
 #login-button {
-  background-color: var(--button-color);
+  background-color: var(--night-button);
   color: black;
   border: none;
   border-radius: 5px;

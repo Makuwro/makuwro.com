@@ -91,10 +91,10 @@ class Header extends React.Component {
 
   render() {
 
-    const {userCache, theme} = this.props;
+    const {userCache, theme, systemDark} = this.props;
 
     return (
-      <header className={theme !== 1 ? "day" : null}>
+      <header className={theme !== 1 && (theme !== 2 || !systemDark) ? "day" : null}>
         <section>
           <div id={styles["wiki-name"]}>The Showrunners</div>
         </section>
@@ -134,7 +134,8 @@ Header.propTypes = {
   articleContainer: PropTypes.any,
   history: PropTypes.object,
   query: PropTypes.string,
-  theme: PropTypes.number
+  theme: PropTypes.number,
+  systemDark: PropTypes.bool
 };
 
 export default withRouter(Header);
