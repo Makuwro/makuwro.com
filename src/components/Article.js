@@ -332,6 +332,7 @@ class Article extends React.Component {
           }
 
           // Format metadata
+          if (articleJson.time) this.setState({time: new Date(articleJson.time)});
           this.formatMetadata(articleJson);
           break;
           
@@ -535,6 +536,13 @@ class Article extends React.Component {
     document.execCommand("defaultParagraphSeparator", false, "p");
 
     const {theme, systemDark} = this.props;
+    const {time} = this.state;
+    let formattedTime = null;
+    if (time) {
+
+      formattedTime = `${time.toLocaleString("default", {month: "long"})} ${time.getDate()}, ${time.getFullYear()}`;
+
+    }
 
     return (
 
@@ -566,7 +574,7 @@ class Article extends React.Component {
 
               {this.state.content && (
                 <section id={styles["article-footer"]}>
-                  <div id={styles["last-edited"]}>Last edited on January 1, 2021</div>
+                  <div id={styles["last-edited"]}>Last edited on {formattedTime || "the darkest day"}</div>
                 </section>
               )}
             </>
