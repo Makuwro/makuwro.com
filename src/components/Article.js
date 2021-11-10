@@ -432,7 +432,7 @@ class Article extends React.Component {
 
             const grandChild = child.childNodes[x];
             const grandNodeName = grandChild.nodeName;
-            if (grandChild.nodeValue !== null && grandChild.nodeValue.trim() === "") continue;
+            if ((grandChild.nodeValue !== null && grandChild.nodeValue.trim() === "") || grandNodeName === "BR") continue;
 
             source += (i !== 0 && x === 0 ? "\n" : "");
 
