@@ -1,0 +1,97 @@
+#home-main {
+  overflow-y: auto;
+  height: calc(100% - 4.5rem);
+}
+
+#home-tv {
+  border-radius: 15px;
+  width: 95%;
+  height: 85vh;
+  left: 2.5%;
+  margin-top: 1rem;
+  position: relative;
+  box-sizing: border-box;
+  background-image: url(https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/SMPTE_COLOR_BAR_75.png/640px-SMPTE_COLOR_BAR_75.png);
+  background-size: contain;
+}
+
+#home-tv-overlay {
+  background-color: rgba(18, 18, 19, 0.253);
+  height: 100%;
+  padding: 1rem;
+  width: 100%;
+  border-radius: 15px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#home-tv-overlay > section:first-of-type > section:first-of-type {
+  font-size: 4rem;
+}
+
+#home-tv-overlay > section:first-of-type > section:nth-of-type(2) {
+  text-align: center;
+  margin-top: 1rem;
+  font-style: italic;
+  font-size: 1.5rem;
+}
+
+#home-tv-overlay > section:nth-of-type(2) {
+  margin-top: 3rem;
+}
+
+#home-tv-overlay button {
+  background-color: white;
+  color: black;
+  margin: 0 auto;
+  display: block;
+}
+
+#home-tv-overlay a {
+  color: white;
+  border-bottom: none;
+  margin-top: 1rem;
+  display: flex;
+}
+
+#home-tv-overlay a:hover {
+  font-weight: normal;
+  transition: 0.3s;
+}
+
+#footer-copyright {
+  border-top: 1px solid #5b5e62;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  color: var(--night-text);
+}
+
+#footer-columns {
+  display: flex;
+}
+
+#footer-columns h1 {
+  color: #5687cf;
+  font-size: 1rem;
+}
+
+#footer-columns > section:first-of-type {
+  margin: 0;
+}
+
+#footer-columns > section {
+  margin-left: 2rem;
+  width: 10%;
+}
+
+#footer-columns ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+#home-features {
+  margin: 0 5rem;
+}

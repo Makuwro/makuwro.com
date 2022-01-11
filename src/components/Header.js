@@ -96,7 +96,7 @@ class Header extends React.Component {
     return (
       <header className={theme !== 1 && (theme !== 2 || !systemDark) ? "day" : null}>
         <section>
-          <div id={styles["wiki-name"]}>The Showrunners</div>
+          <div id={styles["wiki-name"]}>Makuwro</div>
         </section>
         <form onFocus={() => this.setState({inputFocused: true})} onBlur={() => this.setState({inputFocused: false})} id={styles["search-box"]}>
           <input type="text" className={!this.state.searchResults || !this.state.inputFocused ? styles["no-results"] : null} onInput={(e) => this.setState({query: e.target.value, redirect: undefined})} placeholder={this.state.redirect || "Search for or create a page..."} value={this.state.query} />

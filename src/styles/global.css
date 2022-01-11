@@ -7,7 +7,7 @@
   --day-input-placeholder: #7c7c7c;
   --day-text: #4f5053;
   --night-background: #26272b;
-  --night-button: #afa8ff;
+  --night-button: #57bffc;
   --night-input-background: #202021;
   --night-article: #313237;
   --night-text: #b5b5b5;
@@ -42,7 +42,7 @@ body {
 a {
   text-decoration: none;
   border-bottom: 2px solid;
-  color: #a3c1ff;
+  color: #57bffc;
 }
 
 .day a {
@@ -161,12 +161,13 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 3.5rem;
+  height: 4.5rem;
   padding: 0 1.2rem;
   width: calc(100% - 2.4rem);
   z-index: 4;
   color: white;
   background-color: #26272b;
+  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.2));
 }
 
 header.day, main.day {
@@ -236,7 +237,7 @@ u {
 }
 
 button {
-  border-radius: 5px;
+  border-radius: 30px;
 }
 
 li {
@@ -275,4 +276,22 @@ p, li {
 
 .day ::-webkit-scrollbar-thumb:hover {
   background-color: #7a7a7a;
+}
+
+footer {
+  border-top: 1px solid #5b5e62;
+  padding: 2rem 0;
+  margin: 4rem 5rem;
+  margin-bottom: 0;
+}
+
+footer a {
+  border-bottom: none;
+  color: white;
+}
+
+footer a:hover {
+  font-weight: normal;
+  color: #c3d8ff;
+  transition: 0.3s;
 }
