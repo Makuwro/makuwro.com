@@ -17,6 +17,7 @@
   top: 14.5rem;
   filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.2));
   align-items: center;
+  left: 4rem;
 }
 
 #profile-info > img {
@@ -45,8 +46,8 @@
 
 #profile-btn-edit {
   float: right;
-  position: absolute;
-  top: 6rem;
+  position: relative;
+  top: 2rem;
   right: 2rem;
 }
 
