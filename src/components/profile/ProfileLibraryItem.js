@@ -1,10 +1,10 @@
 import React from "react";
 import styles from "../../styles/Profile.module.css";
 
-export default function ProfileLibraryArt() {
+export default function ProfileLibraryItem({tab}) {
 
   return (
-    <section className={styles["profile-card"]} id={styles["profile-art"]}>
+    <section className={`${styles["profile-library"]} ${styles["profile-card"]}`} id={styles["profile-" + tab]}>
       <a className={styles["profile-library-item"]}>
         <img />
       </a>

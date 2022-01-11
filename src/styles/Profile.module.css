@@ -127,7 +127,7 @@
   width: 100%;
 }
 
-#profile-art {
+.profile-library {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
@@ -144,10 +144,10 @@
   max-width: 10rem;
 }
 
-#profile-literature .profile-library-item {
+#profile-stories .profile-library-item {
   height: 15rem;
 }
 
-#profile-art a:first-of-type {
-  margin: 0;
+#profile-worlds .profile-library-item {
+  border-radius: 100%;
 }

@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styles from "../styles/Profile.module.css";
 import Footer from "./Footer";
-import ProfileLibraryArt from "./profile/ProfileLibraryItem";
+import ProfileLibraryItem from "./profile/ProfileLibraryItem";
 
 class Profile extends React.Component {
 
@@ -41,7 +41,7 @@ class Profile extends React.Component {
               <Link to="#">Worlds</Link>
             </section>
             
-            <ProfileLibraryArt />
+            <ProfileLibraryItem tab="art" />
 
           </section>
           <section id={styles["profile-container-right"]}>
