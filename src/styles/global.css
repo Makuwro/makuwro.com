@@ -69,7 +69,7 @@ p {
 
 main {
   width: 100%;
-  height: calc(100% - 56px);
+  height: calc(100% - 4.5rem);
   background-color: var(--night-background);
   color: white;
 }
