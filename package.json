@@ -1,7 +1,7 @@
 {
-  "name": "my-razzle-app",
-  "version": "4.2.4",
-  "license": "MIT",
+  "name": "makuwro-client",
+  "version": "1.0.0",
+  "license": "GPL-3.0",
   "scripts": {
     "start": "razzle start",
     "build": "razzle build --noninteractive && copy CNAME .\\build\\public\\CNAME && copy .nojekyll .\\build\\public\\.nojekyll",
