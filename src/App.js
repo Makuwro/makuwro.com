@@ -11,6 +11,9 @@ import ShareManager from "./components/Share";
 import PropTypes from "prop-types";
 import Header from "./components/Header";
 import Profile from "./components/Profile";
+import Maintenance from "./components/Maintenance";
+
+const maintenance = false;
 
 class App extends React.Component {
 
@@ -88,6 +91,8 @@ class App extends React.Component {
   }
 
   render() {
+
+    if (maintenance) return <Maintenance />;
 
     // Listen for theme changes
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => this.setState({systemDark: event.matches}));

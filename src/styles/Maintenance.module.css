@@ -1,0 +1,24 @@
+#maintenance-main {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+#maintenance-main > section {
+  background-color: var(--night-article);
+  padding: 2rem;
+  border-radius: 100px;
+  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.2));
+}
+
+#maintenance-main > section > section {
+  display: block;
+}
+
+#maintenance-main a {
+  color: var(--night-button);
+  margin-top: 0.5rem;
+  display: inline-block;
+}
