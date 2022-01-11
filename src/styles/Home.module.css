@@ -51,15 +51,8 @@
 }
 
 #home-tv-overlay a {
-  color: white;
-  border-bottom: none;
   margin-top: 1rem;
   display: flex;
-}
-
-#home-tv-overlay a:hover {
-  font-weight: normal;
-  transition: 0.3s;
 }
 
 #footer-copyright {
