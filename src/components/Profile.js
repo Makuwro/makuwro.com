@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styles from "../styles/Profile.module.css";
 import Footer from "./Footer";
-import ProfileLibraryArt from "./profile/ProfileLibraryArt";
+import ProfileLibraryArt from "./profile/ProfileLibraryItem";
 
 class Profile extends React.Component {
 
