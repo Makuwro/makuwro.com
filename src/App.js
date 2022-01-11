@@ -10,6 +10,7 @@ import Settings from "./components/Settings";
 import ShareManager from "./components/Share";
 import PropTypes from "prop-types";
 import Header from "./components/Header";
+import Profile from "./components/Profile";
 
 class App extends React.Component {
 
@@ -112,6 +113,7 @@ class App extends React.Component {
             <Settings {...props} {...this.state} />
           )} />
           <Route exact path="/test" component={ShareManager} />
+          <Route exact path="/Christian" component={Profile} />
         </Switch>
       </BrowserRouter>
     );
