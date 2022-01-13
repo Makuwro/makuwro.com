@@ -20,8 +20,8 @@ export default function Footer() {
           <h1>Contribute</h1>
           <ul>
             <li><Link to="/donate">Donate</Link></li>
-            <li><a href="https://feedback.makuwro.com">Feedback</a></li>
-            <li><a href="https://github.com/makuwro/makuwro.com">GitHub</a></li>
+            <li><a href="https://github.com/Makuwro/makuwro.com/issues">Feedback</a></li>
+            <li><a href="https://github.com/Makuwro/makuwro.com">GitHub</a></li>
           </ul>
         </section>
         <section>
