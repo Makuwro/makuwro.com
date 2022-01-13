@@ -21,7 +21,8 @@ export default function LibraryCreator({category, username}) {
     description: useState(""),
     avatarURL: useState("https://f2.toyhou.se/file/f2-toyhou-se/users/Christian?19"),
     characterURL: useState(""),
-    tags: useState("")
+    tags: useState(""),
+    art: useState()
   };
   let updateAvatar;
   let updateInput;
@@ -44,23 +45,46 @@ export default function LibraryCreator({category, username}) {
 
   switch (category) {
 
-    case "art":
+    case "art": {
+
+      let artRef = useRef();
 
       page = (
-        <form>
+        <form id={styles["upload-art"]}>
           <h1>Upload art</h1>
           <p>You can tag your characters and share your art with others.</p>
           <section>
+            <section>
+              <input type="file" accept="image/*" style={{display: "none"}} ref={artRef} onChange={({target: {files: [file]}}) => state.art[1](URL.createObjectURL(file))} />
+              {state.art[0] && (
+                <img src={state.art[0]} style={{
+                  marginBottom: "1rem"
+                }} />
+              )}
+              <button onClick={(event) => {
+
+                event.preventDefault();
+                artRef.current.click();
+
+              }}>{state.art[0] ? "Re-s" : "S"}elect image</button>
+              <p>Please only upload content that you have permission to use.</p>
+            </section>
+          </section>
+          <section>
             <h1>Basics</h1>
             <section>
-              <label>Name</label>
+              <label>Name<span style={{
+                color: "var(--night-text)",
+                marginLeft: "0.5rem"
+              }}>(optional)</span></label>
               <input type="text" />
             </section>
             <section>
-              <label>Caption</label>
-              <textarea>
-                
-              </textarea>
+              <label>Caption<span style={{
+                color: "var(--night-text)",
+                marginLeft: "0.5rem"
+              }}>(optional)</span></label>
+              <textarea></textarea>
             </section>
             <section>
               <label>Who created this art?</label>
@@ -75,6 +99,34 @@ export default function LibraryCreator({category, username}) {
           </section>
           <section>
             <h1>Organization</h1>
+            <section>
+              <label htmlFor="tags">Tags<span style={{
+                color: "var(--night-text)",
+                marginLeft: "0.5rem"
+              }}>(optional)</span></label>
+              <p>You can use tags to sort your characters and easily find them later.</p>
+              <input type="text" name="tags" onChange={(event) => updateInput(event, "tags")} value={state.tags[0]} />
+            </section>
+            <section>
+              <label>Folders<span style={{
+                color: "var(--night-text)",
+                marginLeft: "0.5rem"
+              }}>(optional)</span></label>
+              <p>You can add your character to multiple folders.</p>
+              <Dropdown>
+
+              </Dropdown>
+            </section>
+            <section>
+              <label>Worlds<span style={{
+                color: "var(--night-text)",
+                marginLeft: "0.5rem"
+              }}>(optional)</span></label>
+              <p>You can directly add your character to worlds you manage here. To add your character to a world you don't manage, you have to create this character first, then submit a request to the world admins.</p>
+              <Dropdown>
+
+              </Dropdown>
+            </section>
           </section>
           <section>
             <h1>Sharing</h1>
@@ -101,14 +153,51 @@ export default function LibraryCreator({category, username}) {
               </Dropdown>
             </section>
             <section>
-              <input type="checkbox" />
-              <label>This image features sensitive content (gore, sexual themes, etc.)</label>
+              <label>Who can view comments on this image?</label>
+              <Dropdown index={0}>
+                <li>Everyone, including visitors who aren't logged in</li>
+                <li>Registered Makuwro users</li>
+                <li>My followers</li>
+                <li>My friends</li>
+                <li>Specific people</li>
+                <li>Just me</li>
+              </Dropdown>
+            </section>
+            <section>
+              <label>Who can comment on this image?</label>
+              <Dropdown index={0}>
+                <li>Registered Makuwro users</li>
+                <li>My followers</li>
+                <li>My friends</li>
+                <li>Specific people</li>
+                <li>Just me</li>
+              </Dropdown>
+            </section>
+            <section>
+              <label>Would you like to age-restrict this image?</label>
+              <p>If so, users must sign in to view this image. If you inappropriately age-gate your image, Makuwro staff might enforce this setting.</p>
+              <Dropdown index={0}>
+                <li>No</li>
+                <li>Yes, restrict users under 13 from viewing this</li>
+                <li>Yes, restrict users under 17 from viewing this</li>
+                <li>Yes, restrict users under 18 from viewing this</li>
+              </Dropdown>
+            </section>
+            <section>
+              <label>Content warning<span style={{
+                color: "var(--night-text)",
+                marginLeft: "0.5rem"
+              }}>(optional)</span></label>
+              <p>This text will be shown to viewers before they view this image.</p>
+              <textarea></textarea>
             </section>
           </section>
           <input type="submit" value="Upload art" />
         </form>
       );
       break;
+
+    }
 
     case "character":
 
