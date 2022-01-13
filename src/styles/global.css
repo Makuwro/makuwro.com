@@ -110,7 +110,7 @@ input[type="text"]:read-only, input[type="password"]:read-only, input:disabled {
   color: var(--day-input-placeholder);
 }
 
-form input[type="text"], form input[type="password"], form input[type="email"] {
+textarea, form input[type="text"], form input[type="password"], form input[type="email"], .input-with-prefix {
   padding: 0.6rem;
   width: 100%;
   background-color: var(--night-input-background);
@@ -120,6 +120,11 @@ form input[type="text"], form input[type="password"], form input[type="email"] {
   font-size: 1rem;
   box-sizing: border-box;
   box-shadow: var(--day-box-shadow);
+}
+
+textarea {
+  height: 10rem;
+  resize: none;
 }
 
 input[type="checkbox"] {
