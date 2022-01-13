@@ -94,7 +94,8 @@ Dropdown.propTypes = {
   option: PropTypes.string,
   children: PropTypes.any,
   onChange: PropTypes.func,
-  width: PropTypes.number
+  width: PropTypes.number,
+  index: PropTypes.number
 };
 
 export default Dropdown;
