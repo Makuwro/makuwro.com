@@ -17,7 +17,7 @@ class Dropdown extends React.Component {
       open: false,
       above: false,
       children: null,
-      index: props.index || 0
+      index: props.index
     };
 
   }
@@ -77,7 +77,11 @@ class Dropdown extends React.Component {
 
     return (
       <section className={`${styles.list} ${!this.state.open ? styles.closed : ""} ${this.state.above ? styles.above : ""}`}>
-        <section style={{width: this.props.width || "auto"}} onClick={() => this.checkIfFlipNeeded(!this.state.open)}>{this.state.option}</section>
+        <section style={{
+          width: this.props.width || "auto"
+        }} onClick={() => this.checkIfFlipNeeded(!this.state.open)}>
+          {this.state.children ? (this.state.option || "Choose from a list...") : "No options available"}
+        </section>
         <ul ref={this.dropdownRef}>{this.state.children}</ul>
       </section>
     );
