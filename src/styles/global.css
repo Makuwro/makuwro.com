@@ -213,6 +213,7 @@ header > section:first-of-type a {
 
 .day button, input[type="button"], input[type="submit"] {
   background-color: var(--day-button);
+  border-radius: 5px;
 }
 
 button, input[type="button"], input[type="submit"] {
