@@ -288,7 +288,7 @@ p, li {
 
 ::-webkit-scrollbar-track {
   border-radius: 10px;
-  background-color: #242424;
+  background-color: transparent;
 }
 
 .day ::-webkit-scrollbar-track {
