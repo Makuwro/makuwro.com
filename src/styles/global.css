@@ -127,6 +127,24 @@ textarea {
   resize: none;
 }
 
+.input-with-prefix {
+  display: flex;
+  cursor: text;
+  padding: 0;
+}
+
+.input-with-prefix span {
+  color: var(--night-text);
+  padding: 0.6rem 0 0.6rem 0.6rem;
+}
+
+.input-with-prefix > input[type="text"] {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
 input[type="checkbox"] {
   width: 25px;
   height: 25px;
