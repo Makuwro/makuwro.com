@@ -7,7 +7,6 @@ import Preferences from "./components/Preferences";
 import Login from "./components/login";
 import Registration from "./components/Registration";
 import Settings from "./components/Settings";
-import ShareManager from "./components/Share";
 import PropTypes from "prop-types";
 import Header from "./components/Header";
 import Profile from "./components/Profile";
