@@ -96,7 +96,7 @@ class Header extends React.Component {
     return (
       <header className={theme !== 1 && (theme !== 2 || !systemDark) ? "day" : null}>
         <section>
-          <div id={styles["wiki-name"]}>Makuwro</div>
+          <Link to="/" id={styles["wiki-name"]}>Makuwro</Link>
           <section>
             <Link to="/library">Library</Link>
           </section>
