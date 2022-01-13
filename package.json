@@ -1,5 +1,10 @@
 {
   "name": "makuwro.com",
+  "description": "The official web client of Makuwro, a world and character service.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Makuwro/makuwro.com.git"
+  },
   "version": "1.0.0",
   "license": "GPL-3.0",
   "scripts": {
