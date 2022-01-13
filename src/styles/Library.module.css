@@ -1,0 +1,39 @@
+#library-creator {
+  overflow-y: auto;
+}
+
+#library-creator > form {
+  margin: 2.5rem 5rem 0;
+}
+
+#library-creator > form > section {
+  background-color: var(--night-article);
+  padding: 2rem;
+  border-radius: 30px;
+  box-shadow: var(--day-box-shadow);
+  margin-top: 2.5rem;
+}
+
+#library-creator > form > section:first-of-type > section:first-of-type > input[type="text"] {
+  width: calc(100% - 13rem);
+}
+
+#library-creator > form > section > h1:first-of-type, #library-creator > form > section > section:first-of-type, #library-creator > form > section > label:first-of-type {
+  margin-top: 0;
+}
+
+#library-creator > form > section > label, #library-creator > form > section > section {
+  margin-top: 1.5rem;
+}
+
+#library-creator > form input[type="submit"] {
+  margin-top: 2rem;
+}
+
+#library-creator-avatar {
+  border-radius: 100%;
+  height: 179.2px;
+  width: 179.2px;
+  cursor: pointer;
+  float: right;
+}
