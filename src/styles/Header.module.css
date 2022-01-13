@@ -4,6 +4,10 @@
   margin-left: 0.75rem;
 }
 
+#wiki-name:hover {
+  color: white;
+}
+
 #search-box {
   width: 50%;
   display: none;
