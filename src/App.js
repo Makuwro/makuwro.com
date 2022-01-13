@@ -11,6 +11,7 @@ import PropTypes from "prop-types";
 import Header from "./components/Header";
 import Profile from "./components/Profile";
 import Maintenance from "./components/Maintenance";
+import LibraryCreator from "./components/LibraryCreator";
 
 const maintenance = false;
 
@@ -35,7 +36,8 @@ class App extends React.Component {
       token: token || undefined,
       redirect: undefined,
       theme: theme ? parseInt(theme, 10) : 1,
-      systemDark: window.matchMedia("(prefers-color-scheme: dark)").matches
+      systemDark: window.matchMedia("(prefers-color-scheme: dark)").matches,
+      transparentHeader: false
     };
 
   }
@@ -116,8 +118,10 @@ class App extends React.Component {
           <Route exact path={["/settings", "/settings/:menu"]} render={(props) => (
             <Settings {...props} {...this.state} />
           )} />
-          <Route exact path="/test" component={ShareManager} />
-          <Route exact path="/Christian" component={Profile} />
+          <Route exact path={["/library/create/:category", "/library/create"]} render={(props) => (
+            <LibraryCreator category={props.match.params.category} />
+          )} />
+          <Route exact path={["/:username/:tab", "/:username"]} render={(props) => <Profile username={props.match.params.username} tab={props.match.params.tab} />} />
         </Switch>
       </BrowserRouter>
     );
