@@ -4,6 +4,8 @@
   background-color: black;
   background-image: url(https://i1.sndcdn.com/visuals-000205406223-miu7o4-t2480x520.jpg);
   background-size: cover;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 #profile-info {
