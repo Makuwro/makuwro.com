@@ -1,3 +1,7 @@
+#profile {
+  overflow-y: overlay;
+}
+
 #profile-bg {
   width: 100%;
   height: 20rem;
@@ -115,10 +119,6 @@
 #profile-bio p {
   margin-top: 10px;
   margin-bottom: 0;
-}
-
-#profile-main {
-  overflow-y: auto;
 }
 
 #profile-actions button:first-of-type {
