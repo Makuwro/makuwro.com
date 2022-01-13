@@ -45,6 +45,69 @@ export default function LibraryCreator({category, username}) {
   switch (category) {
 
     case "art":
+
+      page = (
+        <form>
+          <h1>Upload art</h1>
+          <p>You can tag your characters and share your art with others.</p>
+          <section>
+            <h1>Basics</h1>
+            <section>
+              <label>Name</label>
+              <input type="text" />
+            </section>
+            <section>
+              <label>Caption</label>
+              <textarea>
+                
+              </textarea>
+            </section>
+            <section>
+              <label>Who created this art?</label>
+              <Dropdown index={0}>
+                <li>I am the sole artist</li>
+                <li>I collaborated with another on-site artist</li>
+                <li>I collaborated with an off-site artist</li>
+                <li>I got this from an on-site artist</li>
+                <li>I got this from an off-site artist</li>
+              </Dropdown>
+            </section>
+          </section>
+          <section>
+            <h1>Organization</h1>
+          </section>
+          <section>
+            <h1>Sharing</h1>
+            <section>
+              <label>Who can see the watermarked version of this image?</label>
+              <Dropdown index={0}>
+                <li>Everyone, including visitors who aren't logged in</li>
+                <li>Registered Makuwro users</li>
+                <li>My followers</li>
+                <li>My friends</li>
+                <li>Specific people</li>
+                <li>Just me</li>
+              </Dropdown>
+            </section>
+            <section>
+              <label>Who can see the non-watermarked version of this image?</label>
+              <Dropdown index={0}>
+                <li>Everyone, including visitors who aren't logged in</li>
+                <li>Registered Makuwro users</li>
+                <li>My followers</li>
+                <li>My friends</li>
+                <li>Specific people</li>
+                <li>Just me</li>
+              </Dropdown>
+            </section>
+            <section>
+              <input type="checkbox" />
+              <label>This image features sensitive content (gore, sexual themes, etc.)</label>
+            </section>
+          </section>
+          <input type="submit" value="Upload art" />
+        </form>
+      );
       break;
 
     case "character":
@@ -69,12 +132,15 @@ export default function LibraryCreator({category, username}) {
       avatarRef = useRef();
       urlRef = useRef();
       page = (
-        <form>
+        <form id={styles["upload-character"]}>
           <h1>Create a character</h1>
           <p>Making a character page is a great way to organize your images and lore.</p>
           <section>
-            <input type="file" style={{display: "none"}} ref={avatarRef} onChange={({target}) => updateAvatar(target.files)} accept="image/*" />
-            <img src={state.avatarURL[0]} onClick={() => avatarRef.current.click()} id={styles["library-creator-avatar"]} />
+            <section>
+              <input type="file" style={{display: "none"}} ref={avatarRef} onChange={({target}) => updateAvatar(target.files)} accept="image/*" />
+              <img src={state.avatarURL[0]} onClick={() => avatarRef.current.click()} id={styles["library-creator-avatar"]} />
+              <button>Remove</button>
+            </section>
             <h1>Basics</h1>
             <section>
               <label htmlFor="name">Character name</label>

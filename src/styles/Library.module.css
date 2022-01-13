@@ -14,11 +14,19 @@
   margin-top: 2.5rem;
 }
 
-#library-creator > form > section:first-of-type > section:first-of-type > input[type="text"] {
+#library-creator > form#upload-character > section:first-of-type > section:first-of-type {
+  display: flex;
+  float: right;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem 0;
+}
+
+#library-creator > form > section:first-of-type > section:nth-of-type(2) > input[type="text"] {
   width: calc(100% - 13rem);
 }
 
-#library-creator > form > section > h1:first-of-type, #library-creator > form > section > section:first-of-type, #library-creator > form > section > label:first-of-type {
+#library-creator > form > section:first-of-type > section:nth-of-type(2), #library-creator > form > section > h1:first-of-type, #library-creator > form > section > section:first-of-type, #library-creator > form > section > label:first-of-type {
   margin-top: 0;
 }
 
@@ -35,5 +43,4 @@
   height: 179.2px;
   width: 179.2px;
   cursor: pointer;
-  float: right;
 }
