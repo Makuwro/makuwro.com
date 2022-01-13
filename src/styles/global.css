@@ -204,7 +204,7 @@ header > section {
   align-items: center;
 }
 
-header > section:first-of-type a {
+header > section:first-of-type > section a {
   margin-left: 1rem;
   font-size: 1.1rem;
   position: relative;
