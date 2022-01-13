@@ -3,22 +3,58 @@ import { Link } from "react-router-dom";
 import styles from "../styles/Profile.module.css";
 import Footer from "./Footer";
 import ProfileLibraryItem from "./profile/ProfileLibraryItem";
+import ProfileStats from "./profile/ProfileStats";
+import PropTypes from "prop-types";
 
 class Profile extends React.Component {
 
+  constructor(props) {
+
+    console.log(props);
+
+    super();
+    this.state = {
+      tab: props.tab || "activity",
+      displayName: props.username,
+      username: props.username,
+      disabled: false
+    };
+
+  }
+
+  componentDidUpdate(oldProps) {
+
+    if (oldProps.tab !== this.props.tab) this.setState({tab: this.props.tab});
+
+  }
+
   render() {
 
-    document.title = "Christian Toney / Makuwro";
+    const components = {
+      art: <ProfileLibraryItem tab="art" />,
+      stories: <ProfileLibraryItem tab="stories" />,
+      worlds: <ProfileLibraryItem tab="worlds" />,
+      teams: <ProfileLibraryItem tab="teams" />,
+      stats: <ProfileStats />
+    };
+    let tab;
+
+    document.title = `${this.state.displayName} / Makuwro`;
+
+    tab = components[this.state.tab];
 
     return (
-      <main id={styles["profile-main"]}>
+      <main id={styles["profile"]}>
         <section id={styles["profile-bg"]}>
           <button id={styles["profile-btn-edit"]}>Edit profile</button>
           <section id={styles["profile-info"]}>
             <img src="https://i1.sndcdn.com/avatars-cQrv7oKRIfqHb95q-i9wmwQ-t200x200.jpg" />
             <section>
-              <h1>Christian Toney</h1>
-              <h2>@Sudobeast</h2>
+              <h1>{this.state.displayName}</h1>
+              <h2>{`@${this.state.username}`}</h2>
+              {this.state.disabled && (
+                <p>This account has been disabled for violating the <a href="https://about.makuwro.com/policies/terms">terms of service</a></p>
+              )}
             </section>
           </section>
         </section>
@@ -31,18 +67,18 @@ class Profile extends React.Component {
           </section>
           <section id={styles["profile-container-center"]}>
             <section className={styles["profile-card"]} id={styles["profile-selection"]}>
-              <Link to="#activity">Activity</Link>
-              <Link to="#art">Art</Link>
-              <Link to="#blog">Blog</Link>
-              <Link to="#characters">Characters</Link>
-              <Link to="#stats">Stats</Link>
-              <Link to="#stories">Stories</Link>
-              <Link to="#teams">Teams</Link>
-              <Link to="#">Worlds</Link>
+              <Link to={`/${this.state.username}`}>Activity</Link>
+              <Link to={`/${this.state.username}/art`}>Art</Link>
+              <Link to={`/${this.state.username}/blog`}>Blog</Link>
+              <Link to={`/${this.state.username}/characters`}>Characters</Link>
+              <Link to={`/${this.state.username}/stats`}>Stats</Link>
+              <Link to={`/${this.state.username}/stories`}>Stories</Link>
+              <Link to={`/${this.state.username}/teams`}>Teams</Link>
+              <Link to={`/${this.state.username}/terms`}>Terms</Link>
+              <Link to={`/${this.state.username}/worlds`}>Worlds</Link>
             </section>
             
-            <ProfileLibraryItem tab="art" />
-
+            <>{tab}</>
           </section>
           <section id={styles["profile-container-right"]}>
             <section className={styles["profile-card"]} id={styles["profile-actions"]}>
@@ -61,5 +97,10 @@ class Profile extends React.Component {
   }
 
 }
+
+Profile.propTypes = {
+  username: PropTypes.string,
+  tab: PropTypes.string
+};
 
 export default Profile;
