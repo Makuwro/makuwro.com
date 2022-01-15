@@ -1,0 +1,22 @@
+#popup-background {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.623);
+  height: 100%;
+  width: 100%;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#popup-container {
+  background-color: var(--night-article);
+  border-radius: 5px;
+  color: white;
+  padding: 15px;
+}
+
+#popup-header > h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}

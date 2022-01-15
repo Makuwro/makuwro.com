@@ -39,6 +39,9 @@
 
 #profile-info h1, #profile-info h2 {
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 #profile-info h2 {
@@ -141,16 +144,27 @@
 .profile-library-item {
   height: 10rem;
   background-color: black;
-  display: block;
   border-radius: 5px;
   flex: 1 0 10rem;
   max-width: 10rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-#profile-stories .profile-library-item {
+#profile-literature .profile-library-item {
   height: 15rem;
 }
 
 #profile-worlds .profile-library-item {
   border-radius: 100%;
+}
+
+.profile-badge {
+  border-radius: 5px;
+  background-color: var(--night-button);
+  padding: 0.2rem 0.3rem;
+  font-size: 0.9rem;
+  color: white;
+  cursor: help;
 }

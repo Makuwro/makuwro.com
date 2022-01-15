@@ -10,7 +10,7 @@ export default function LibraryCreator({category, username}) {
   const titles = {
     art: "Upload art",
     character: "Create a character",
-    story: "Write a story"
+    literature: "Create literature"
   };
   let title;
   let page;
@@ -130,6 +130,19 @@ export default function LibraryCreator({category, username}) {
           </section>
           <section>
             <h1>Sharing</h1>
+            <section>
+              <label htmlFor="url">Image URL</label>
+              <p>Only alphanumeric characters, underscores, hyphens, and periods are allowed.</p>
+              <section className="input-with-prefix">
+                <span onClick={() => {
+
+                  urlRef.current.focus();
+                  urlRef.current.setSelectionRange(0, 0);
+
+                }}>{`makuwro.com/${username}/images/`}</span>
+                <input type="text" name="url" ref={urlRef} onChange={(event) => updateInput(event, "characterURL")} value={state.characterURL[0]} placeholder={state.name[0].replaceAll(" ", "-")}/>
+              </section>
+            </section>
             <section>
               <label>Who can see the watermarked version of this image?</label>
               <Dropdown index={0}>
@@ -350,6 +363,121 @@ export default function LibraryCreator({category, username}) {
             </section>
           </section>
           <input type="submit" value="Create character" />
+        </form>
+      );
+      break;
+
+    case "literature":
+      page = (
+        <form>
+          <h1>Create literature</h1>
+          <p>On this page, you can start a new series or upload a one-off.</p>
+          <section>
+            <section>
+              <input type="file" style={{display: "none"}} ref={avatarRef} onChange={({target}) => updateAvatar(target.files)} accept="image/*" />
+              <img src={state.avatarURL[0]} onClick={() => avatarRef.current.click()} id={styles["library-creator-avatar"]} />
+              <button>Remove</button>
+            </section>
+            <h1>Basics</h1>
+            <section>
+              <label htmlFor="name">Title</label>
+              <p>This name will be the first thing people see on the page.</p>
+              <input type="text" required onChange={(event) => updateInput(event, "name")} value={state.name[0]} />
+            </section>
+            <section>
+              <label>Description</label>
+              <p>This description is shown below your literature's name.</p>
+              <textarea onChange={(e) => {
+
+                e.preventDefault();
+                //setDescription(e.target.value);
+
+              }} value={state.description[0]}></textarea>
+            </section>
+            <section>
+              <input type="checkbox" />
+              <label>This literature is a work in progress</label>
+            </section>
+          </section>
+          <section>
+            <h1>Organization</h1>
+            <section>
+              <label htmlFor="tags">Tags</label>
+              <p>You can use tags to sort your literature and easily find them later.</p>
+              <input type="text" name="tags" onChange={(event) => updateInput(event, "tags")} value={state.tags[0]} />
+            </section>
+            <section>
+              <label>Folders</label>
+              <p>You can add your literature to multiple folders.</p>
+              <Dropdown>
+
+              </Dropdown>
+            </section>
+            <section>
+              <label>Worlds</label>
+              <p>You can directly add your literature to worlds you manage here. To add your literature to a world you don't manage, you have to create this literature first, then submit a request to the world admins.</p>
+              <Dropdown>
+
+              </Dropdown>
+            </section>
+          </section>
+          <section>
+            <h1>Sharing</h1>
+            <section>
+              <label htmlFor="url">Literature URL</label>
+              <p>Only alphanumeric characters, underscores, hyphens, and periods are allowed.</p>
+              <section className="input-with-prefix">
+                <span onClick={() => {
+
+                  urlRef.current.focus();
+                  urlRef.current.setSelectionRange(0, 0);
+
+                }}>{`makuwro.com/${username}/literature/`}</span>
+                <input type="text" name="url" ref={urlRef} onChange={(event) => updateInput(event, "characterURL")} value={state.characterURL[0]} placeholder={state.name[0].replaceAll(" ", "-")}/>
+              </section>
+            </section>
+            <section>
+              <label>Who can view this literature?</label>
+              <Dropdown index={0}>
+                <li>Everyone, including visitors who aren't logged in</li>
+                <li>Registered Makuwro users</li>
+                <li>My followers</li>
+                <li>My friends</li>
+                <li>Specific people</li>
+                <li>Just me</li>
+              </Dropdown>
+            </section>
+            <section>
+              <label>Who can comment on this literature?</label>
+              <Dropdown index={0}>
+                <li>Registered Makuwro users</li>
+                <li>My followers</li>
+                <li>My friends</li>
+                <li>Specific people</li>
+                <li>Just me</li>
+              </Dropdown>
+            </section>
+            <section>
+              <label>Who can view comments on this literature?</label>
+              <Dropdown index={0}>
+                <li>Everyone, including visitors who aren't logged in</li>
+                <li>Registered Makuwro users</li>
+                <li>My followers</li>
+                <li>My friends</li>
+                <li>Specific people</li>
+                <li>Just me</li>
+              </Dropdown>
+            </section>
+            <section>
+              <input type="checkbox" />
+              <label>Disable likes</label>
+            </section>
+            <section>
+              <input type="checkbox" />
+              <label>Disable subscriptions</label>
+            </section>
+          </section>
+          <input type="submit" value="Create literature" />
         </form>
       );
       break;

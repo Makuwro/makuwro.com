@@ -16,7 +16,7 @@ export default function Home({theme}) {
           <section id={styles["home-tv-overlay"]}>
             <section>
               <section>Welcome to Makuwro</section>
-              <section>The cool, worldbuilding platform</section>
+              <section>The easiest way to store characters, worlds, and lore</section>
             </section>
             <section>
               <button>Start making</button>

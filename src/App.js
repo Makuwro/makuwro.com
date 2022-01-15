@@ -12,6 +12,7 @@ import Header from "./components/Header";
 import Profile from "./components/Profile";
 import Maintenance from "./components/Maintenance";
 import LibraryCreator from "./components/LibraryCreator";
+import Popup from "./components/Popup";
 
 const maintenance = false;
 
@@ -100,6 +101,7 @@ class App extends React.Component {
 
     return (
       <BrowserRouter>
+        <Popup />
         <Header {...this.state} />
         <Switch>
           <Route exact path="/">

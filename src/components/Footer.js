@@ -29,7 +29,7 @@ export default function Footer() {
           <ul>
             <li><Link to="/library/art">Art</Link></li>
             <li><Link to="/library/characters">Characters</Link></li>
-            <li><Link to="/library/stories">Stories</Link></li>
+            <li><Link to="/library/literature">Literature</Link></li>
             <li><Link to="/library/worlds">Worlds</Link></li>
             <li><Link to="/library">Show me everything!</Link></li>
           </ul>

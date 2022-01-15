@@ -32,7 +32,7 @@ class Profile extends React.Component {
 
     const components = {
       art: <ProfileLibraryItem tab="art" />,
-      stories: <ProfileLibraryItem tab="stories" />,
+      literature: <ProfileLibraryItem tab="literature" />,
       worlds: <ProfileLibraryItem tab="worlds" />,
       teams: <ProfileLibraryItem tab="teams" />,
       stats: <ProfileStats />
@@ -50,7 +50,7 @@ class Profile extends React.Component {
           <section id={styles["profile-info"]}>
             <img src="https://i1.sndcdn.com/avatars-cQrv7oKRIfqHb95q-i9wmwQ-t200x200.jpg" />
             <section>
-              <h1>{this.state.displayName}</h1>
+              <h1>{this.state.displayName}<span title="This user is a Makuwro staff member" className={styles["profile-badge"]}>STAFF</span></h1>
               <h2>{`@${this.state.username}`}</h2>
               {this.state.disabled && (
                 <p>This account has been disabled for violating the <a href="https://about.makuwro.com/policies/terms">terms of service</a></p>
@@ -71,13 +71,12 @@ class Profile extends React.Component {
               <Link to={`/${this.state.username}/art`}>Art</Link>
               <Link to={`/${this.state.username}/blog`}>Blog</Link>
               <Link to={`/${this.state.username}/characters`}>Characters</Link>
+              <Link to={`/${this.state.username}/literature`}>Literature</Link>
               <Link to={`/${this.state.username}/stats`}>Stats</Link>
-              <Link to={`/${this.state.username}/stories`}>Stories</Link>
               <Link to={`/${this.state.username}/teams`}>Teams</Link>
               <Link to={`/${this.state.username}/terms`}>Terms</Link>
               <Link to={`/${this.state.username}/worlds`}>Worlds</Link>
             </section>
-            
             <>{tab}</>
           </section>
           <section id={styles["profile-container-right"]}>
