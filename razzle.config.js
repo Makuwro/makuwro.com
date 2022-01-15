@@ -2,7 +2,6 @@
 
 module.exports = {
   options: {
-    buildType: "spa",
-    verbose: true
+    buildType: "spa"
   }
 };
