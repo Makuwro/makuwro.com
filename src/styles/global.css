@@ -7,7 +7,8 @@
   --day-input-placeholder: #7c7c7c;
   --day-text: #4f5053;
   --night-background: #26272b;
-  --night-button: #57bffc;
+  --night-button: #2196f3;
+  --night-link: #57bffc;
   --night-input-background: #202021;
   --night-article: #313237;
   --night-text: #b5b5b5;
@@ -45,11 +46,11 @@ a {
 }
 
 .day a {
-  color: #3673ef
+  color: #3673ef;
 }
 
 a:hover {
-  color: var(--night-button);
+  color: var(--night-link);
   transition: 0.3s;
 }
 
@@ -221,8 +222,9 @@ button, input[type="button"], input[type="submit"] {
   background-color: var(--night-button);
   border: none;
   padding: 0.6rem 1rem;
-  color: black;
+  color: white;
   font-size: 1rem;
+  transition: 0.1s;
 }
 
 .day button:hover, .day input[type="button"]:hover, input[type="submit"]:hover {
@@ -230,7 +232,7 @@ button, input[type="button"], input[type="submit"] {
 }
 
 button:hover, input[type="button"]:hover, input[type="submit"]:hover {
-  background-color: #827add;
+  filter: brightness(.8);
 }
 
 input[type="password"] {
@@ -268,7 +270,7 @@ u {
 }
 
 button {
-  border-radius: 30px;
+  border-radius: 5px;
 }
 
 li {

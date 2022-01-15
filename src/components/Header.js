@@ -1,44 +1,41 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "../styles/Header.module.css";
 import PropTypes from "prop-types";
-import { Link, withRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-class Header extends React.Component {
+export default function Header(props) {
 
-  constructor(props) {
+  const {userCache, theme, systemDark} = props;
+  let state = {
+    cachedResults: useState(),
+    userSearching: useState(false),
+    searchResults: useState(null),
+    query: useState(props.query || ""),
+    inputFocused: useState(false),
+    redirect: useState()
+  };
 
-    super(props);
-    this.userSearching = this.userSearching.bind(this);
+  useEffect(async () => {
 
-    // Set initial state
-    this.state = {
-      searchResults: null,
-      query: props.query || "",
-      inputFocused: false
-    };
-    
-
-  }
-
-  async userSearching() {
+    //if (oldState.cachedResults === state.cachedResults[0] && (oldState.query === state.query[0] || oldState.redirect && oldState.query !== "")) return;
     
     try {
 
       // Get all article names
-      const articleResponse = !this.state.cachedResults && await fetch(`${process.env.RAZZLE_WIKI_SERVER}/pages`, {
+      const articleResponse = !state.cachedResults[0] && await fetch(`${process.env.RAZZLE_WIKI_SERVER}/pages`, {
         headers: {
-          token: this.props.token
+          token: props.token
         }
       });
-      const articleJson = this.state.cachedResults || (articleResponse.ok && await articleResponse.json());
+      const articleJson = state.cachedResults || (articleResponse.ok && await articleResponse.json());
+      const {query} = state;
 
-      const {query} = this.state;
-      if (query && articleJson) {
+      if (query[0] && articleJson) {
 
-        this.setState({cachedResults: articleJson}, () => {
+        state.cachedResults[1](articleJson, () => {
 
           // Search through articles to find those that start with our query
-          const searchRegex = new RegExp(`^${query.replaceAll(" ", "_")}`, "gi");
+          const searchRegex = new RegExp(`^${query[0].replaceAll(" ", "_")}`, "gi");
           const nearMatches = query !== "" ? articleJson.filter(article => article.name.match(searchRegex)) : [];
 
           if (nearMatches[0]) {
@@ -54,7 +51,8 @@ class Header extends React.Component {
 
                   e.preventDefault();
                   document.activeElement.blur();
-                  this.setState({redirect: spacedName, query: ""}, () => this.props.history.push(`/articles/${name}`));
+                  state.redirect[1](spacedName);
+                  state.query[1]("", () => props.history.push(`/articles/${name}`));
                   
                 }} href={`/articles/${name}`}>{spacedName}</a></li>
               );
@@ -62,7 +60,7 @@ class Header extends React.Component {
             }
 
             // Finally, show the matches
-            this.setState({searchResults: elements});
+            state.searchResults[1](elements);
 
           }
 
@@ -70,7 +68,7 @@ class Header extends React.Component {
 
       } else {
 
-        this.setState({searchResults: null});
+        state.searchResults[1](null);
 
       }
 
@@ -80,54 +78,47 @@ class Header extends React.Component {
 
     }
 
-  }
+  }, [state.cachedResults[0], state.query[0], state.redirect[0]]);
 
-  componentDidUpdate(oldProps, oldState) {
-
-    if (oldState.cachedResults === this.state.cachedResults && (oldState.query === this.state.query || oldState.redirect && oldState.query !== "")) return;
-    this.userSearching();
-
-  }
-
-  render() {
-
-    const {userCache, theme, systemDark} = this.props;
-
-    return (
-      <header className={theme !== 1 && (theme !== 2 || !systemDark) ? "day" : null}>
+  return (
+    <header className={theme !== 1 && (theme !== 2 || !systemDark) ? "day" : null}>
+      <section>
+        <Link to="/" id={styles["wiki-name"]}>Makuwro</Link>
         <section>
-          <Link to="/" id={styles["wiki-name"]}>Makuwro</Link>
-          <section>
-            <Link to="/library">Library</Link>
-          </section>
+          <Link to="/library">Library</Link>
+          <Link to="/creators">Creators</Link>
         </section>
-        <form onFocus={() => this.setState({inputFocused: true})} onBlur={() => this.setState({inputFocused: false})} id={styles["search-box"]}>
-          <input type="text" className={!this.state.searchResults || !this.state.inputFocused ? styles["no-results"] : null} onInput={(e) => this.setState({query: e.target.value, redirect: undefined})} placeholder={this.state.redirect || "Search for or create a page..."} value={this.state.query} />
-          <ul id={styles["search-results"]}>
-            {this.state.searchResults}
-          </ul>
-        </form>
-        <section>
-          {userCache && userCache._id ? (
-            <>
-              <button>
-                Share
-              </button>
-              <button title="Preferences" onClick={() => this.props.history.push("/preferences")} id={styles["account-button"]} style={{
-                backgroundImage: `url(${userCache.avatar_url})`,
-                backgroundSize: "cover"
-              }}></button>
-            </>
-          ) : (
-            <Link to="/login" id={styles["login-button"]}>
-              Login
-            </Link>
-          )}
-        </section>
-      </header>
-    );
+      </section>
+      <form onFocus={() => state.inputFocused[1](true)} onBlur={() => state.inputFocused[1](false)} id={styles["search-box"]}>
+        <input type="text" className={!state.searchResults || !state.inputFocused ? styles["no-results"] : null} onInput={(e) => {
+          
+          state.query[1](e.target.value);
+          state.redirect[1](null);
 
-  }
+        }} placeholder={state.redirect[0] || "Search for or create a page..."} value={state.query[0]} />
+        <ul id={styles["search-results"]}>
+          {state.searchResults[0]}
+        </ul>
+      </form>
+      <section>
+        {userCache && userCache._id ? (
+          <>
+            <button>
+              Share
+            </button>
+            <button title="Preferences" onClick={() => props.history.push("/preferences")} id={styles["account-button"]} style={{
+              backgroundImage: `url(${userCache.avatar_url})`,
+              backgroundSize: "cover"
+            }}></button>
+          </>
+        ) : (
+          <Link to="/login" id={styles["login-button"]}>
+            Login
+          </Link>
+        )}
+      </section>
+    </header>
+  );
 
 }
 
@@ -140,5 +131,3 @@ Header.propTypes = {
   theme: PropTypes.number,
   systemDark: PropTypes.bool
 };
-
-export default withRouter(Header);

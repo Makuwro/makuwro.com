@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "../styles/Authentication.module.css";
-import { Link, withRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 
 class UserRegistration extends React.Component {
@@ -134,4 +134,4 @@ UserRegistration.propTypes = {
   history: PropTypes.object
 };
 
-export default withRouter(UserRegistration);
+export default UserRegistration;

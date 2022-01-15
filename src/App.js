@@ -1,17 +1,13 @@
 import React from "react";
-import { Route, Switch, withRouter, BrowserRouter } from "react-router-dom";
+import { Route, Routes, BrowserRouter } from "react-router-dom";
 import Home from "./components/Home";
 import "./styles/global.css";
-import Article from "./components/Article";
-import Preferences from "./components/Preferences";
 import Login from "./components/login";
 import Registration from "./components/Registration";
-import Settings from "./components/Settings";
 import PropTypes from "prop-types";
 import Header from "./components/Header";
 import Profile from "./components/Profile";
 import Maintenance from "./components/Maintenance";
-import LibraryCreator from "./components/LibraryCreator";
 import Popup from "./components/Popup";
 
 const maintenance = false;
@@ -103,28 +99,13 @@ class App extends React.Component {
       <BrowserRouter>
         <Popup />
         <Header {...this.state} />
-        <Switch>
-          <Route exact path="/">
-            <Home {...this.state} />
-          </Route>
-          <Route exact path={["/articles", "/articles/:name", "/categories", "/categories/:name", "/templates", "/templates/:name"]} render={(props) => (
-            <Article {...props} {...this.state} />
-          )} />
-          <Route exact path="/login">
-            <Login setToken={(token, redirect) => this.setState({token: token, redirect: redirect})} />
-          </Route>
-          <Route exact path="/preferences">
-            <Preferences {...this.state} onThemeChange={(theme) => this.changeTheme(theme)} />
-          </Route>
-          <Route exact path="/register" component={Registration} />
-          <Route exact path={["/settings", "/settings/:menu"]} render={(props) => (
-            <Settings {...props} {...this.state} />
-          )} />
-          <Route exact path={["/library/create/:category", "/library/create"]} render={(props) => (
-            <LibraryCreator category={props.match.params.category} />
-          )} />
-          <Route exact path={["/:username/:tab", "/:username"]} render={(props) => <Profile username={props.match.params.username} tab={props.match.params.tab} />} />
-        </Switch>
+        <Routes>
+          <Route path="/" element={<Home {...this.state} />} />
+          <Route path="/login" element={<Login setToken={(token, redirect) => this.setState({token: token, redirect: redirect})} />} />
+          <Route path="/register" element={<Registration />} />
+          <Route path={"/:username"} element={<Profile />} />
+          <Route path={"/:username/:tab"} element={<Profile />} />
+        </Routes>
       </BrowserRouter>
     );
 
@@ -136,4 +117,4 @@ App.propTypes = {
   history: PropTypes.object
 };
 
-export default withRouter(App);
+export default App;

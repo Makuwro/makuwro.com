@@ -3,5 +3,6 @@
 module.exports = {
   options: {
     buildType: "spa",
+    verbose: true
   }
 };

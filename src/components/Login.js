@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import styles from "../styles/Authentication.module.css";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
 export default function Login({setToken}) {
@@ -10,7 +10,7 @@ export default function Login({setToken}) {
 
   const urlSearchParams = new URLSearchParams(window.location.search);
   const redirect = urlSearchParams.get("redirect") || "/";
-  const history = useHistory();
+  const history = useNavigate();
   const checkAuth = () => {
 
     const value = `; ${document.cookie}`;
