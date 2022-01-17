@@ -7,7 +7,7 @@ export default function ProfileLibraryItem({tab}) {
 
   return (
     <section className={`${styles["profile-library"]} ${styles["profile-card"]}`} id={styles["profile-" + tab]}>
-      <Link className={styles["profile-library-item"]} to={`?create=${tab}`}>
+      <Link className={styles["profile-library-item"]} to={`?create=${tab === "characters" ? "character" : tab}`}>
         CREATE NEW
       </Link>
     </section>
