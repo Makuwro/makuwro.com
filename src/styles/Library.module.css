@@ -2,20 +2,6 @@
   overflow-y: auto;
 }
 
-#library-creator > form {
-  margin: 2.5rem 5rem 0;
-}
-
-#library-creator > form > section {
-  background-color: var(--night-article);
-  padding: 2rem;
-  border-radius: 15px;
-  box-shadow: var(--day-box-shadow);
-  margin-top: 2.5rem;
-}
-
-
-
 #upload-art > section:first-of-type > section:first-of-type, #upload-art > section:first-of-type > section:first-of-type > section {
   display: flex;
   flex-direction: column;
@@ -26,7 +12,7 @@
   padding: 5rem;
 }
 
-#upload-character > section:first-of-type > section:first-of-type {
+#upload-character > section:first-of-type > section:first-of-type, #create-literature > section:first-of-type > section:first-of-type {
   display: flex;
   float: right;
   flex-direction: column;
@@ -34,7 +20,7 @@
   gap: 1.5rem 0;
 }
 
-#upload-character > section:first-of-type > section:nth-of-type(2) > input[type="text"] {
+#upload-character > section:first-of-type > section:nth-of-type(2) > input[type="text"], #create-literature > section:first-of-type > section:nth-of-type(2) {
   width: calc(100% - 13rem);
 }
 
@@ -50,9 +36,18 @@
   margin-top: 2rem;
 }
 
-#library-creator-avatar {
+#avatar, #cover {
+  cursor: pointer;
+}
+
+#avatar {
   border-radius: 100%;
   height: 179.2px;
   width: 179.2px;
-  cursor: pointer;
+}
+
+#cover {
+  border-radius: 5px;
+  height: 15rem;
+  width: 10rem;
 }

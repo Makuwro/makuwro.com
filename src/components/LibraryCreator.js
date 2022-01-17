@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import PropTypes from "prop-types";
 import styles from "../styles/Library.module.css";
-import Footer from "./Footer";
 import NotFound from "./NotFound";
 import Dropdown from "./Dropdown";
 
@@ -51,7 +50,6 @@ export default function LibraryCreator({category, username}) {
 
       page = (
         <form id={styles["upload-art"]}>
-          <h1>Upload art</h1>
           <p>You can tag your characters and share your art with others.</p>
           <section>
             <section>
@@ -235,12 +233,11 @@ export default function LibraryCreator({category, username}) {
       urlRef = useRef();
       page = (
         <form id={styles["upload-character"]}>
-          <h1>Create a character</h1>
           <p>Making a character page is a great way to organize your images and lore.</p>
           <section>
             <section>
               <input type="file" style={{display: "none"}} ref={avatarRef} onChange={({target}) => updateAvatar(target.files)} accept="image/*" />
-              <img src={state.avatarURL[0]} onClick={() => avatarRef.current.click()} id={styles["library-creator-avatar"]} />
+              <img src={state.avatarURL[0]} onClick={() => avatarRef.current.click()} id={styles.avatar} />
               <button>Remove</button>
             </section>
             <h1>Basics</h1>
@@ -369,13 +366,12 @@ export default function LibraryCreator({category, username}) {
 
     case "literature":
       page = (
-        <form>
-          <h1>Create literature</h1>
+        <form id={styles["create-literature"]}>
           <p>On this page, you can start a new series or upload a one-off.</p>
           <section>
             <section>
               <input type="file" style={{display: "none"}} ref={avatarRef} onChange={({target}) => updateAvatar(target.files)} accept="image/*" />
-              <img src={state.avatarURL[0]} onClick={() => avatarRef.current.click()} id={styles["library-creator-avatar"]} />
+              <img src={state.avatarURL[0]} onClick={() => avatarRef.current.click()} id={styles.cover} />
               <button>Remove</button>
             </section>
             <h1>Basics</h1>
@@ -488,15 +484,15 @@ export default function LibraryCreator({category, username}) {
   }
 
   return (
-    <main id={styles["library-creator"]}>
+    <section id={styles["library-creator"]}>
       {page}
-      <Footer />
-    </main>
+    </section>
   );
 
 }
 
 LibraryCreator.propTypes = {
   category: PropTypes.string,
-  username: PropTypes.string
+  username: PropTypes.string,
+  popup: PropTypes.element
 };
