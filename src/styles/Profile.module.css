@@ -163,3 +163,7 @@
   color: white;
   cursor: help;
 }
+
+#profile-terms {
+  color: var(--night-text);
+}
