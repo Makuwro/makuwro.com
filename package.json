@@ -5,6 +5,11 @@
     "type": "git",
     "url": "https://github.com/Makuwro/makuwro.com.git"
   },
+  "homepage": "https://makuwro.com",
+  "bugs": {
+    "url": "https://github.com/Makuwro/issues",
+    "email": "staff@makuwro.com"
+  },
   "version": "1.0.0",
   "license": "GPL-3.0",
   "scripts": {
