@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styles from "../../styles/Profile.module.css";
+import PropTypes from "prop-types";
 
 export default function ProfileLibraryItem({tab, info}) {
 
@@ -13,3 +14,7 @@ export default function ProfileLibraryItem({tab, info}) {
   );
 
 }
+
+ProfileLibraryItem.propTypes = {
+  tab: PropTypes.string
+};
