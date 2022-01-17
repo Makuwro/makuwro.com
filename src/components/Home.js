@@ -56,9 +56,7 @@ export default function Home({theme}) {
             <button>Join today</button>
           </section>
         </section>
-
         <Footer />
-
       </main>
     </>
   );
