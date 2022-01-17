@@ -122,7 +122,6 @@
 
 #login-button {
   background-color: var(--night-button);
-  color: black;
   border: none;
   border-radius: 5px;
   padding: 0.1rem 0.75rem;
@@ -130,6 +129,7 @@
 
 #login-button:hover {
   font-weight: normal;
+  color: white;
 }
 
 #account-info {

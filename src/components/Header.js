@@ -81,7 +81,7 @@ export default function Header(props) {
   }, [state.cachedResults[0], state.query[0], state.redirect[0]]);
 
   return (
-    <header className={theme !== 1 && (theme !== 2 || !systemDark) ? "day" : null}>
+    <header className={!systemDark && theme !== 2 ? "day" : null}>
       <section>
         <Link to="/" id={styles["wiki-name"]}>Makuwro</Link>
         <section>
