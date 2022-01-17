@@ -233,7 +233,6 @@ export default function LibraryCreator({category, username}) {
       urlRef = useRef();
       page = (
         <form id={styles["upload-character"]}>
-          <p>Making a character page is a great way to organize your images and lore.</p>
           <section>
             <section>
               <input type="file" style={{display: "none"}} ref={avatarRef} onChange={({target}) => updateAvatar(target.files)} accept="image/*" />
@@ -367,7 +366,6 @@ export default function LibraryCreator({category, username}) {
     case "literature":
       page = (
         <form id={styles["create-literature"]}>
-          <p>On this page, you can start a new series or upload a one-off.</p>
           <section>
             <section>
               <input type="file" style={{display: "none"}} ref={avatarRef} onChange={({target}) => updateAvatar(target.files)} accept="image/*" />
