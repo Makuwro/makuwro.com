@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styles from "../../styles/Profile.module.css";
 import PropTypes from "prop-types";
 
-export default function ProfileLibraryItem({tab, info}) {
+export default function ProfileLibraryItem({tab}) {
 
   return (
     <section className={`${styles["profile-library"]} ${styles["profile-card"]}`} id={styles["profile-" + tab]}>
