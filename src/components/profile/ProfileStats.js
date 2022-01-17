@@ -39,10 +39,42 @@ export default function ProfileStats() {
       </section>
       <section>
         <section>
-          ID
+          Art uploaded
         </section>
         <section>
           0
+        </section>
+      </section>
+      <section>
+        <section>
+          Characters created
+        </section>
+        <section>
+          0
+        </section>
+      </section>
+      <section>
+        <section>
+          Characters owned
+        </section>
+        <section>
+          0
+        </section>
+      </section>
+      <section>
+        <section>
+          Literatures uploaded
+        </section>
+        <section>
+          0
+        </section>
+      </section>
+      <section>
+        <section>
+          ID
+        </section>
+        <section>
+          Unknown
         </section>
       </section>
     </section>
