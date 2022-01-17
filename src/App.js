@@ -1,5 +1,5 @@
-import React from "react";
-import { Route, Routes, BrowserRouter } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Route, Routes } from "react-router-dom";
 import Home from "./components/Home";
 import "./styles/global.css";
 import Login from "./components/login";
@@ -12,36 +12,30 @@ import Popup from "./components/Popup";
 
 const maintenance = false;
 
-class App extends React.Component {
+export default function App() {
 
-  constructor() {
+  const value = `; ${document.cookie}`;
+  const tokenParts = value.split("; token=");
+  const token = tokenParts.length === 2 && tokenParts.pop().split(";")[0];
+  const themeParts = value.split("; theme=");
+  const theme = themeParts.length === 2 && themeParts.pop().split(";")[0];
+  const state = {
+    userCache: useState({}),
+    userDataObtained: useState(false),
+    token: useState(token || ""),
+    redirect: useState(),
+    theme: useState(theme ? parseInt(theme, 10) : 1),
+    systemDark: useState(window.matchMedia("(prefers-color-scheme: dark)").matches),
+    transparentHeader: useState(false)
+  };
 
-    super();
+  // Check if the website is under maintenance
+  if (maintenance) return <Maintenance />;
 
-    const value = `; ${document.cookie}`;
-    const tokenParts = value.split("; token=");
-    const token = tokenParts.length === 2 && tokenParts.pop().split(";")[0];
-    const themeParts = value.split("; theme=");
-    const theme = themeParts.length === 2 && themeParts.pop().split(";")[0];
+  // Check if we're logged in
+  useEffect(async () => {
 
-    this.checkUserInfo = this.checkUserInfo.bind(this);
-    this.changeTheme = this.changeTheme.bind(this);
-
-    this.state = {
-      userCache: {},
-      userDataObtained: false,
-      token: token || undefined,
-      redirect: undefined,
-      theme: theme ? parseInt(theme, 10) : 1,
-      systemDark: window.matchMedia("(prefers-color-scheme: dark)").matches,
-      transparentHeader: false
-    };
-
-  }
-
-  async checkUserInfo() {
-
-    const {token, userCache, redirect} = this.state;
+    const {token, userCache, redirect} = state;
     if (token && !userCache.id) {
 
       try {
@@ -67,54 +61,32 @@ class App extends React.Component {
 
     }
 
-  }
+  }, [state.token[0]]);
 
-  async componentDidMount() {
+  // Listen for theme changes
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => state.systemDark[1](event.matches));
 
-    await this.checkUserInfo();
+  return (
+    <>
+      <Popup />
+      <Header userCache={state.userCache[0]} token={state.token[0]} theme={state.theme[0]} systemDark={state.systemDark[0]} />
+      <Routes>
+        <Route path="/" element={<Home theme={state.theme[0]} />} />
+        <Route path="/login" element={<Login setToken={(token, redirect) => {
+          
+          state.token[1](token);
+          state.redirect[1](redirect);
 
-  }
-
-  async componentDidUpdate(oldProps, oldState) {
-
-    if (oldState.token !== this.state.token) await this.checkUserInfo();
-
-  }
-
-  changeTheme(theme) {
-
-    document.cookie = `theme=${theme}`;
-    this.setState({theme: theme});
-
-  }
-
-  render() {
-
-    if (maintenance) return <Maintenance />;
-
-    // Listen for theme changes
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => this.setState({systemDark: event.matches}));
-
-    return (
-      <BrowserRouter>
-        <Popup />
-        <Header {...this.state} />
-        <Routes>
-          <Route path="/" element={<Home {...this.state} />} />
-          <Route path="/login" element={<Login setToken={(token, redirect) => this.setState({token: token, redirect: redirect})} />} />
-          <Route path="/register" element={<Registration />} />
-          <Route path={"/:username"} element={<Profile />} />
-          <Route path={"/:username/:tab"} element={<Profile />} />
-        </Routes>
-      </BrowserRouter>
-    );
-
-  }
+        }} />} />
+        <Route path="/register" element={<Registration />} />
+        <Route path={"/:username"} element={<Profile />} />
+        <Route path={"/:username/:tab"} element={<Profile />} />
+      </Routes>
+    </>
+  );
 
 }
 
 App.propTypes = {
   history: PropTypes.object
 };
-
-export default App;
