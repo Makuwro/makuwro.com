@@ -91,20 +91,15 @@
 #profile-selection {
   display: flex;
   justify-content: center;
-  width: 70%;
+  max-width: 75%;
   margin: 0 auto;
-}
-
-#profile-selection a:first-of-type {
-  margin-left: 0;
-}
-
-#profile-selection a {
-  margin-left: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 #profile-container-center > section:nth-of-type(2) {
-  margin-top: 2rem;
+  width: calc(720px - 2rem);
+  margin: 2rem auto 0;
 }
 
 .profile-card {
