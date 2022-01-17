@@ -4,6 +4,8 @@ import styles from "../styles/Profile.module.css";
 import Footer from "./Footer";
 import ProfileLibraryItem from "./profile/ProfileLibraryItem";
 import ProfileStats from "./profile/ProfileStats";
+import ProfileTerms from "./profile/ProfileTerms";
+import ProfileBlog from "./profile/ProfileBlog";
 
 export default function Profile() {
 
@@ -17,7 +19,10 @@ export default function Profile() {
     literature: <ProfileLibraryItem tab="literature" />,
     worlds: <ProfileLibraryItem tab="worlds" />,
     teams: <ProfileLibraryItem tab="teams" />,
-    stats: <ProfileStats />
+    stats: <ProfileStats />,
+    characters: <ProfileLibraryItem tab="characters" />,
+    terms: <ProfileTerms />,
+    blog: <ProfileBlog />
   };
   let tabComponent;
 
