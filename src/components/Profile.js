@@ -29,7 +29,7 @@ export default function Profile() {
       <section id={styles["profile-bg"]}>
         <button id={styles["profile-btn-edit"]}>Edit profile</button>
         <section id={styles["profile-info"]}>
-          <img src="https://i1.sndcdn.com/avatars-cQrv7oKRIfqHb95q-i9wmwQ-t200x200.jpg" />
+          <img src="https://pbs.twimg.com/profile_images/1477875323953991682/MM_ZZPTh_400x400.jpg" />
           <section>
             <h1>{state.displayName[0]}<span title="This user is a Makuwro staff member" className={styles["profile-badge"]}>STAFF</span></h1>
             <h2>{`@${username}`}</h2>
@@ -48,15 +48,15 @@ export default function Profile() {
         </section>
         <section id={styles["profile-container-center"]}>
           <section className={styles["profile-card"]} id={styles["profile-selection"]}>
-            <Link to="">Activity</Link>
-            <Link to="art">Art</Link>
-            <Link to="blog">Blog</Link>
-            <Link to="characters">Characters</Link>
-            <Link to="literature">Literature</Link>
-            <Link to="stats">Stats</Link>
-            <Link to="teams">Teams</Link>
-            <Link to="terms">Terms</Link>
-            <Link to="worlds">Worlds</Link>
+            <Link to={`/${username}`}>Activity</Link>
+            <Link to={`/${username}/art`}>Art</Link>
+            <Link to={`/${username}/blog`}>Blog</Link>
+            <Link to={`/${username}/characters`}>Characters</Link>
+            <Link to={`/${username}/literature`}>Literature</Link>
+            <Link to={`/${username}/stats`}>Stats</Link>
+            <Link to={`/${username}/teams`}>Teams</Link>
+            <Link to={`/${username}/terms`}>Terms</Link>
+            <Link to={`/${username}/worlds`}>Worlds</Link>
           </section>
           <>{tabComponent}</>
         </section>
