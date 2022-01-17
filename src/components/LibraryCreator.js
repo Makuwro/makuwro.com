@@ -237,7 +237,6 @@ export default function LibraryCreator({category, username}) {
             <section>
               <input type="file" style={{display: "none"}} ref={avatarRef} onChange={({target}) => updateAvatar(target.files)} accept="image/*" />
               <img src={state.avatarURL[0]} onClick={() => avatarRef.current.click()} id={styles.avatar} />
-              <button>Remove</button>
             </section>
             <h1>Basics</h1>
             <section>
@@ -370,7 +369,6 @@ export default function LibraryCreator({category, username}) {
             <section>
               <input type="file" style={{display: "none"}} ref={avatarRef} onChange={({target}) => updateAvatar(target.files)} accept="image/*" />
               <img src={state.avatarURL[0]} onClick={() => avatarRef.current.click()} id={styles.cover} />
-              <button>Remove</button>
             </section>
             <h1>Basics</h1>
             <section>
