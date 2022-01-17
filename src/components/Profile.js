@@ -7,7 +7,7 @@ import ProfileStats from "./profile/ProfileStats";
 
 export default function Profile() {
 
-  const {username, tab = "activity"} = useParams();
+  const {username, tab = "comments"} = useParams();
   const state = {
     displayName: useState(username),
     disabled: useState(false)
@@ -48,10 +48,10 @@ export default function Profile() {
         </section>
         <section id={styles["profile-container-center"]}>
           <section className={styles["profile-card"]} id={styles["profile-selection"]}>
-            <Link to={`/${username}`}>Activity</Link>
             <Link to={`/${username}/art`}>Art</Link>
             <Link to={`/${username}/blog`}>Blog</Link>
             <Link to={`/${username}/characters`}>Characters</Link>
+            <Link to={`/${username}/comments`}>Comments</Link>
             <Link to={`/${username}/literature`}>Literature</Link>
             <Link to={`/${username}/stats`}>Stats</Link>
             <Link to={`/${username}/teams`}>Teams</Link>
