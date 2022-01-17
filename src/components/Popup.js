@@ -21,7 +21,7 @@ export default function Popup({title, content}) {
       break;
 
     case "character":
-      title = "Create a character";
+      title = "Create character";
       break;
 
     default:
