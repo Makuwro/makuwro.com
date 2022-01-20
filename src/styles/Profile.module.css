@@ -146,14 +146,6 @@
   align-items: center;
 }
 
-#profile-literature .profile-library-item {
-  height: 15rem;
-}
-
-#profile-worlds .profile-library-item {
-  border-radius: 100%;
-}
-
 .profile-badge {
   border-radius: 5px;
   background-color: var(--night-button);
@@ -165,4 +157,12 @@
 
 #profile-terms {
   color: var(--night-text);
+}
+
+#profile-literature {
+  flex-direction: column;
+}
+
+#profile-literature > a {
+  max-width: none;
 }

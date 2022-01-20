@@ -1,60 +1,45 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import PropTypes from "prop-types";
 import styles from "../styles/Popup.module.css";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import LibraryCreator from "./LibraryCreator";
+import { useNavigate } from "react-router-dom";
 
-export default function Popup({title, content}) {
+export default function Popup({title, children, queried}) {
 
-  const [searchParams] = useSearchParams();
-  let create = searchParams.get("create");
-  let queried = true;
-  content = create ? <LibraryCreator category={create} /> : null;
-  switch (create) {
-
-    case "art":
-      title = "Upload art";
-      break;
-
-    case "literature":
-      title = "Create literature";
-      break;
-
-    case "character":
-      title = "Create character";
-      break;
-
-    default:
-      queried = false;
-      break;
-
-  }
-  let [open, setOpen] = useState(queried);
-  if (queried && !open) {
-
-    setOpen(true);
-    return null;
-
-  }
   const navigate = useNavigate();
+  let [open, setOpen] = useState(false);
+  let [initialOpen, setInitialOpen] = useState();
+
+  // Let the popup mount, then show the open animation
+  useEffect(() => {
+
+    // We're only doing this once
+    if (!initialOpen) {
+
+      setInitialOpen(true);
+
+      // Using setTimeout so the open animation is still shown
+      setTimeout(() => {
+
+        setOpen(true);
+
+      }, 0);
+
+    }
+
+  }, [open, initialOpen]);
 
   return (
-    <section id={styles["popup-background"]} className={open ? styles["open"] : null} onClick={() => {
+    <section id={styles["popup-background"]} className={open ? styles.open : null} onClick={() => {
 
-      if (queried) {
-
-        navigate(window.location.pathname + (location.hash ? `#${location.hash}` : ""), {replace: true});
-        setOpen(false);
-        return;
-
-      }
+      setOpen(false);
+      if (queried) setTimeout(() => navigate(window.location.pathname + (location.hash ? `#${location.hash}` : ""), {replace: true}), 300);
 
     }}>
       <section id={styles["popup-container"]} onClick={(event) => event.stopPropagation()}>
         <section id={styles["popup-header"]}>
           <h1>{title}</h1>
         </section>
-        <section id={styles["popup-content"]}>{content}</section>
+        <section id={styles["popup-content"]}>{children}</section>
       </section>
     </section>
   );
@@ -62,7 +47,7 @@ export default function Popup({title, content}) {
 }
 
 Popup.propTypes = {
-  visible: PropTypes.bool,
+  queried: PropTypes.bool,
   title: PropTypes.string,
-  content: PropTypes.element
+  children: PropTypes.node.isRequired
 };
