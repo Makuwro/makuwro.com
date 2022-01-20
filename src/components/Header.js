@@ -112,8 +112,8 @@ export default function Header(props) {
             }}></button>
           </>
         ) : (
-          <Link to="/login" id={styles["login-button"]}>
-            Login
+          <Link to="/signin" id={styles["login-button"]}>
+            Sign in
           </Link>
         )}
       </section>

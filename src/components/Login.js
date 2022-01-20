@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 export default function Login({setToken}) {
 
   // Set page title
-  document.title = "Sign in to The Showrunners Wiki";
+  document.title = "Welcome back to Makuwro";
 
   const urlSearchParams = new URLSearchParams(window.location.search);
   const redirect = urlSearchParams.get("redirect") || "/";
