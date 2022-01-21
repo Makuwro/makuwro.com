@@ -166,3 +166,67 @@
 #profile-literature > a {
   max-width: none;
 }
+
+#profile-blog {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.profile-blog-post {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.profile-blog-post > img {
+  height: 3rem;
+  width: 3rem;
+  border-radius: 100%;
+  margin-right: 0.5rem;
+}
+
+.names {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.username {
+  color: var(--night-text);
+  font-weight: 300;
+}
+
+.profile-blog-post .badge {
+  color: var(--night-button);
+}
+
+.profile-blog-post .content p {
+  color: white;
+}
+
+.profile-blog-post .content > p:first-of-type {
+  margin-top: 0;
+}
+
+.profile-blog-post .content > p:last-of-type {
+  margin-bottom: 0;
+}
+
+#profile-blog > form {
+  background-color: var(--night-input-background);
+  padding: 1rem;
+  border-radius: 5px;
+}
+
+#profile-blog > form > section {
+  width: 100%;
+}
+
+#profile-blog > form textarea {
+  padding: 0;
+  border: none;
+  margin-top: 0.15rem;
+}
+
+#profile-blog > form input[type="submit"] {
+  float: right;
+}
