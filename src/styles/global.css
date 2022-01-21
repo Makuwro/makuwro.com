@@ -66,6 +66,7 @@ h1 {
 p {
   margin-bottom: 1rem;
   font-size: 1rem;
+  font-weight: 300;
 }
 
 main {
@@ -126,6 +127,7 @@ textarea, form input[type="text"], form input[type="password"], form input[type=
 textarea {
   height: 10rem;
   resize: none;
+  font-weight: 300;
 }
 
 .input-with-prefix {
