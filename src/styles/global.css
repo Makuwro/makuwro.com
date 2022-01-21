@@ -121,7 +121,6 @@ textarea, form input[type="text"], form input[type="password"], form input[type=
   border-radius: 5px;
   font-size: 1rem;
   box-sizing: border-box;
-  box-shadow: var(--day-box-shadow);
 }
 
 textarea {
