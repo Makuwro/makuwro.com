@@ -14,7 +14,7 @@ import CharacterCreator from "./components/library/creator/CharacterCreator";
 import TeamCreator from "./components/library/creator/TeamCreator";
 import WorldCreator from "./components/library/creator/WorldCreator";
 
-const maintenance = true;
+const maintenance = false;
 
 export default function App() {
 
