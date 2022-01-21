@@ -12,6 +12,7 @@ import ArtCreator from "./components/library/creator/ArtCreator";
 import LiteratureCreator from "./components/library/creator/LiteratureCreator";
 import CharacterCreator from "./components/library/creator/CharacterCreator";
 import TeamCreator from "./components/library/creator/TeamCreator";
+import WorldCreator from "./components/library/creator/WorldCreator";
 
 const maintenance = false;
 
@@ -21,7 +22,8 @@ export default function App() {
     art: ArtCreator,
     literature: LiteratureCreator,
     character: CharacterCreator,
-    team: TeamCreator
+    team: TeamCreator,
+    world: WorldCreator
   };
   const [searchParams] = useSearchParams();
   const value = `; ${document.cookie}`;
