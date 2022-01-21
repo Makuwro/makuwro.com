@@ -86,11 +86,11 @@ export default function TeamCreator() {
             </Dropdown>
           </section>
           <section>
-            <label>May others join this team?</label>
+            <label>May others directly join this team?</label>
             <Dropdown index={0}>
               <li>This team is invite-only</li>
               <li>Anyone may request to join this team, but they have to be approved</li>
-              <li>Anyone may join this team</li>
+              <li>Anyone may directly join this team</li>
             </Dropdown>
           </section>
         </section>
