@@ -160,6 +160,12 @@
   color: var(--night-text);
 }
 
+#profile-terms button {
+  display: block;
+  float: right;
+  margin-left: 0.5rem;
+}
+
 #profile-literature {
   flex-direction: column;
 }
