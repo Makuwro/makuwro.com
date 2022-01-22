@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import styles from "../styles/Profile.module.css";
 import Footer from "./Footer";
 import ProfileLibraryItem from "./profile/ProfileLibraryItem";
