@@ -80,10 +80,15 @@ export default function Profile() {
     terms: <ProfileTerms />,
     blog: <ProfileBlog />
   };
-  let tabComponent;
-
-  document.title = `${state.displayName[0]} / Makuwro`;
   tabComponent = components[tab];
+
+  // Run this after the page loads
+  useEffect(() => {
+
+    // Redirect if no tab is selected
+    if (!tab) navigate(`/${username}/blog`);
+
+  }, []);
 
   return (
     <main id={styles["profile"]}>
