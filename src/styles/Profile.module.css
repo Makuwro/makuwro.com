@@ -95,13 +95,23 @@
 #profile-selection {
   display: flex;
   justify-content: center;
-  max-width: 75%;
+  max-width: 65%;
   margin: 0 auto;
   flex-wrap: wrap;
   gap: 1rem;
 }
 
-#profile-container-center > .profile-card {
+#profile-container-center > section {
+  transition: 0.3s;
+  opacity: 1;
+}
+
+#profile-container-center > section.invisible {
+  transition: 0.15s;
+  opacity: 0;
+}
+
+#profile-container-center > nav {
   width: calc(720px - 2rem);
   margin: 0 auto;
 }
@@ -136,7 +146,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  margin: 1.5rem auto 0;
+  height: auto;
 }
 
 .profile-library-item {

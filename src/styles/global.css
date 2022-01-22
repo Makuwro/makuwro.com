@@ -43,13 +43,14 @@ body {
 a {
   text-decoration: none;
   color: white;
+  transition: 0.3s;
 }
 
 .day a {
   color: #3673ef;
 }
 
-a:hover {
+a:hover, .selected {
   color: var(--night-link);
   transition: 0.3s;
 }
