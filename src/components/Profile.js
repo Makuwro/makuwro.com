@@ -12,9 +12,65 @@ export default function Profile() {
   const {username, tab, id} = useParams();
   const state = {
     displayName: useState(username),
-    disabled: useState(false)
+    disabled: useState(false),
+    shifting: useState(false)
   };
-  const components = {
+  let navigate;
+  let components;
+  let tabComponent;
+  let i;
+  let navChildren;
+  let navItems;
+
+  // Change the website title
+  document.title = `${state.displayName[0]} / Makuwro`;
+
+  // Add links to the profile navigator
+  navigate = useNavigate();
+  navChildren = [];
+  navItems = ["Art", "Blog", "Characters", "Literature", "Stats", "Teams", "Terms", "Worlds"];
+  for (i = 0; navItems.length > i; i++) {
+
+    // First, let's work on the onClick function
+    let item = navItems[i];
+    let itemLC = item.toLowerCase();
+    let element;
+    let onClick = (event) => {
+
+      // Don't go to the link quite yet, let's animate this first
+      event.preventDefault();
+
+      // Change the state
+      state.shifting[1](true);
+      
+      // Wait for the animation to finish
+      setTimeout(() => {
+
+        // Now it's time to go to the next page
+        navigate(`/${username}/${itemLC}`);
+
+        // Change the state again
+        state.shifting[1](false);
+
+      }, 150);
+
+    };
+
+    // Create the link
+    element = React.createElement(Link, {
+      to: `/${username}/${itemLC}`,
+      className: itemLC === tab ? "selected" : null,
+      onClick: itemLC !== tab ? onClick : null,
+      key: itemLC
+    }, item);
+
+    // Push it for use later
+    navChildren.push(element);
+
+  }
+
+  // Set the current view
+  components = {
     art: <ProfileLibraryItem tab="art" />,
     literature: <ProfileLibraryItem tab="literature" />,
     worlds: <ProfileLibraryItem tab="worlds" />,
@@ -52,18 +108,12 @@ export default function Profile() {
           </section>
         </section>
         <section id={styles["profile-container-center"]}>
-          <section className={styles["profile-card"]} id={styles["profile-selection"]}>
-            <Link to={`/${username}/art`}>Art</Link>
-            <Link to={`/${username}/blog`}>Blog</Link>
-            <Link to={`/${username}/characters`}>Characters</Link>
-            <Link to={`/${username}/comments`}>Comments</Link>
-            <Link to={`/${username}/literature`}>Literature</Link>
-            <Link to={`/${username}/stats`}>Stats</Link>
-            <Link to={`/${username}/teams`}>Teams</Link>
-            <Link to={`/${username}/terms`}>Terms</Link>
-            <Link to={`/${username}/worlds`}>Worlds</Link>
+          <nav className={styles["profile-card"]} id={styles["profile-selection"]}>
+            {navChildren}
+          </nav>
+          <section className={state.shifting[0] ? styles.invisible : null}>
+            {tabComponent}
           </section>
-          <>{tabComponent}</>
         </section>
         <section id={styles["profile-container-right"]}>
           <section className={styles["profile-card"]} id={styles["profile-actions"]}>
