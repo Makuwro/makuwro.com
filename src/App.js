@@ -94,13 +94,6 @@ export default function App() {
       <Header userCache={state.userCache[0]} token={state.token[0]} theme={state.theme[0]} systemDark={state.systemDark[0]} />
       <Routes>
         <Route path="/" element={<Home theme={state.theme[0]} />} />
-        <Route path="/login" element={<Login setToken={(token, redirect) => {
-          
-          state.token[1](token);
-          state.redirect[1](redirect);
-
-        }} />} />
-        <Route path="/register" element={<Registration />} />
         <Route path={"/:username"} element={<Profile />} />
         <Route path={"/:username/:tab"} element={<Profile />} />
       </Routes>
