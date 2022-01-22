@@ -9,7 +9,7 @@ import ProfileBlog from "./profile/ProfileBlog";
 
 export default function Profile() {
 
-  const {username, tab = "comments"} = useParams();
+  const {username, tab, id} = useParams();
   const state = {
     displayName: useState(username),
     disabled: useState(false)

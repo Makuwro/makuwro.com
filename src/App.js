@@ -96,6 +96,7 @@ export default function App() {
         <Route path="/" element={<Home theme={state.theme[0]} />} />
         <Route path={"/:username"} element={<Profile />} />
         <Route path={"/:username/:tab"} element={<Profile />} />
+        <Route path={"/:username/:tab/:id"} element={<Profile />} />
       </Routes>
     </>
   );
