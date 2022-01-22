@@ -5,10 +5,14 @@ import styles from "../../styles/Profile.module.css";
 export default function ProfileTerms() {
 
   return (
-    <section className={styles["profile-card"]} id={styles["profile-terms"]}>
-      <button>Edit</button>
-      This user didn't share any terms with Makuwro. If you want to commission them, or want to use their characters, art, or literature, you should <Link to="?message=">ask them about their policies</Link> before doing so.
-    </section>
+    <>
+      <section className={styles["profile-card"]} id={styles["profile-terms"]}>
+        This user didn't share any terms with Makuwro. If you want to commission them, or want to use their characters, art, or literature, you should <Link to="?message=">ask them about their policies</Link> before doing so.
+      </section>
+      <section className={styles["profile-card"]} style={{width: "auto", marginTop: "-3rem"}}>
+        <button>Edit terms</button>
+      </section>
+    </>
   );
 
 }

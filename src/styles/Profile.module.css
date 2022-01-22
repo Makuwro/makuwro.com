@@ -87,6 +87,9 @@
 #profile-container-center {
   width: 60%;
   margin-top: 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 #profile-selection {
@@ -98,9 +101,9 @@
   gap: 1rem;
 }
 
-#profile-container-center > section:nth-of-type(2) {
+#profile-container-center > .profile-card {
   width: calc(720px - 2rem);
-  margin: 2rem auto 0;
+  margin: 0 auto;
 }
 
 .profile-card {
@@ -158,12 +161,6 @@
 
 #profile-terms {
   color: var(--night-text);
-}
-
-#profile-terms button {
-  display: block;
-  float: right;
-  margin-left: 0.5rem;
 }
 
 #profile-literature {
