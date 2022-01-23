@@ -5,7 +5,7 @@ You're interested in making Makuwro better? That's super cool! We really appreci
 ## Before working on Makuwro.com
 * Make sure your project follows the Makuwro [terms of service](https://about.makuwro.com/policies/terms) and [privacy policy](https://about.makuwro.com/policies/privacy).
 
-* Remember that your contribution will be public and licensed under the [GNU General Public License v3.0](https://github.com/Makuwro/makuwro.com/blob/main/LICENSE).
+* Remember that your contribution will be public and licensed under the [Mozilla Public License v2.0](https://github.com/Makuwro/makuwro.com/blob/main/LICENSE).
 
 * Make sure there's a relevant feature request or bug report in the [issues](https://github.com/Makuwro/makuwro.com/issues). If there isn't one, no biggie: [you can just make one](https://github.com/Makuwro/makuwro.com/issues/new).
 
@@ -23,6 +23,8 @@ You're interested in making Makuwro better? That's super cool! We really appreci
   * If your contribution adds backwards-compatible features (meaning your contribution does **not** break something that works), use the minor branch. For example, v1.1.0.
 
   * If your contribution adds features or fixes bugs that make the app backwards-incompatible, make sure you get explicit approval from Makuwro staff first. Then, use the major branch. For example, v2.0.0.
+
+* Do not send a network request to any site other than api.makuwro.com.
   
 ## When you're ready to show it off to the community
 * Remember to put your Makuwro username in your pull request. If your contribution gets merged, you'll get a cool badge on the website!
