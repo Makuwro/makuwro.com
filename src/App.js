@@ -43,37 +43,6 @@ export default function App() {
   // Check if the website is under maintenance
   if (maintenance) return <Maintenance />;
 
-  // Check if we're logged in
-  useEffect(async () => {
-
-    const {token, userCache, redirect} = state;
-    if (token && !userCache.id) {
-
-      try {
-
-        // Get current user info
-        const userResponse = await fetch(`${process.env.RAZZLE_WIKI_SERVER}/accounts/me`, {
-          headers: {
-            token: token
-          }
-        });
-        const jsonResponse = await userResponse.json();
-        if (userResponse.ok) this.setState({
-          userCache: jsonResponse,
-          userDataObtained: true,
-          redirect: undefined
-        }, () => redirect && this.props.history.replace(redirect));
-
-      } catch (err) {
-
-        console.log(`Couldn't get user info: ${err.message}`);
-
-      }
-
-    }
-
-  }, [state.token[0]]);
-
   // Check if they want to create something
   useEffect(() => {
 
