@@ -25,9 +25,6 @@ export default function Profile() {
   let navItems;
   let contentViewers;
 
-  // Change the website title
-  document.title = `${state.displayName[0]} / Makuwro`;
-
   // Add links to the profile navigator
   navigate = useNavigate();
   navChildren = [];
@@ -99,9 +96,14 @@ export default function Profile() {
       };
       setContentViewer(contentViewers.art);
   
+    } else {
+
+      // Change the document title
+      document.title = `${state.displayName[0]}'s ${tab} / Makuwro`;
+
     }
 
-  }, []);
+  }, [id]);
 
   return (
     <main id={styles["profile"]}>
