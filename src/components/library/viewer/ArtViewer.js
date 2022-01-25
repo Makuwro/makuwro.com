@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import styles from "../../../styles/LibraryViewer.module.css";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Comment from "../../Comment";
 
 export default function ArtViewer({username, id}) {
 
@@ -15,15 +16,57 @@ export default function ArtViewer({username, id}) {
     display_name: "Christian Toney",
     username: "Christian"
   });
-  let [comments, setComments] = useState([]);
-  let [open, setOpen] = useState(true);
+  let [comments, setComments] = useState(
+    <>
+      <Comment name="Christian Toney" username="Christian" avatarUrl="https://pbs.twimg.com/profile_images/1477875323953991682/MM_ZZPTh_400x400.jpg">
+        Test
+      </Comment>
+      <Comment name="Christian Toney" username="Christian" avatarUrl="https://pbs.twimg.com/profile_images/1477875323953991682/MM_ZZPTh_400x400.jpg">
+        Another test comment!
+      </Comment>
+    </>
+  );
+  let [open, setOpen] = useState(false);
   let [commentsOpen, toggleComments] = useState(false);
   let [commentsEnabled, toggleCommentsEnabled] = useState(true);
+  let path;
+  // eslint-disable-next-line no-unused-vars
+  const navigate = useNavigate();
+
+  // Wait for the page to load
+  path = location.pathname;
+  useEffect(() => {
+
+    // Run the opening animation
+    // This will also run if we press the back/forward button
+    if (path === `/${creator.username}/art/${path.substring(path.lastIndexOf("/") + 1)}`) {
+
+      setOpen(true);
+      document.title = `${creator.display_name}: ${image.caption} / Makuwro`;
+
+    } else {
+
+      setOpen(false);
+
+    }
+    
+
+  }, [path]);
+
+  function closeViewer() {
+
+    // Run the closing animation
+    setOpen(false);
+
+    // Go back to the art page
+    navigate(`/${creator.username}/art`);
+
+  }
 
   return (
     <section id={styles.viewer} className={!open ? styles.closed : null}>
       <section id={styles.content}>
-        <section id={styles["image-background"]} onClick={() => setOpen(false)}>
+        <section id={styles["image-background"]} onClick={() => closeViewer()}>
           <img src={image.url} onClick={(event) => event.stopPropagation()} />
         </section>
         <section id={styles.artist}>
@@ -35,7 +78,7 @@ export default function ArtViewer({username, id}) {
             @{creator.username}
           </h2>
           <Link to={`/${creator.username}/terms`}>Terms of use</Link>
-          <Link to={`/${creator.username}/terms`}>Report</Link>
+          <Link to="?action=report">Report</Link>
         </section>
       </section>
       <section id={styles.right}>
@@ -64,15 +107,19 @@ export default function ArtViewer({username, id}) {
             </dl>
           </section>
           <section id={styles.actions}>
-            <button id={styles.like} className={!commentsEnabled ? styles.disabled : false} onClick={() => toggleComments(true)}>Like</button>
-            <button id={styles["show-comments"]} className={!commentsEnabled ? styles.disabled : false} onClick={() => toggleComments(true)}>{commentsEnabled ? "Comments (0)" : "Comments disabled"}</button>
+            <button id={styles.like} className={!commentsEnabled ? styles.disabled : null} onClick={null}>Like</button>
+            <button id={styles["show-comments"]} className={!commentsEnabled ? styles.disabled : null} onClick={commentsEnabled ? () => toggleComments(true) : null}>{commentsEnabled ? "Comments (0)" : "Comments disabled"}</button>
           </section>
         </section>
-        <section id={styles.comments}>
+        <section id={styles["comment-container"]}>
           <form id={styles["comment-creator"]}>
-            <textarea></textarea>
-            <input type="submit" />
+            <textarea placeholder="Say something nice!"></textarea>
+            <input type="submit" value="Comment" disabled />
           </form>
+          <ul id={styles.comments}>
+            {comments}
+          </ul>
+          <button onClick={() => toggleComments(false)}>Close comments</button>
         </section>
       </section>
     </section>

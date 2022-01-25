@@ -340,3 +340,8 @@ dd {
   color: var(--night-text);
   font-weight: 300;
 }
+
+input[type="submit"]:disabled {
+  filter: saturate(0) brightness(0.5);
+  cursor: not-allowed;
+}
