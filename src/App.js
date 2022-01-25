@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Route, Routes, useSearchParams } from "react-router-dom";
 import Home from "./components/Home";
 import "./styles/global.css";
-import Login from "./components/Login";
-import Registration from "./components/Registration";
 import PropTypes from "prop-types";
 import Header from "./components/Header";
 import Profile from "./components/Profile";
