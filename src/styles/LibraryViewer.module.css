@@ -68,8 +68,8 @@
 }
 
 #right {
-  padding: 1rem;
-  width: calc(20% - 1rem);
+  padding: 1rem 0;
+  width: 20%;
   background-color: var(--night-article);
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
@@ -113,6 +113,11 @@
   background-color: var(--night-input-box);
 }
 
+#comment-creator > input[type="submit"] {
+  float: right;
+  margin: 0 1rem 1rem 0;
+}
+
 #timestamp {
   filter: brightness(0.7);
 }
@@ -120,12 +125,14 @@
 #metadata {
   height: 94.5%;
   overflow-y: auto;
+  padding: 0 1rem;
 }
 
 #actions {
   display: flex;
   gap: 0.5rem;
   height: 5.5%;
+  padding: 0 1rem;
 }
 
 #actions > button {
@@ -140,22 +147,35 @@
 }
 
 #details {
-  display: flex;
-  flex-direction: column;
   gap: 1rem;
 }
 
-#comments {
+#details, #details.closed + #comment-container {
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+}
+
+#comment-container, #details.closed {
+  opacity: 0;
   display: none;
 }
 
-#details, #comments {
+#details, #comment-container {
   position: relative;
-  bottom: 0;
   transition: 0.3s;
   height: 100%;
 }
 
-#details.closed, #details.closed + #comments {
-  bottom: 100%;
+#comment-container > form {
+  background-color: var(--night-input-background);
+}
+
+#comments {
+  padding-inline-start: 0;
+  margin: 0;
+}
+
+#comment-container > button {
+  margin: 0 1rem;
 }
