@@ -13,6 +13,7 @@
 
 .closed#viewer {
   opacity: 0;
+  pointer-events: none;
 }
 
 #content {
@@ -21,7 +22,9 @@
 }
 
 #image-background {
-  display: flex;
+  display: flex;ner > button {
+  margin: 0 1rem;
+}
   align-items: center;
   justify-content: center;
   height: 100%;
@@ -176,6 +179,4 @@
   margin: 0;
 }
 
-#comment-container > button {
-  margin: 0 1rem;
-}
+#comment-contai
