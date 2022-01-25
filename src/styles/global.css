@@ -334,3 +334,9 @@ footer a:hover {
 button.destructive {
   background-color: #f65151;
 }
+
+dd {
+  margin-inline-start: 0;
+  color: var(--night-text);
+  font-weight: 300;
+}

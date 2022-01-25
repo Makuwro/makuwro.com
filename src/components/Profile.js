@@ -6,6 +6,7 @@ import ProfileLibraryItem from "./profile/ProfileLibraryItem";
 import ProfileStats from "./profile/ProfileStats";
 import ProfileTerms from "./profile/ProfileTerms";
 import ProfileBlog from "./profile/ProfileBlog";
+import ArtViewer from "./library/viewer/ArtViewer";
 
 export default function Profile() {
 
@@ -15,12 +16,14 @@ export default function Profile() {
     disabled: useState(false),
     shifting: useState(false)
   };
+  const [contentViewer, setContentViewer] = useState(null);
   let navigate;
   let components;
   let tabComponent;
   let i;
   let navChildren;
   let navItems;
+  let contentViewers;
 
   // Change the website title
   document.title = `${state.displayName[0]} / Makuwro`;
@@ -88,10 +91,21 @@ export default function Profile() {
     // Redirect if no tab is selected
     if (!tab) navigate(`/${username}/blog`);
 
+    // Check if we need to show a specific piece of content
+    if (id) {
+
+      contentViewers = {
+        art: <ArtViewer />
+      };
+      setContentViewer(contentViewers.art);
+  
+    }
+
   }, []);
 
   return (
     <main id={styles["profile"]}>
+      {contentViewer}
       <section id={styles["profile-bg"]}>
         <button id={styles["profile-btn-edit"]}>Edit profile</button>
         <section id={styles["profile-info"]}>

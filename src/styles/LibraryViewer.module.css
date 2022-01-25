@@ -1,0 +1,161 @@
+#viewer {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  display: flex;
+  height: 100%;
+  background-color: #000000da;
+  z-index: 1;
+  opacity: 1;
+  transition: 0.3s;
+}
+
+.closed#viewer {
+  opacity: 0;
+}
+
+#content {
+  height: 100%;
+  width: 80%;
+}
+
+#image-background {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  transform: none;
+  transition: 0.3s;
+}
+
+#image-background > img {
+  max-width: 90%;
+}
+
+.closed #image-background {
+  transform: scale(70%);
+}
+
+#artist {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  gap: 1rem;
+  opacity: 1;
+  transition: 0.3s;
+}
+
+.closed #artist {
+  opacity: 0;
+}
+
+#artist > h1, #artist > h2 {
+  margin: 0;
+}
+
+#artist > h2, #artist > a {
+  color: #959595;
+  font-weight: 300;
+}
+
+#artist > img {
+  border-radius: 100%;
+  height: 3rem;
+  width: 3rem;
+}
+
+#right {
+  padding: 1rem;
+  width: calc(20% - 1rem);
+  background-color: var(--night-article);
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  transition: 0.3s;
+  position: relative;
+  left: 0;
+  height: 90%;
+  top: 2.5%;
+}
+
+.closed #right {
+  left: calc(20% + 1rem);
+}
+
+#right dl {
+  border-top: 1px solid var(--night-text);
+  padding-top: 1rem;
+}
+
+#right dd {
+  margin-bottom: 1rem;
+}
+
+#right p {
+  margin: 0;
+}
+
+#show-comments {
+  width: 78%;
+  box-sizing: border-box;
+}
+
+#show-comments.disabled {
+  cursor: not-allowed;
+  border: 1px solid var(--night-text);
+  color: var(--night-text);
+  background: transparent;
+}
+
+#comment-creator {
+  background-color: var(--night-input-box);
+}
+
+#timestamp {
+  filter: brightness(0.7);
+}
+
+#metadata {
+  height: 94.5%;
+  overflow-y: auto;
+}
+
+#actions {
+  display: flex;
+  gap: 0.5rem;
+  height: 5.5%;
+}
+
+#actions > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#like {
+  width: 22%;
+  box-sizing: border-box;
+}
+
+#details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+#comments {
+  display: none;
+}
+
+#details, #comments {
+  position: relative;
+  bottom: 0;
+  transition: 0.3s;
+  height: 100%;
+}
+
+#details.closed, #details.closed + #comments {
+  bottom: 100%;
+}
