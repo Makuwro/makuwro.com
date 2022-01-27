@@ -1,101 +1,110 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "../styles/Dropdown.module.css";
 import PropTypes from "prop-types";
 
-class Dropdown extends React.Component {
-  
-  constructor(props) {
-    
-    super(props);
+export default function Dropdown({defaultIndex, children, onChange, width}) {
 
-    this.dropdownRef = React.createRef();
-    this.checkIfFlipNeeded = this.checkIfFlipNeeded.bind(this);
-    this.refresh = this.refresh.bind(this);
+  const dropdownRef = useRef();
+  const [option, setOption] = useState();
+  const [open, setOpen] = useState(false);
+  const [above, setAbove] = useState(false);
+  const [childrenComponents, setChildrenComponents] = useState();
+  const [index, setIndex] = useState(defaultIndex);
 
-    this.state = {
-      option: null,
-      open: false,
-      above: false,
-      children: null,
-      index: props.index
-    };
+  function checkIfFlipNeeded() {
+
+    const rect = dropdownRef.current.getBoundingClientRect();
+    setOpen(!open);
+    setAbove(rect.bottom > window.innerHeight);
 
   }
 
-  checkIfFlipNeeded(open) {
+  useEffect(() => {
 
-    this.setState({open: true}, () => {
+    // Create and store the child components
+    setChildrenComponents(React.Children.map(children, (child, childIndex) => {
 
-      const rect = this.dropdownRef.current.getBoundingClientRect();
-      this.setState({above: rect.bottom > window.innerHeight, open: open});
+      let newProps;
 
-    });
+      if (childIndex === index) {
+        
+        setOption(child.props.children);
 
-  }
+      }
 
-  refresh() {
-
-    this.setState({children: React.Children.map(this.props.children, (child, index) => {
-
-      if (index === this.state.index) this.setState({option: child.props.children});
-
-      const newProps = {
+      newProps = {
         ...child,
         props: undefined,
         _owner: undefined,
         _store: undefined,
         type: undefined,
-        key: index,
-        className: this.state.index === index ? styles.selected : null,
+        key: childIndex,
+        className: childIndex === index ? styles.selected : null,
         onClick: () => {
     
-          this.setState({option: child.props.children, index: index, open: false, above: false}, () => this.props.onChange && this.props.onChange(index));
+          if (childIndex !== index) {
+            
+            setOption(child.props.children);
+            setIndex(childIndex);
+            
+            if (onChange) {
+              
+              onChange(childIndex);
+
+            }
+
+          }
+
+          setOpen(false);
+          setAbove(false);
           
         }
       };
+
       newProps["$$typeof"] = undefined;
+
       return React.createElement(child.type, newProps, child.props.children);
   
-    })});
+    }));
 
-  }
+    function checkIfClickedOutside(event) {
 
-  componentDidMount() {
+      const {current} = dropdownRef;
+      if (current && !current.contains(event.target)) {
 
-    this.refresh();
+        // This is an outside click, so close the dropdown
+        setOpen(false);
 
-  }
+      }
 
-  componentDidUpdate(oldProps, oldState) {
+    }
 
-    if (this.props.index !== oldProps.index) this.setState({index: this.props.index});
-    if (this.state.index !== oldState.index) this.refresh();
+    document.addEventListener("click", checkIfClickedOutside, true);
 
-  }
+    return () => {
 
-  render() {
+      document.removeEventListener("click", checkIfClickedOutside, true);
 
-    return (
-      <section className={`${styles.list} ${!this.state.open ? styles.closed : ""} ${this.state.above ? styles.above : ""}`}>
-        <section style={{
-          width: this.props.width || "auto"
-        }} onClick={() => this.checkIfFlipNeeded(!this.state.open)}>
-          {this.state.children ? (this.state.option || "Choose from a list...") : "No options available"}
-        </section>
-        <ul ref={this.dropdownRef}>{this.state.children}</ul>
+    };
+
+  }, [index]);
+
+  return (
+    <section className={`${styles.list} ${!open ? styles.closed : ""} ${above ? styles.above : ""}`} ref={dropdownRef}>
+      <section style={{
+        width: width || "auto"
+      }} onClick={() => checkIfFlipNeeded()}>
+        {children ? (option || "Choose from a list...") : "No options available"}
       </section>
-    );
-
-  }
+      <ul>{childrenComponents}</ul>
+    </section>
+  );
 
 }
 
 Dropdown.propTypes = {
-  option: PropTypes.string,
-  children: PropTypes.any,
+  defaultIndex: PropTypes.number,
+  children: PropTypes.node,
   onChange: PropTypes.func,
-  width: PropTypes.number,
-  index: PropTypes.number
+  width: PropTypes.number
 };
-
-export default Dropdown;

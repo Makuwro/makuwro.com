@@ -78,7 +78,7 @@ export default function TeamCreator() {
           <h1>Security</h1>
           <section>
             <label>Who can view this team's profile?</label>
-            <Dropdown index={0}>
+            <Dropdown defaultIndex={0}>
               <li>Everyone, including visitors who aren't signed in</li>
               <li>Registered Makuwro users</li>
               <li>Team followers</li>
@@ -87,7 +87,7 @@ export default function TeamCreator() {
           </section>
           <section>
             <label>May others directly join this team?</label>
-            <Dropdown index={0}>
+            <Dropdown defaultIndex={0}>
               <li>This team is invite-only</li>
               <li>Anyone may request to join this team, but they have to be approved</li>
               <li>Anyone may directly join this team</li>

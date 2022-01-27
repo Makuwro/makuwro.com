@@ -108,7 +108,7 @@ export default function LiteratureCreator({username}) {
           </section>
           <section>
             <label>Who can view this literature?</label>
-            <Dropdown index={0}>
+            <Dropdown defaultIndex={0}>
               <li>Everyone, including visitors who aren't logged in</li>
               <li>Registered Makuwro users</li>
               <li>My followers</li>
@@ -119,7 +119,7 @@ export default function LiteratureCreator({username}) {
           </section>
           <section>
             <label>Who can comment on this literature?</label>
-            <Dropdown index={0}>
+            <Dropdown defaultIndex={0}>
               <li>Registered Makuwro users</li>
               <li>My followers</li>
               <li>My friends</li>
@@ -129,7 +129,7 @@ export default function LiteratureCreator({username}) {
           </section>
           <section>
             <label>Who can view comments on this literature?</label>
-            <Dropdown index={0}>
+            <Dropdown defaultIndex={0}>
               <li>Everyone, including visitors who aren't logged in</li>
               <li>Registered Makuwro users</li>
               <li>My followers</li>

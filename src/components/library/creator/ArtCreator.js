@@ -62,7 +62,7 @@ export default function ArtCreator({username}) {
           </section>
           <section>
             <label>Who created this art?</label>
-            <Dropdown index={0}>
+            <Dropdown defaultIndex={0}>
               <li>I am the sole artist</li>
               <li>I collaborated with another on-site artist</li>
               <li>I collaborated with an off-site artist</li>
@@ -119,7 +119,7 @@ export default function ArtCreator({username}) {
           </section>
           <section>
             <label>Who can see the watermarked version of this image?</label>
-            <Dropdown index={0}>
+            <Dropdown defaultIndex={0}>
               <li>Everyone, including visitors who aren't logged in</li>
               <li>Registered Makuwro users</li>
               <li>My followers</li>
@@ -130,7 +130,7 @@ export default function ArtCreator({username}) {
           </section>
           <section>
             <label>Who can see the non-watermarked version of this image?</label>
-            <Dropdown index={0}>
+            <Dropdown defaultIndex={0}>
               <li>Everyone, including visitors who aren't logged in</li>
               <li>Registered Makuwro users</li>
               <li>My followers</li>
@@ -141,7 +141,7 @@ export default function ArtCreator({username}) {
           </section>
           <section>
             <label>Who can view comments on this image?</label>
-            <Dropdown index={0}>
+            <Dropdown defaultIndex={0}>
               <li>Everyone, including visitors who aren't logged in</li>
               <li>Registered Makuwro users</li>
               <li>My followers</li>
@@ -152,7 +152,7 @@ export default function ArtCreator({username}) {
           </section>
           <section>
             <label>Who can comment on this image?</label>
-            <Dropdown index={0}>
+            <Dropdown defaultIndex={0}>
               <li>Registered Makuwro users</li>
               <li>My followers</li>
               <li>My friends</li>
@@ -163,7 +163,7 @@ export default function ArtCreator({username}) {
           <section>
             <label>Would you like to age-restrict this image?</label>
             <p>If so, users must sign in to view this image. If you inappropriately age-gate your image, Makuwro staff might enforce this setting.</p>
-            <Dropdown index={0}>
+            <Dropdown defaultIndex={0}>
               <li>No</li>
               <li>Yes, restrict users under 13 from viewing this</li>
               <li>Yes, restrict users under 17 from viewing this</li>

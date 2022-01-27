@@ -60,7 +60,7 @@ export default function CharacterCreator({username}) {
           </section>
           <section>
             <label>Who created this character?</label>
-            <Dropdown index={0}>
+            <Dropdown defaultIndex={0}>
               <li>I am the sole creator of this character</li>
               <li>I collaborated with another on-site creator</li>
               <li>I collaborated with an off-site creator</li>
@@ -108,7 +108,7 @@ export default function CharacterCreator({username}) {
           </section>
           <section>
             <label>Who can view this character?</label>
-            <Dropdown index={0}>
+            <Dropdown defaultIndex={0}>
               <li>Everyone, including visitors who aren't logged in</li>
               <li>Registered Makuwro users</li>
               <li>My followers</li>
@@ -119,7 +119,7 @@ export default function CharacterCreator({username}) {
           </section>
           <section>
             <label>Who can comment on this character?</label>
-            <Dropdown index={0}>
+            <Dropdown defaultIndex={0}>
               <li>Registered Makuwro users</li>
               <li>My followers</li>
               <li>My friends</li>
@@ -129,7 +129,7 @@ export default function CharacterCreator({username}) {
           </section>
           <section>
             <label>Who can view comments on this character?</label>
-            <Dropdown index={0}>
+            <Dropdown defaultIndex={0}>
               <li>Everyone, including visitors who aren't logged in</li>
               <li>Registered Makuwro users</li>
               <li>My followers</li>
