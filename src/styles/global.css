@@ -122,6 +122,7 @@ textarea, form input[type="text"], form input[type="password"], form input[type=
   border-radius: 5px;
   font-size: 1rem;
   box-sizing: border-box;
+  font-weight: 300;
 }
 
 textarea {
