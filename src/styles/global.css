@@ -154,13 +154,6 @@ input[type="checkbox"] {
   height: 25px;
 }
 
-input[type="checkbox"] + label {
-  display: inline;
-  position: relative;
-  bottom: 7px;
-  left: 7px;
-}
-
 label {
   display: block;
   margin-bottom: 1rem;
@@ -242,19 +235,6 @@ input[type="password"] {
   letter-spacing: 2px;
 }
 
-.unavailable {
-  background-color: #6e6e6e !important;
-  cursor: not-allowed !important;
-}
-
-.invalid {
-  border-color: red !important;
-}
-
-.invisible {
-  display: none;
-}
-
 article {
   user-select: text;
 }
@@ -270,10 +250,6 @@ b {
 u {
   text-decoration: none;
   border-bottom: 2px solid;
-}
-
-button {
-  border-radius: 5px;
 }
 
 li {
