@@ -7,7 +7,6 @@
 :global(.day) .list > section {
   background-color: #d3d3d3;
   color: #474748;
-  box-shadow: var(--day-box-shadow);
 }
 
 .list > section {
@@ -33,7 +32,6 @@
 
 .list > ul > li {
   margin-top: 0;
-  box-shadow: var(--day-box-shadow);
 }
 
 .list.closed > ul {
