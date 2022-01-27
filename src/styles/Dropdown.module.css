@@ -2,6 +2,7 @@
   cursor: pointer;
   position: relative;
   user-select: none;
+  font-weight: 300;
 }
 
 :global(.day) .list > section {
