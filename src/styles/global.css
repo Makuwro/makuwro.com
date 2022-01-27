@@ -345,3 +345,8 @@ input[type="submit"]:disabled {
   filter: saturate(0) brightness(0.5);
   cursor: not-allowed;
 }
+
+input[type="checkbox"] + label {
+  font-weight: 300;
+  color: var(--night-text);
+}
