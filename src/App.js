@@ -11,17 +11,19 @@ import LiteratureCreator from "./components/library/creator/LiteratureCreator";
 import CharacterCreator from "./components/library/creator/CharacterCreator";
 import TeamCreator from "./components/library/creator/TeamCreator";
 import WorldCreator from "./components/library/creator/WorldCreator";
+import AbuseReporter from "./components/AbuseReporter";
 
 const maintenance = false;
 
 export default function App() {
 
   const creators = {
-    art: ArtCreator,
-    literature: LiteratureCreator,
-    character: CharacterCreator,
-    team: TeamCreator,
-    world: WorldCreator
+    "report-abuse": AbuseReporter,
+    "create-art": ArtCreator,
+    "create-literature": LiteratureCreator,
+    "create-character": CharacterCreator,
+    "create-team": TeamCreator,
+    "create-world": WorldCreator
   };
   const [searchParams] = useSearchParams();
   const value = `; ${document.cookie}`;
@@ -39,18 +41,20 @@ export default function App() {
     transparentHeader: useState(false),
     createContent: useState(React.Fragment)
   };
+  let action;
 
   // Check if the website is under maintenance
   if (maintenance) return <Maintenance />;
 
   // Check if they want to create something
+  action = searchParams.get("action");
   useEffect(() => {
 
-    let create = creators[searchParams.get("create")];
-    if (state.createContent[0].type === create) return;
-    state.createContent[1](create ? React.createElement(create, {}, null) : React.Fragment);
+    let component = creators[action];
+    if (state.createContent[0].type === component) return;
+    state.createContent[1](component ? React.createElement(component, {}, null) : React.Fragment);
 
-  }, [state.createContent[0], searchParams.get("create")]);
+  }, [state.createContent[0], action]);
 
   // Listen for theme changes
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => state.systemDark[1](event.matches));

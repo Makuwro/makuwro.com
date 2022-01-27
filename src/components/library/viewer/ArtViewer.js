@@ -78,7 +78,7 @@ export default function ArtViewer({username, id}) {
             @{creator.username}
           </h2>
           <Link to={`/${creator.username}/terms`}>Terms of use</Link>
-          <Link to="?action=report">Report</Link>
+          <Link to="?action=report-abuse">Report</Link>
         </section>
       </section>
       <section id={styles.right}>
