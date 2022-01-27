@@ -110,10 +110,6 @@
   background: transparent;
 }
 
-#comment-creator {
-  background-color: var(--night-input-box);
-}
-
 #comment-creator > input[type="submit"] {
   float: right;
   margin: 0 1rem 1rem 0;
@@ -168,15 +164,34 @@
   height: 100%;
 }
 
-#comment-container > form {
+#comment-creator {
   background-color: var(--night-input-background);
+  margin: 0 1rem;
+  border-radius: 5px;
+}
+
+#comment-creator > textarea {
+  max-height: 10rem;
+}
+
+#comment-creator > input {
+  display: none;
+  opacity: 0;
+  transition: 0.3s;
 }
 
 #comments {
   padding-inline-start: 0;
-  margin: 0;
+  margin: 1rem 0 0;
+  max-height: 24rem;
+  overflow-y: auto;
 }
 
 #comment-container > button {
-  margin: 0 1rem;
+  margin: auto 1rem 0;
+}
+
+.commenting > input {
+  display: block;
+  opacity: 1;
 }
