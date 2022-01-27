@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from "../styles/Dropdown.module.css";
 import PropTypes from "prop-types";
 
-export default function Dropdown({defaultIndex, children, onChange, width}) {
+export default function Dropdown({defaultIndex, children, onChange, width, inPopup}) {
 
   const dropdownRef = useRef();
   const [option, setOption] = useState();
@@ -14,8 +14,8 @@ export default function Dropdown({defaultIndex, children, onChange, width}) {
   function checkIfFlipNeeded() {
 
     const rect = dropdownRef.current.getBoundingClientRect();
+    setAbove(rect.bottom > (inPopup ? 560 : window.innerHeight));
     setOpen(!open);
-    setAbove(rect.bottom > window.innerHeight);
 
   }
 
@@ -106,5 +106,6 @@ Dropdown.propTypes = {
   defaultIndex: PropTypes.number,
   children: PropTypes.node,
   onChange: PropTypes.func,
-  width: PropTypes.number
+  width: PropTypes.number,
+  inPopup: PropTypes.bool
 };
