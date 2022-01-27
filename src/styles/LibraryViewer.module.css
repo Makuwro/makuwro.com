@@ -70,7 +70,7 @@
 
 #right {
   padding: 1rem 0;
-  width: 20%;
+  width: 30rem;
   background-color: var(--night-article);
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
@@ -82,7 +82,7 @@
 }
 
 .closed #right {
-  left: calc(20% + 1rem);
+  left: 30rem;
 }
 
 #right dl {
