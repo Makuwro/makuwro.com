@@ -3,7 +3,7 @@ You're interested in making Makuwro better? That's super cool! We really appreci
 
 # Things to note
 ## Before working on Makuwro.com
-* Make sure your project follows the Makuwro [terms of service](https://about.makuwro.com/policies/terms) and [privacy policy](https://about.makuwro.com/policies/privacy).
+* Make sure your project follows the Makuwro [terms of service](https://support.makuwro.com/policies/terms) and [privacy policy](https://support.makuwro.com/policies/privacy).
 
 * Remember that your contribution will be public and licensed under the [Mozilla Public License v2.0](https://github.com/Makuwro/makuwro.com/blob/main/LICENSE).
 
