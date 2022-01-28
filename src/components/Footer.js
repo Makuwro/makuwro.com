@@ -12,8 +12,6 @@ export default function Footer() {
           <ul>
             <li><a href="https://about.makuwro.com">Company</a></li>
             <li><a href="https://about.makuwro.com/team">Team</a></li>
-            <li><a href="https://about.makuwro.com/policies/terms">Terms</a></li>
-            <li><a href="https://about.makuwro.com/policies/privacy">Privacy</a></li>
           </ul>
         </section>
         <section>
@@ -21,7 +19,7 @@ export default function Footer() {
           <ul>
             <li><Link to="/donate">Donate</Link></li>
             <li><a href="https://github.com/Makuwro/makuwro.com/issues">Feedback</a></li>
-            <li><a href="https://github.com/Makuwro/makuwro.com">GitHub</a></li>
+            <li><a href="https://github.com/Makuwro/makuwro.com">Code</a></li>
           </ul>
         </section>
         <section>
@@ -37,8 +35,11 @@ export default function Footer() {
         <section>
           <h1>Resources</h1>
           <ul>
-            <li><Link to="/forums">Forums</Link></li>
-            <li><a href="https://support.makuwro.com">Support</a></li>
+            <li><a href="https://support.makuwro.com">Help center</a></li>
+            <li><a href="https://support.makuwro.com/policies/terms">Terms</a></li>
+            <li><a href="https://support.makuwro.com/policies/community-guidelines">Community guidelines</a></li>
+            <li><a href="https://support.makuwro.com/policies/privacy">Privacy</a></li>
+            <li><a href="https://support.makuwro.com/contact">Contact us</a></li>
           </ul>
         </section>
         <section>
