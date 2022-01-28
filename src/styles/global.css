@@ -327,3 +327,7 @@ input[type="checkbox"] + label {
   font-weight: 300;
   color: var(--night-text);
 }
+
+input[type="submit"] {
+  margin-top: 1rem;
+}
