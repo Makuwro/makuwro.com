@@ -54,14 +54,7 @@
   box-sizing: border-box;
   list-style: none;
   background-color: #202021;
-}
-
-:global(.day) .list li:hover {
-  background-color: #c0c0c0;
-}
-
-.list li:hover {
-  background-color: #282828;
+  transition: 0.15s;
 }
 
 .list li:last-of-type {
@@ -91,11 +84,11 @@
   border-bottom-right-radius: 0;
 }
 
-:global(.day) .selected {
-  background-color: #b6b6b6 !important;
-  color: black !important;
+:global(.day) li.selected {
+  background-color: #b6b6b6;
+  color: black;
 }
 
-.selected {
-  background-color: #0c0c0c !important;
+li.selected {
+  background-color: #121212;
 }

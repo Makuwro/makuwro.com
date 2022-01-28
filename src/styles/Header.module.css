@@ -20,8 +20,6 @@
   padding: 0 0.75rem;
   caret-color: white;
   border-radius: 20px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
 }
 
 #search-box > input:focus-visible {
@@ -32,9 +30,9 @@
   display: none;
 }
 
-.no-results {
-  border-bottom-left-radius: 20px !important;
-  border-bottom-right-radius: 20px !important;
+input.no-results {
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
 
 #search-results {
@@ -90,11 +88,6 @@
   border-radius: 100%;
   cursor: pointer;
   background: none;
-}
-
-.selected {
-  border: 1px solid #929292 !important;
-  background-color: #cccccc !important;
 }
 
 #menu-button > img {
