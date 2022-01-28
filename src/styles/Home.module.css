@@ -54,37 +54,3 @@
   margin-top: 1rem;
   display: flex;
 }
-
-#footer-copyright {
-  border-top: 1px solid #5b5e62;
-  margin-top: 2rem;
-  padding-top: 2rem;
-  color: var(--night-text);
-}
-
-#footer-columns {
-  display: flex;
-}
-
-#footer-columns h1 {
-  color: #5687cf;
-  font-size: 1rem;
-}
-
-#footer-columns > section:first-of-type {
-  margin: 0;
-}
-
-#footer-columns > section {
-  margin-left: 2rem;
-  width: 10%;
-}
-
-#footer-columns ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-#home-features {
-  margin: 0 5rem;
-}
