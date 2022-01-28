@@ -120,7 +120,7 @@
   background-color: var(--night-article);
   filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.2));
   padding: 1rem;
-  border-radius: 15px;
+  border-radius: 5px;
 }
 
 #profile-bio h1:first-of-type {
