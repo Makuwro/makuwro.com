@@ -51,10 +51,17 @@ export default function App() {
   useEffect(() => {
 
     let component = creators[action];
-    if (state.createContent[0].type === component) return;
-    state.createContent[1](component ? React.createElement(component, {}, null) : React.Fragment);
+    if (component) {
 
-  }, [state.createContent[0], action]);
+      state.createContent[1](React.createElement(component, {onClose: () => {
+        
+        state.createContent[1](null);
+
+      }}, null));
+
+    }
+
+  }, [action]);
 
   // Listen for theme changes
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => state.systemDark[1](event.matches));
