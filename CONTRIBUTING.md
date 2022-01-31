@@ -5,7 +5,7 @@ You're interested in making Makuwro better? That's super cool! We really appreci
 ## Before working on Makuwro.com
 * Make sure your project follows the Makuwro [terms of service](https://support.makuwro.com/policies/terms) and [privacy policy](https://support.makuwro.com/policies/privacy).
 
-* Remember that your contribution will be public and licensed under the [Mozilla Public License v2.0](https://github.com/Makuwro/makuwro.com/blob/main/LICENSE).
+* Remember that your contribution will be public and licensed under the [GNU General Public License v3.0](https://github.com/Makuwro/makuwro.com/blob/main/LICENSE).
 
 * Make sure there's a relevant feature request or bug report in the [issues](https://github.com/Makuwro/makuwro.com/issues). If there isn't one, no biggie: [you can just make one](https://github.com/Makuwro/makuwro.com/issues/new).
 
