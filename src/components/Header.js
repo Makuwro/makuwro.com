@@ -3,12 +3,11 @@ import styles from "../styles/Header.module.css";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
-export default function Header(props) {
+export default function Header({userData, theme, systemDark, query, history, onSignInClick}) {
 
-  const {userCache, theme, systemDark} = props;
   let state = {
     searchResults: useState(null),
-    query: useState(props.query || ""),
+    query: useState(query || ""),
     inputFocused: useState(false)
   };
 
@@ -16,9 +15,8 @@ export default function Header(props) {
     <header className={!systemDark && theme !== 2 ? "day" : null}>
       <section>
         <Link to="/" id={styles["wiki-name"]}>Makuwro</Link>
-        <section>
+        <section id={styles.leftLinks}>
           <Link to="/library">Library</Link>
-          <Link to="/creators">Creators</Link>
         </section>
       </section>
       <form onFocus={() => state.inputFocused[1](true)} onBlur={() => state.inputFocused[1](false)} id={styles["search-box"]}>
@@ -32,18 +30,23 @@ export default function Header(props) {
         </ul>
       </form>
       <section>
-        {userCache && userCache._id ? (
+        {userData && userData.id ? (
           <>
             <button>
               Share
             </button>
-            <button title="Preferences" onClick={() => props.history.push("/preferences")} id={styles["account-button"]} style={{
-              backgroundImage: `url(${userCache.avatar_url})`,
+            <button title="Preferences" onClick={() => history.push("/preferences")} id={styles["account-button"]} style={{
+              backgroundImage: `url(${userData.avatarURL})`,
               backgroundSize: "cover"
             }}></button>
           </>
         ) : (
-          <Link to="/signin" id={styles["login-button"]}>
+          <Link to="/signin" id={styles["login-button"]} onClick={(event) => {
+
+            event.preventDefault();
+            onSignInClick();
+
+          }}>
             Sign in
           </Link>
         )}
@@ -54,8 +57,7 @@ export default function Header(props) {
 }
 
 Header.propTypes = {
-  userCache: PropTypes.object,
-  token: PropTypes.string,
+  userData: PropTypes.object,
   articleContainer: PropTypes.any,
   history: PropTypes.object,
   query: PropTypes.string,

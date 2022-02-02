@@ -176,38 +176,6 @@ label > button:hover {
   background-color: rgb(239, 239, 239);
 }
 
-/* Header */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 4.5rem;
-  padding: 0 1.2rem;
-  width: calc(100% - 2.4rem);
-  z-index: 4;
-  color: white;
-  background-color: #26272b;
-  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.2));
-}
-
-header.day, main.day {
-  background-color: white;
-  color: #26272b;
-}
-
-header > section {
-  margin: 0;
-  display: flex;
-  align-items: center;
-}
-
-header > section:first-of-type > section a {
-  margin-left: 1rem;
-  font-size: 1.1rem;
-  position: relative;
-  top: 2px;
-}
-
 .day button, .day input[type="button"], .day input[type="submit"] {
   background-color: var(--day-button);
 }
