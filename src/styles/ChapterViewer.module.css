@@ -1,0 +1,36 @@
+#chapterBannerContainer {
+  background-color: #5e6065;
+  height: 260px;
+  width: 100%;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+#chapterBannerContainer > img {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+#details, #commentsContainer, #content {
+  margin: 1rem;
+}
+
+#author {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+#authorImageContainer {
+  border-radius: 100%;
+  background-color: #5e6065;
+  height: 2rem;
+  width: 2rem;
+}
+
+#authorImageContainer > img {
+  border-radius: 100%;
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+}
