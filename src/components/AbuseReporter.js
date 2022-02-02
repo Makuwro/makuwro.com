@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Dropdown from "./Dropdown";
-import Popup from "./Popup";
 import styles from "../styles/AbuseReporter.module.css";
 import CountryDropdown from "./CountryDropdown";
 import Checkbox from "./Checkbox";
 
-export default function AbuseReporter({onClose}) {
+export default function AbuseReporter({setPopupSettings}) {
 
   const [menu, setMenu] = useState([]);
   const [escalate, setEscalate] = useState(false);
@@ -49,8 +48,17 @@ export default function AbuseReporter({onClose}) {
 
   }
 
+  useEffect(() => {
+
+    setPopupSettings({
+      title: "Report abuse",
+      warnUnfinished: true
+    });
+
+  }, []);
+
   return (
-    <Popup title="Report abuse" onClose={() => onClose()}>
+    <>
       <p>Think you found something that shouldn't be on Makuwro? Let us know!</p>
       <form>
         <section>
@@ -111,7 +119,7 @@ export default function AbuseReporter({onClose}) {
                 {menu[2] !== undefined && (
                   <>
                     <section>
-                      <label>What is the type of your intellectual property?</label>
+                      <label>What intellectual property is this content infringing?</label>
                       <Dropdown onChange={(index) => {
 
                         setMenu([4, 1, menu[2], index]);
@@ -292,7 +300,7 @@ export default function AbuseReporter({onClose}) {
           </section>
         )}
       </form>
-    </Popup>
+    </>
   );
 
 }
