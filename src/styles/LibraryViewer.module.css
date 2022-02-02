@@ -1,10 +1,9 @@
 #viewer {
   height: 100%;
   width: 100%;
-  position: absolute;
+  position: fixed;
   top: 0;
   display: flex;
-  height: 100%;
   background-color: #000000da;
   z-index: 1;
   opacity: 1;
