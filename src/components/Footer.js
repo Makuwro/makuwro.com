@@ -17,7 +17,7 @@ export default function Footer() {
         <section>
           <h1>Contribute</h1>
           <ul>
-            <li><Link to="/donate">Donate</Link></li>
+            <li><a href="https://ko-fi.com/Makuwro">Donate</a></li>
             <li><a href="https://github.com/Makuwro/makuwro.com/issues">Feedback</a></li>
             <li><a href="https://github.com/Makuwro/makuwro.com">Code</a></li>
           </ul>

@@ -3,6 +3,7 @@
   position: relative;
   user-select: none;
   font-weight: 300;
+  margin: 1rem 0 0;
 }
 
 :global(.day) .list > section {
@@ -16,6 +17,11 @@
   padding: 10.6px;
   background-color: #202021;
   box-sizing: border-box;
+  transition: 0.15s;
+}
+
+.list > section:hover, .list li:hover {
+  filter: brightness(1.2);
 }
 
 .list.closed > section {

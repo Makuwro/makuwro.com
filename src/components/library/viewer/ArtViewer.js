@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "../../../styles/LibraryViewer.module.css";
 import PropTypes from "prop-types";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Comment from "../../Comment";
 
-export default function ArtViewer({username, id}) {
+export default function ArtViewer({open, currentUser, username, id, onClose}) {
 
   let [image, setImage] = useState({
     url: "https://pbs.twimg.com/media/FIL8VyuWYAIM1UW?format=png&name=small",
@@ -26,47 +26,16 @@ export default function ArtViewer({username, id}) {
       </Comment>
     </>
   );
-  let [open, setOpen] = useState(false);
   let [commentsOpen, toggleComments] = useState(false);
   let [commentsEnabled, toggleCommentsEnabled] = useState(true);
-  let path;
-  // eslint-disable-next-line no-unused-vars
-  const navigate = useNavigate();
+  let [commenting, setCommenting] = useState(false);
 
-  // Wait for the page to load
-  path = location.pathname;
-  useEffect(() => {
-
-    // Run the opening animation
-    // This will also run if we press the back/forward button
-    if (path === `/${creator.username}/art/${path.substring(path.lastIndexOf("/") + 1)}`) {
-
-      setOpen(true);
-      document.title = `${creator.display_name}: ${image.caption} / Makuwro`;
-
-    } else {
-
-      setOpen(false);
-
-    }
-    
-
-  }, [path]);
-
-  function closeViewer() {
-
-    // Run the closing animation
-    setOpen(false);
-
-    // Go back to the art page
-    navigate(`/${creator.username}/art`);
-
-  }
+  document.title = `${username}: Details, details, details! / Makuwro`;
 
   return (
     <section id={styles.viewer} className={!open ? styles.closed : null}>
       <section id={styles.content}>
-        <section id={styles["image-background"]} onClick={() => closeViewer()}>
+        <section id={styles["image-background"]} onClick={() => onClose(username)}>
           <img src={image.url} onClick={(event) => event.stopPropagation()} />
         </section>
         <section id={styles.artist}>
@@ -112,7 +81,7 @@ export default function ArtViewer({username, id}) {
           </section>
         </section>
         <section id={styles["comment-container"]}>
-          <form id={styles["comment-creator"]}>
+          <form id={styles["comment-creator"]} className={commenting ? styles.commenting : null}>
             <textarea placeholder="Say something nice!"></textarea>
             <input type="submit" value="Comment" disabled />
           </form>
@@ -128,6 +97,8 @@ export default function ArtViewer({username, id}) {
 }
 
 ArtViewer.propTypes = {
+  open: PropTypes.bool,
+  currentUser: PropTypes.object,
   username: PropTypes.string,
   id: PropTypes.string
 };

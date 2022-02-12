@@ -1,13 +1,21 @@
+footer {
+  border-top: 1px solid #5b5e62;
+  padding: 2rem 0;
+  margin: 4rem 2rem 0;
+}
+
 #footer-copyright {
   border-top: 1px solid #5b5e62;
   margin-top: 2rem;
   padding-top: 2rem;
   color: var(--night-text);
+  text-align: center;
 }
 
 #footer-columns {
   display: flex;
-  gap: 5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 #footer-columns h1 {
@@ -20,7 +28,7 @@
 }
 
 #footer-columns > section {
-  width: 20%;
+  flex: 1 1 0px;
 }
 
 #footer-columns ul {
@@ -28,6 +36,29 @@
   padding: 0;
 }
 
+footer a {
+  border-bottom: none;
+  color: white;
+}
+
+footer a:hover {
+  font-weight: normal;
+  color: #c3d8ff;
+  transition: 0.3s;
+}
+
 #home-features {
   margin: 0 5rem;
+}
+
+@media screen and (min-width: 768px) {
+
+  footer {
+    margin: 4rem 5rem 0;
+  }
+
+  #footer-copyright {
+    text-align: left;
+  }
+  
 }

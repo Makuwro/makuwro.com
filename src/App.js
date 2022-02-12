@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Route, Routes, useSearchParams, useNavigate } from "react-router-dom";
+import { Route, Routes, useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import Home from "./components/Home";
 import "./styles/global.css";
 import PropTypes from "prop-types";
@@ -15,6 +15,7 @@ import AbuseReporter from "./components/AbuseReporter";
 import ArtViewer from "./components/library/viewer/ArtViewer";
 import ChapterViewer from "./components/library/viewer/ChapterViewer";
 import Popup from "./components/Popup";
+import Authenticator from "./components/Authenticator";
 
 const artRegex = /^\/(?<uploaderName>[^/]+)\/art\/(?<id>[^/]+)\/?$/gm;
 const maintenance = false;
@@ -43,6 +44,9 @@ export default function App() {
   const [uploaderName, setUploaderName] = useState();
   const [artId, setArtId] = useState();
   const [signInOpen, setSignInOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [shownLocation, setLocation] = useState(location);
   let matchedPath;
   let action;
   let pathname;
@@ -102,15 +106,27 @@ export default function App() {
 
     }
 
-  }, [action, pathname]);
+    // Check if we need to sign in
+    if (pathname === "/signin") {
 
-  const navigate = useNavigate();
+      setSignInOpen(true);
+
+    } else {
+
+      setSignInOpen(false);
+
+    }
+
+  }, [action, pathname]);
 
   // Listen for theme changes
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => setSystemDark(event.matches));
 
   return (
     <>
+      <Popup open={signInOpen} onClose={() => navigate(shownLocation.pathname, {replace: true})}>
+        <Authenticator />
+      </Popup>
       <Popup title={popupTitle} open={popupChildren !== null} onClose={() => setPopupChildren(null)} warnUnfinished={popupWarnUnfinished}>
         {popupChildren}
       </Popup>
@@ -121,20 +137,18 @@ export default function App() {
         setArtId();
 
       }} />
-      <Header userData={userData} theme={theme} systemDark={systemDark} onSignInClick={() => setSignInOpen(true)} />
-      <Routes>
-        <Route path={"/"} element={<Home theme={theme} />} />
-        <Route path={"/register"} element={<Home theme={theme} />} />
-        <Route path={"/signin"} element={<Home theme={theme} />} />
-        <Route path={"/library"} element={<Home theme={theme} />} />
-        <Route path={"/library/:category"} element={<Home theme={theme} />} />
-        <Route path={"/:username"} element={<Profile />} />
-        <Route path={"/:username/art/:id"} element={<Profile />} />
-        <Route path={"/:username/:tab"} element={<Profile />} />
-        <Route path={"/:username/:tab/:id"} element={<Profile />} />
-        <Route path={"/:username/:tab/:id/chapters"} element={<Profile />} />
-        <Route path={"/:username/:tab/:id/characters"} element={<Profile />} />
-        <Route path={"/:username/literature/:id/chapters/:chapter"} element={<ChapterViewer />} />
+      <Header userData={userData} theme={theme} systemDark={systemDark} setLocation={setLocation} />
+      <Routes location={shownLocation}>
+        <Route path={"/"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
+        <Route path={"/register"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
+        <Route path={"/signin"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
+        <Route path={"/library"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
+        <Route path={"/library/:category"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
+        {["/:username", "/:username/art/:id", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id/chapters", "/:username/:tab/:id/characters", "/:username/literature/:id/chapters/:chapter"].map((path, index) => {
+          
+          return <Route key={index} path={path} element={<Profile shownLocation={shownLocation} setLocation={setLocation} />} />;
+
+        })}
       </Routes>
     </>
   );

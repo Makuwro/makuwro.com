@@ -54,7 +54,7 @@ header > section:first-of-type > section a {
   width: 100%;
   padding: 0 0.75rem;
   caret-color: white;
-  border-radius: 20px;
+  border-radius: 5px;
 }
 
 #search-box > input:focus-visible {
@@ -66,8 +66,8 @@ header > section:first-of-type > section a {
 }
 
 input.no-results {
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 #search-results {
@@ -84,8 +84,8 @@ input.no-results {
 }
 
 #search-results > li:last-child {
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 :global(.day) #search-results > li {

@@ -13,8 +13,7 @@ export default function ProfileBlog() {
             <section>Christian Toney</section>
             <section className={styles.username}>@Christian</section>
           </section>
-          <textarea>
-
+          <textarea placeholder="What's popping?">
           </textarea>
           <input type="submit" value="Post" />
         </section>

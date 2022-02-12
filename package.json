@@ -7,11 +7,11 @@
   },
   "homepage": "https://makuwro.com",
   "bugs": {
-    "url": "https://github.com/Makuwro/issues",
+    "url": "https://github.com/Makuwro/makuwro.com/issues",
     "email": "staff@makuwro.com"
   },
   "version": "1.0.0",
-  "license": "MPL-2.0",
+  "license": "GPL-3.0",
   "scripts": {
     "start": "razzle start",
     "build": "razzle build --noninteractive",

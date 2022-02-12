@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import styles from "../../../styles/Library.module.css";
 import Dropdown from "../../Dropdown";
+import Checkbox from "../../Checkbox";
 
 export default function LiteratureCreator({username, setPopupSettings}) {
 
@@ -71,10 +72,9 @@ export default function LiteratureCreator({username, setPopupSettings}) {
 
           }} value={state.description[0]}></textarea>
         </section>
-        <section>
-          <input type="checkbox" />
-          <label>This literature is a work in progress</label>
-        </section>
+        <Checkbox>
+          This literature is a work in progress
+        </Checkbox>
       </section>
       <section>
         <h1>Organization</h1>
@@ -145,14 +145,12 @@ export default function LiteratureCreator({username, setPopupSettings}) {
             <li>Just me</li>
           </Dropdown>
         </section>
-        <section>
-          <input type="checkbox" />
-          <label>Disable likes</label>
-        </section>
-        <section>
-          <input type="checkbox" />
-          <label>Disable subscriptions</label>
-        </section>
+        <Checkbox>
+          Disable likes
+        </Checkbox>
+        <Checkbox>
+          Disable subscriptions
+        </Checkbox>
       </section>
       <input type="submit" value="Create literature" />
     </form>

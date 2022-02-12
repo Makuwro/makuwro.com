@@ -38,6 +38,7 @@ body {
   line-height: 1.5;
   overflow: hidden;
   user-select: none;
+  background-color: var(--night-background);
 }
 
 a {
@@ -58,6 +59,7 @@ a:hover, .selected {
 h1, h2, h3, h4, h5, h6 {
   margin: 1rem 0;
   font-weight: normal;
+  color: white;
 }
 
 h1 {
@@ -73,7 +75,7 @@ p {
 main {
   width: 100%;
   height: calc(100% - 4.5rem);
-  background-color: var(--night-background);
+  overflow-y: overlay;
   color: white;
 }
 
@@ -83,6 +85,13 @@ form > section:first-of-type {
 
 form > section {
   margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+form > section > h1 {
+  margin: 0;
 }
 
 form > section > select {
@@ -117,7 +126,7 @@ textarea, form input[type="text"], form input[type="password"], form input[type=
   padding: 0.6rem;
   width: 100%;
   background-color: var(--night-input-background);
-  border: 1px solid var(--night-input-background);
+  border: 1px solid #111111;
   color: white;
   border-radius: 5px;
   font-size: 1rem;
@@ -211,7 +220,7 @@ article {
   color: black;
 }
 
-b {
+dt, b {
   color: white;
 }
 
@@ -233,12 +242,13 @@ p, li {
 }
 
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 20px;
 }
 
 ::-webkit-scrollbar-track {
   border-radius: 10px;
-  background-color: transparent;
+  background-clip: padding-box;
+  margin: 5px;
 }
 
 .day ::-webkit-scrollbar-track {
@@ -247,7 +257,9 @@ p, li {
 
 ::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: #5c5c5c;
+  background-color: #878792;
+  border: 5px solid transparent;
+  background-clip: padding-box;
 }
 
 .day ::-webkit-scrollbar-thumb {
@@ -256,24 +268,6 @@ p, li {
 
 .day ::-webkit-scrollbar-thumb:hover {
   background-color: #7a7a7a;
-}
-
-footer {
-  border-top: 1px solid #5b5e62;
-  padding: 2rem 0;
-  margin: 4rem 5rem;
-  margin-bottom: 0;
-}
-
-footer a {
-  border-bottom: none;
-  color: white;
-}
-
-footer a:hover {
-  font-weight: normal;
-  color: #c3d8ff;
-  transition: 0.3s;
 }
 
 button.destructive {
@@ -298,4 +292,8 @@ input[type="checkbox"] + label {
 
 input[type="submit"] {
   margin-top: 1rem;
+}
+
+#content {
+  overflow-y: overlay;
 }

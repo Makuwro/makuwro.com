@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import styles from "../styles/Header.module.css";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
-export default function Header({userData, theme, systemDark, query, history, onSignInClick}) {
+export default function Header({userData, theme, systemDark, query, history, onSignInClick, setLocation}) {
 
+  const location = useLocation();
   let state = {
     searchResults: useState(null),
     query: useState(query || ""),
@@ -14,7 +15,7 @@ export default function Header({userData, theme, systemDark, query, history, onS
   return (
     <header className={!systemDark && theme !== 2 ? "day" : null}>
       <section>
-        <Link to="/" id={styles["wiki-name"]}>Makuwro</Link>
+        <Link to="/" onClick={() => setLocation(location)} id={styles["wiki-name"]}>Makuwro</Link>
         <section id={styles.leftLinks}>
           <Link to="/library">Library</Link>
         </section>
@@ -41,12 +42,7 @@ export default function Header({userData, theme, systemDark, query, history, onS
             }}></button>
           </>
         ) : (
-          <Link to="/signin" id={styles["login-button"]} onClick={(event) => {
-
-            event.preventDefault();
-            onSignInClick();
-
-          }}>
+          <Link to="/signin" id={styles["login-button"]}>
             Sign in
           </Link>
         )}

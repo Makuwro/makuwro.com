@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import styles from "../../../styles/Library.module.css";
 import Dropdown from "../../Dropdown";
-import Popup from "../../Popup";
+import Checkbox from "../../Checkbox";
 
 export default function CharacterCreator({username, setPopupSettings}) {
 
@@ -148,23 +148,20 @@ export default function CharacterCreator({username, setPopupSettings}) {
         </section>
         <section>
           <label>Character transferability</label>
-          <section>
-            <input type="checkbox" name="tradable" />
-            <label htmlFor="tradable">This character is tradable</label>
-          </section>
-          <section>
-            <input type="checkbox" name="sellable" />
-            <label htmlFor="sellable">This character is sellable</label>
-          </section>
-          <section>
-            <input type="checkbox" name="giftable" />
-            <label htmlFor="giftable">This character is giftable</label>
-          </section>
+          <Checkbox>
+            This character is tradable
+          </Checkbox>
+          <Checkbox>
+            This character is sellable
+          </Checkbox>
+          <Checkbox>
+            This character is giftable
+          </Checkbox>
         </section>
         <section>
-          <label>Terms of use</label>
-          <p>This will be shown on your character's page. Your <a href={`/${username}/terms`}>global terms of use</a> will be shown below this.</p>
-          <textarea>
+          <label>Character terms of use</label>
+          <p>This will be shown on your character's page. Your <a target="_blank" href={`/${username}/terms`} rel="noreferrer">global terms of use</a> will be shown below this.</p>
+          <textarea placeholder="All rights reserved. Do not use this character without my approval.">
 
           </textarea>
         </section>

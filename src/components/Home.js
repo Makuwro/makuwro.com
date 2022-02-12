@@ -1,17 +1,47 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import styles from "../styles/Home.module.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Footer from "./Footer";
 
-export default function Home({theme}) {
+export default function Home({theme, shownLocation, setLocation}) {
 
   // Set the title
   document.title = "Makuwro, the cool worldbuilding platform";
 
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [leaving, setLeaving] = useState(true);
+
+  useEffect(() => {
+
+    if (location.pathname !== "/signin" && location.pathname !== "/register") {
+
+      if (location.pathname !== shownLocation.pathname) {
+
+        setLeaving(true);
+
+      } else {
+
+        setLeaving(false);
+
+      }
+
+    }
+
+  }, [location]);
+
   return (
     <>
-      <main id={styles["home-main"]} className={theme !== "night" ? theme : null}>
+      <main id={styles.home} className={`${theme !== "night" ? theme : null} ${leaving ? styles.leaving : null}`} onTransitionEnd={() => {
+
+        if (leaving) {
+
+          setLocation(location);
+
+        }
+
+      }}>
         <section id={styles["home-tv"]}>
           <section id={styles["home-tv-overlay"]}>
             <section>
@@ -19,8 +49,8 @@ export default function Home({theme}) {
               <section>The easiest way to store characters, worlds, and lore</section>
             </section>
             <section>
-              <button>Start making</button>
-              <Link to="/login">I already have an account</Link>
+              <button onClick={() => navigate("/register")}>Start making</button>
+              <Link to="/signin">I already have an account</Link>
             </section>
           </section>
         </section>
