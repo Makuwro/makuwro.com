@@ -68,12 +68,10 @@ export default function CharacterCreator({username, setPopupSettings}) {
         </section>
         <section>
           <label>Who created this character?</label>
-          <Dropdown defaultIndex={0}>
+          <Dropdown index={0}>
             <li>I am the sole creator of this character</li>
             <li>I collaborated with another on-site creator</li>
             <li>I collaborated with an off-site creator</li>
-            <li>I got this character from an on-site creator</li>
-            <li>I got this character from an off-site creator</li>
           </Dropdown>
         </section>
       </section>
@@ -116,33 +114,30 @@ export default function CharacterCreator({username, setPopupSettings}) {
         </section>
         <section>
           <label>Who can view this character?</label>
-          <Dropdown defaultIndex={0}>
+          <Dropdown index={0}>
             <li>Everyone, including visitors who aren't logged in</li>
             <li>Registered Makuwro users</li>
             <li>My followers</li>
             <li>My friends</li>
-            <li>Specific people</li>
             <li>Just me</li>
           </Dropdown>
         </section>
         <section>
           <label>Who can comment on this character?</label>
-          <Dropdown defaultIndex={0}>
+          <Dropdown index={0}>
             <li>Registered Makuwro users</li>
             <li>My followers</li>
             <li>My friends</li>
-            <li>Specific people</li>
             <li>Just me</li>
           </Dropdown>
         </section>
         <section>
           <label>Who can view comments on this character?</label>
-          <Dropdown defaultIndex={0}>
+          <Dropdown index={0}>
             <li>Everyone, including visitors who aren't logged in</li>
             <li>Registered Makuwro users</li>
             <li>My followers</li>
             <li>My friends</li>
-            <li>Specific people</li>
             <li>Just me</li>
           </Dropdown>
         </section>

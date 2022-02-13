@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "../styles/Profile.module.css";
 
-export default function Article({avatarURL, displayName, username, children, badge, commentsDisabled}) {
+export default function BlogPost({avatarURL, displayName, username, children, badge, commentsDisabled}) {
 
   return (
     <article className={styles["profile-blog-post"]}>

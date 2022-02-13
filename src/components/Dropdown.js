@@ -2,14 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from "../styles/Dropdown.module.css";
 import PropTypes from "prop-types";
 
-export default function Dropdown({defaultIndex, children, onChange, width, inPopup}) {
+export default function Dropdown({index, children, onChange, width, inPopup}) {
 
   const dropdownRef = useRef();
-  const [option, setOption] = useState();
   const [open, setOpen] = useState(false);
   const [above, setAbove] = useState(false);
   const [childrenComponents, setChildrenComponents] = useState();
-  const [index, setIndex] = useState(defaultIndex);
 
   function checkIfFlipNeeded() {
 
@@ -26,26 +24,13 @@ export default function Dropdown({defaultIndex, children, onChange, width, inPop
 
       let newProps;
 
-      if (childIndex === index) {
-        
-        setOption(child.props.children);
-
-      }
-
       newProps = {
         ...child,
-        props: undefined,
-        _owner: undefined,
-        _store: undefined,
-        type: undefined,
         key: childIndex,
         className: childIndex === index ? styles.selected : null,
         onClick: () => {
     
           if (childIndex !== index) {
-            
-            setOption(child.props.children);
-            setIndex(childIndex);
             
             if (onChange) {
               
@@ -60,6 +45,11 @@ export default function Dropdown({defaultIndex, children, onChange, width, inPop
           
         }
       };
+
+      delete newProps.props;
+      delete newProps._owner;
+      delete newProps._store;
+      delete newProps.type;
 
       newProps["$$typeof"] = undefined;
 
@@ -81,6 +71,8 @@ export default function Dropdown({defaultIndex, children, onChange, width, inPop
 
     document.addEventListener("click", checkIfClickedOutside, true);
 
+    console.log("hi");
+
     return () => {
 
       document.removeEventListener("click", checkIfClickedOutside, true);
@@ -93,8 +85,8 @@ export default function Dropdown({defaultIndex, children, onChange, width, inPop
     <section className={`${styles.list} ${!open ? styles.closed : ""} ${above ? styles.above : ""}`} ref={dropdownRef}>
       <section style={{
         width: width || "auto"
-      }} onClick={() => checkIfFlipNeeded()}>
-        {children ? (option || "Choose from a list...") : "No options available"}
+      }} onClick={() => children && checkIfFlipNeeded()}>
+        {childrenComponents ? (childrenComponents[index].props.children || "Choose from a list...") : "No options available"}
       </section>
       <ul>{childrenComponents}</ul>
     </section>
@@ -103,7 +95,7 @@ export default function Dropdown({defaultIndex, children, onChange, width, inPop
 }
 
 Dropdown.propTypes = {
-  defaultIndex: PropTypes.number,
+  index: PropTypes.number,
   children: PropTypes.node,
   onChange: PropTypes.func,
   width: PropTypes.number,

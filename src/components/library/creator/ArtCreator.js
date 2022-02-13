@@ -1,9 +1,9 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "../../../styles/Library.module.css";
 import Dropdown from "../../Dropdown";
 import PropTypes from "prop-types";
 
-export default function ArtCreator({username, setPopupSettings}) {
+export default function ArtCreator({currentUser, setPopupSettings}) {
 
   const ref = {
     art: useRef(),
@@ -15,6 +15,22 @@ export default function ArtCreator({username, setPopupSettings}) {
     tags: useState(""),
     url: useState("")
   };
+  const [description, setDescription] = useState("");
+  const [creatorType, setCreatorType] = useState(0);
+  const [collaborators, setCollaborators] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [folders, setFolders] = useState([]);
+  const [worlds, setWorlds] = useState([]);
+  const [slug, setSlug] = useState("");
+  const [permissions, setPermissions] = useState({
+    viewWatermarked: 0,
+    viewOriginal: 0,
+    viewComments: 0,
+    postComments: 1
+  });
+  const [ageRestriction, setAgeRestriction] = useState(0);
+  const [contentWarning, setContentWarning] = useState("");
+  const [ready, setReady] = useState(false);
 
   function updateInput({target: {value: value}}, name) {
       
@@ -22,57 +38,68 @@ export default function ArtCreator({username, setPopupSettings}) {
 
   }
 
-  setPopupSettings({
-    title: "Upload art",
-    warnUnfinished: true
-  });
+  useEffect(() => {
 
-  return (
-    <form id={styles["upload-art"]}>
-      <p>You can tag your characters and share your art with others.</p>
-      <section>
-        <section>
-          <input type="file" accept="image/*" style={{display: "none"}} ref={ref.art} onChange={({target: {files: [file]}}) => state.art[1](URL.createObjectURL(file))} />
-          {state.art[0] && (
-            <img src={state.art[0]} style={{
-              marginBottom: "1rem"
-            }} />
-          )}
-          <button onClick={(event) => {
+    setPopupSettings({
+      title: "Upload art",
+      warnUnfinished: true
+    });
 
-            event.preventDefault();
-            ref.art.current.click();
+    document.title = "Upload art to Makuwro";
+    if (currentUser) {
 
-          }}>{state.art[0] ? "Re-s" : "S"}elect image</button>
-          <p>Please only upload content that you have permission to use.</p>
-        </section>
-      </section>
+      setReady(true);
+
+    }
+
+  }, [currentUser]);
+
+  async function submitForm() {
+
+
+
+  }
+
+  return ready && currentUser && (
+    <form id={styles["upload-art"]} onSubmit={submitForm}>
       <section>
         <h1>Basics</h1>
-        <section>
-          <label>Name<span style={{
-            color: "var(--night-text)",
-            marginLeft: "0.5rem"
-          }}>(optional)</span></label>
-          <input type="text" />
+        <section id={styles.fileSelectBackground}>
+          <section>
+            <input required type="file" accept="image/*" style={{display: "none"}} ref={ref.art} onChange={({target: {files: [file]}}) => state.art[1](URL.createObjectURL(file))} />
+            {state.art[0] && (
+              <img src={state.art[0]} />
+            )}
+            <button onClick={(event) => {
+
+              event.preventDefault();
+              ref.art.current.click();
+
+            }}>{state.art[0] ? "Re-s" : "S"}elect image</button>
+            <p>Please only upload content that you have permission to use.</p>
+          </section>
         </section>
         <section>
-          <label>Caption<span style={{
+          <label>Description<span style={{
             color: "var(--night-text)",
             marginLeft: "0.5rem"
           }}>(optional)</span></label>
-          <textarea></textarea>
+          <textarea value={description} onInput={(event) => setDescription(event.target.value)}></textarea>
         </section>
         <section>
           <label>Who created this art?</label>
-          <Dropdown defaultIndex={0}>
+          <Dropdown index={creatorType} onChange={(choice) => setCreatorType(choice)}>
             <li>I am the sole artist</li>
             <li>I collaborated with another on-site artist</li>
             <li>I collaborated with an off-site artist</li>
-            <li>I got this from an on-site artist</li>
-            <li>I got this from an off-site artist</li>
           </Dropdown>
         </section>
+        {creatorType !== 0 && (
+          <section>
+            <label>Who did you collaborate with?</label>
+            <input type="text" required />
+          </section>
+        )}
       </section>
       <section>
         <h1>Organization</h1>
@@ -108,7 +135,7 @@ export default function ArtCreator({username, setPopupSettings}) {
       <section>
         <h1>Sharing</h1>
         <section>
-          <label htmlFor="url">Image URL</label>
+          <label htmlFor="url">Art URL</label>
           <p>Only alphanumeric characters, underscores, hyphens, and periods are allowed.</p>
           <section className="input-with-prefix">
             <span onClick={() => {
@@ -116,57 +143,53 @@ export default function ArtCreator({username, setPopupSettings}) {
               ref.url.current.focus();
               ref.url.current.setSelectionRange(0, 0);
 
-            }}>{`makuwro.com/${username}/images/`}</span>
-            <input type="text" name="url" ref={ref.url} onChange={(event) => updateInput(event, "characterURL")} value={state.url[0]}/>
+            }}>{`makuwro.com/${currentUser.username}/art/`}</span>
+            <input type="text" name="url" ref={ref.url} onInput={(event) => setSlug(event.target.value)} value={slug}/>
           </section>
         </section>
         <section>
           <label>Who can see the watermarked version of this image?</label>
-          <Dropdown defaultIndex={0}>
+          <Dropdown index={permissions.viewWatermarked} onChange={(choice) => setPermissions({...permissions, viewWatermarked: choice})}>
             <li>Everyone, including visitors who aren't logged in</li>
             <li>Registered Makuwro users</li>
             <li>My followers</li>
             <li>My friends</li>
-            <li>Specific people</li>
             <li>Just me</li>
           </Dropdown>
         </section>
         <section>
           <label>Who can see the non-watermarked version of this image?</label>
-          <Dropdown defaultIndex={0}>
+          <Dropdown index={permissions.viewOriginal} onChange={(choice) => setPermissions({...permissions, viewOriginal: choice})}>
             <li>Everyone, including visitors who aren't logged in</li>
             <li>Registered Makuwro users</li>
             <li>My followers</li>
             <li>My friends</li>
-            <li>Specific people</li>
             <li>Just me</li>
           </Dropdown>
         </section>
         <section>
           <label>Who can view comments on this image?</label>
-          <Dropdown defaultIndex={0}>
+          <Dropdown index={permissions.viewComments} onChange={(choice) => setPermissions({...permissions, viewComments: choice})}>
             <li>Everyone, including visitors who aren't logged in</li>
             <li>Registered Makuwro users</li>
             <li>My followers</li>
             <li>My friends</li>
-            <li>Specific people</li>
             <li>Just me</li>
           </Dropdown>
         </section>
         <section>
           <label>Who can comment on this image?</label>
-          <Dropdown defaultIndex={0}>
+          <Dropdown index={permissions.postComments - 1} onChange={(choice) => setPermissions({...permissions, postComments: choice + 1})}>
             <li>Registered Makuwro users</li>
             <li>My followers</li>
             <li>My friends</li>
-            <li>Specific people</li>
             <li>Just me</li>
           </Dropdown>
         </section>
         <section>
           <label>Would you like to age-restrict this image?</label>
           <p>If so, users must sign in to view this image. If you inappropriately age-gate your image, Makuwro staff might enforce this setting.</p>
-          <Dropdown defaultIndex={0}>
+          <Dropdown index={ageRestriction} onChange={(choice) => setAgeRestriction(choice)}>
             <li>No</li>
             <li>Yes, restrict users under 13 from viewing this</li>
             <li>Yes, restrict users under 17 from viewing this</li>
@@ -179,7 +202,7 @@ export default function ArtCreator({username, setPopupSettings}) {
             marginLeft: "0.5rem"
           }}>(optional)</span></label>
           <p>This text will be shown to viewers before they view this image.</p>
-          <textarea></textarea>
+          <textarea value={contentWarning} onInput={(event) => setContentWarning(event.target.value)}></textarea>
         </section>
       </section>
       <input type="submit" value="Upload art" />

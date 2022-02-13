@@ -8,7 +8,7 @@ import ProfileStats from "./profile/ProfileStats";
 import ProfileTerms from "./profile/ProfileTerms";
 import ProfileBlog from "./profile/ProfileBlog";
 
-export default function Profile({shownLocation, setLocation}) {
+export default function Profile({shownLocation, setLocation, currentUser}) {
 
   const {username, tab, id} = useParams();
   const state = {
@@ -19,6 +19,8 @@ export default function Profile({shownLocation, setLocation}) {
   const [leaving, setLeaving] = useState(true);
   const [shifting, setShifting] = useState(false);
   const [searchParams] = useSearchParams();
+  const [profileInfo, setProfileInfo] = useState();
+  const [ready, setReady] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   let components;
@@ -76,14 +78,14 @@ export default function Profile({shownLocation, setLocation}) {
 
   // Set the current view
   components = {
-    art: <ProfileLibraryItem tab="art" />,
-    literature: <ProfileLibraryItem tab="literature" />,
-    worlds: <ProfileLibraryItem tab="worlds" />,
-    teams: <ProfileLibraryItem tab="teams" />,
-    stats: <ProfileStats />,
-    characters: <ProfileLibraryItem tab="characters" />,
-    terms: <ProfileTerms />,
-    blog: <ProfileBlog />
+    art: <ProfileLibraryItem tab="art" profileInfo={profileInfo} currentUser={currentUser} />,
+    literature: <ProfileLibraryItem tab="literature" profileInfo={profileInfo} currentUser={currentUser} />,
+    worlds: <ProfileLibraryItem tab="worlds" profileInfo={profileInfo} currentUser={currentUser} />,
+    teams: <ProfileLibraryItem tab="teams" profileInfo={profileInfo} currentUser={currentUser} />,
+    stats: <ProfileStats profileInfo={profileInfo} currentUser={currentUser} />,
+    characters: <ProfileLibraryItem tab="characters" profileInfo={profileInfo} currentUser={currentUser} />,
+    terms: <ProfileTerms profileInfo={profileInfo} currentUser={currentUser} />,
+    blog: <ProfileBlog profileInfo={profileInfo} currentUser={currentUser} />
   };
   tabComponent = components[tab];
   action = searchParams.get("action");
@@ -107,17 +109,32 @@ export default function Profile({shownLocation, setLocation}) {
 
         setLeaving(true);
 
-      } else {
-
-        setLeaving(false);
-
       }
 
     }
 
   }, [action, location]);
 
-  return (
+  useEffect(async () => {
+
+    // Get the profile info from the server
+    const headers = currentUser.token ? {
+      token: currentUser.token
+    } : {};
+    const response = await fetch(`${process.env.RAZZLE_API_DEV}accounts/users/${username}`, {headers});
+
+    if (response.ok) {
+
+      setProfileInfo(await response.json());
+
+    }
+
+    setReady(true);
+    setLeaving(false);
+
+  }, [currentUser]);
+
+  return ready ? (
     <section id={styles.profileEditor} className={`${editorOpen ? styles.open : null} ${leaving ? styles.leaving : null}`} onTransitionEnd={() => {
 
       if (leaving) {
@@ -132,64 +149,72 @@ export default function Profile({shownLocation, setLocation}) {
           <section id={styles.profileBannerContainer}>
             {/*<img src="https://i1.sndcdn.com/visuals-000205406223-miu7o4-t2480x520.jpg" />*/}
           </section>
-          <button id={styles["profile-btn-edit"]} onClick={() => navigate("?action=edit-profile")}>Edit profile</button>
           <section id={styles["profile-info"]}>
             {!isLiterature && (
-              <img src="https://pbs.twimg.com/profile_images/1477875323953991682/MM_ZZPTh_400x400.jpg" />
+              <img src={profileInfo ? profileInfo.avatarPath : ""} />
             )}
             <section>
               <h1>
-                {state.displayName[0]}
-                {!isLiterature && (
+                {profileInfo ? (profileInfo.displayName || `@${profileInfo.username}`) : `@${username}`}
+                {!isLiterature && profileInfo && profileInfo.isStaff && (
                   <span title="This user is a Makuwro staff member" className={styles["profile-badge"]}>STAFF</span>
                 )}
               </h1>
               <h2>
-                {isLiterature ? state.displayName[0] : `@${username}`}
+                {isLiterature ? state.displayName[0] : (profileInfo && profileInfo.displayName ? `@${profileInfo.username}` : null)}
               </h2>
-              {state.disabled[0] && (
-                <p>This account has been disabled for violating the <a href="https://about.makuwro.com/policies/terms">terms of service</a></p>
-              )}
+              {!profileInfo ? (
+                <p style={{margin: 0}}>This account doesn't exist</p>
+              ) : (profileInfo.isBanned ? (
+                <p style={{margin: 0}}>This account has been banned for violating the <a href="https://about.makuwro.com/policies/terms">terms of service</a></p>
+              ) : null)}
             </section>
           </section>
         </section>
-        <section id={styles["profile-container"]}>
-          <section id={styles["profile-container-left"]}>
-            <section className={styles["profile-card"]} id={styles["profile-bio"]}>
-              <h1>About</h1>
-              <p>I'm extra epic</p>
+        {profileInfo && !profileInfo.isBanned && (
+          <section id={styles["profile-container"]}>
+            <section id={styles["profile-container-left"]}>
+              <section className={styles["profile-card"]} id={styles["profile-bio"]}>
+                <h1>About</h1>
+                <p>I'm extra epic</p>
+              </section>
+            </section>
+            <section id={styles["profile-container-center"]}>
+              <nav className={styles["profile-card"]} id={styles["profile-selection"]}>
+                {navChildren}
+              </nav>
+              <section className={shifting ? styles.invisible : null} onTransitionEnd={(event) => {
+
+                event.stopPropagation();
+                setShifting(false);
+                setLocation(location);
+
+              }}>
+                {tabComponent}
+              </section>
+            </section>
+            <section id={styles["profile-container-right"]}>
+              <section className={styles["profile-card"]} id={styles["profile-actions"]}>
+                {isLiterature ? (
+                  <button>Subscribe</button>
+                ) : (
+                  currentUser.username === username ? (
+                    <>
+                      <button onClick={() => navigate("?action=edit-profile")}>Edit profile</button>
+                    </>
+                  ) : (
+                    <>
+                      <button>Follow</button>
+                      <button>Message</button>
+                      <button className="destructive">Block</button>
+                    </>
+                  )
+                )}
+                <button className="destructive" onClick={() => navigate("?action=report-abuse")}>Report</button>
+              </section>
             </section>
           </section>
-          <section id={styles["profile-container-center"]}>
-            <nav className={styles["profile-card"]} id={styles["profile-selection"]}>
-              {navChildren}
-            </nav>
-            <section className={shifting ? styles.invisible : null} onTransitionEnd={(event) => {
-
-              event.stopPropagation();
-              setShifting(false);
-              setLocation(location);
-
-            }}>
-              {tabComponent}
-            </section>
-          </section>
-          <section id={styles["profile-container-right"]}>
-            <section className={styles["profile-card"]} id={styles["profile-actions"]}>
-              {isLiterature ? (
-                <button>Subscribe</button>
-              ) : (
-                <>
-                  <button>Follow</button>
-                  <button>Message</button>
-                  <button className="destructive">Block</button>
-                </>
-              )}
-              <button className="destructive" onClick={() => navigate("?action=report-abuse")}>Report</button>
-            </section>
-          </section>
-        </section>
-
+        )}
         <Footer />
       </main>
       <section id={styles.profileEditorOptions}>
@@ -197,15 +222,13 @@ export default function Profile({shownLocation, setLocation}) {
         <button>Change profile picture</button>
         <button>Change banner</button>
         <button>Edit about me</button>
-        <button>Manage pages</button>
-        <button>Edit HTML and CSS</button>
-        <button>Make profile private</button>
       </section>
     </section>
-  );
+  ) : <>loading</>;
 
 }
 
 Profile.propTypes = {
-  setLocation: PropTypes.func
+  setLocation: PropTypes.func,
+  currentUser: PropTypes.object
 };

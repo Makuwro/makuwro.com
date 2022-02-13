@@ -35,18 +35,18 @@ export default function App() {
   const themeParts = value.split("; theme=");
   
   // States
-  const [userData, setUserData] = useState({});
   const [theme, setTheme] = useState((themeParts.length === 2 && themeParts.pop().split(";")[0]) || 1);
   const [systemDark, setSystemDark] = useState(window.matchMedia("(prefers-color-scheme: dark)").matches);
   const [popupChildren, setPopupChildren] = useState(null);
   const [popupTitle, setPopupTitle] = useState();
   const [popupWarnUnfinished, setPopupWarnUnfinished] = useState(false);
   const [uploaderName, setUploaderName] = useState();
-  const [artId, setArtId] = useState();
+  const [artSlug, setArtSlug] = useState();
   const [signInOpen, setSignInOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const [shownLocation, setLocation] = useState(location);
+  const [currentUser, setCurrentUser] = useState({});
   let matchedPath;
   let action;
   let pathname;
@@ -70,19 +70,21 @@ export default function App() {
 
       // Save the uploader name and id
       setUploaderName(groups.uploaderName);
-      setArtId(groups.id);
+      setArtSlug(groups.id);
       
     } else {
 
       setUploaderName();
-      setArtId();
+      setArtSlug();
 
     }
 
     // Check if we need a popup open
     if (component) {
 
-      element = React.createElement(component, {setPopupSettings: ({title, warnUnfinished}) => {
+      element = React.createElement(component, {
+        currentUser,
+        setPopupSettings: ({title, warnUnfinished}) => {
 
         if (title) {
 
@@ -96,7 +98,8 @@ export default function App() {
 
         }
         
-      }});
+        }
+      });
 
       setPopupChildren(element);
 
@@ -117,36 +120,60 @@ export default function App() {
 
     }
 
-  }, [action, pathname]);
+  }, [action, pathname, currentUser]);
+
+  useEffect(async () => {
+
+    const token = document.cookie.match("(^|;)\\s*token\\s*=\\s*([^;]+)")?.pop() || null;
+
+    if (token) {
+
+      const response = await fetch(`${process.env.RAZZLE_API_DEV}accounts/user`, {
+        headers: {
+          token
+        }
+      });
+  
+      setCurrentUser(response.ok ? {
+        ...await response.json(),
+        token
+      } : {});
+
+    }
+
+  }, [document.cookie]);
+
+  
 
   // Listen for theme changes
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => setSystemDark(event.matches));
 
   return (
     <>
-      <Popup open={signInOpen} onClose={() => navigate(shownLocation.pathname, {replace: true})}>
-        <Authenticator />
+      <Popup open={signInOpen}>
+        <Authenticator onSuccess={() => navigate(shownLocation.pathname, {replace: true})} />
       </Popup>
       <Popup title={popupTitle} open={popupChildren !== null} onClose={() => setPopupChildren(null)} warnUnfinished={popupWarnUnfinished}>
         {popupChildren}
       </Popup>
-      <ArtViewer open={artId ? true : false} username={uploaderName} id={artId} onClose={(username) => {
+      <ArtViewer currentUser={currentUser} open={artSlug ? true : false} username={uploaderName} slug={artSlug} onClose={(username) => {
         
         navigate(`/${username}/art`);
+        setLocation(location);
         setUploaderName();
-        setArtId();
+        setArtSlug();
 
       }} />
-      <Header userData={userData} theme={theme} systemDark={systemDark} setLocation={setLocation} />
+      <Header currentUser={currentUser} theme={theme} systemDark={systemDark} setLocation={setLocation} />
       <Routes location={shownLocation}>
         <Route path={"/"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
         <Route path={"/register"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
         <Route path={"/signin"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
         <Route path={"/library"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
         <Route path={"/library/:category"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
-        {["/:username", "/:username/art/:id", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id/chapters", "/:username/:tab/:id/characters", "/:username/literature/:id/chapters/:chapter"].map((path, index) => {
+        {["/:username", "/:username/:tab/:id", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id/chapters", "/:username/:tab/:id/characters", "/:username/literature/:id/chapters/:chapter"].map((path, index) => {
           
-          return <Route key={index} path={path} element={<Profile shownLocation={shownLocation} setLocation={setLocation} />} />;
+          return <Route key={index} path={path} element={<Profile shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} />} />;
 
         })}
       </Routes>

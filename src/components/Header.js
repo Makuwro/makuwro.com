@@ -3,7 +3,7 @@ import styles from "../styles/Header.module.css";
 import PropTypes from "prop-types";
 import { Link, useLocation } from "react-router-dom";
 
-export default function Header({userData, theme, systemDark, query, history, onSignInClick, setLocation}) {
+export default function Header({currentUser, theme, systemDark, query, history, setLocation}) {
 
   const location = useLocation();
   let state = {
@@ -25,20 +25,18 @@ export default function Header({userData, theme, systemDark, query, history, onS
           
           state.query[1](e.target.value);
 
-        }} placeholder="Search for or create a page..." value={state.query[0]} />
+        }} placeholder="Search for something! I dare you." value={state.query[0]} />
         <ul id={styles["search-results"]}>
           {state.searchResults[0]}
         </ul>
       </form>
       <section>
-        {userData && userData.id ? (
+        {currentUser && currentUser.id ? (
           <>
-            <button>
-              Share
-            </button>
             <button title="Preferences" onClick={() => history.push("/preferences")} id={styles["account-button"]} style={{
-              backgroundImage: `url(${userData.avatarURL})`,
-              backgroundSize: "cover"
+              backgroundImage: `url(${currentUser.avatarPath})`,
+              backgroundSize: "cover",
+              backgroundColor: "gray"
             }}></button>
           </>
         ) : (

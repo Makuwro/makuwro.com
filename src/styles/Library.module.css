@@ -2,14 +2,31 @@
   overflow-y: auto;
 }
 
-#upload-art > section:first-of-type > section:first-of-type, #upload-art > section:first-of-type > section:first-of-type > section {
+#fileSelectBackground {
+  background-color: var(--night-input-background);
+  border-radius: 5px;
+  border: 1px solid #111111;
+  height: 350px;
+  justify-content: center;
+}
+
+#fileSelectBackground p {
+  margin: 0;
+}
+
+#fileSelectBackground, #fileSelectBackground > section {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-#upload-art > section:first-of-type > section {
-  padding: 5rem;
+#fileSelectBackground > section {
+  gap: 1rem;
+}
+
+#fileSelectBackground img {
+  margin-bottom: 1rem;
+  max-height: 200px;
 }
 
 #upload-character > section:first-of-type > section:first-of-type, #create-literature > section:first-of-type > section:first-of-type {
