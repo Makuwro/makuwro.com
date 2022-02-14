@@ -8,7 +8,7 @@ import ProfileStats from "./profile/ProfileStats";
 import ProfileTerms from "./profile/ProfileTerms";
 import ProfileBlog from "./profile/ProfileBlog";
 
-export default function Profile({shownLocation, setLocation, currentUser}) {
+export default function Profile({shownLocation, setLocation, currentUser, notify}) {
 
   const {username, tab, id} = useParams();
   const state = {

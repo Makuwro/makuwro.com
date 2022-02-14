@@ -63,7 +63,7 @@ export default function AbuseReporter({setPopupSettings}) {
       <form>
         <section>
           <label>What's the problem?</label>
-          <Dropdown onChange={(index) => {
+          <Dropdown index={menu[0]} onChange={(index) => {
 
             setMenu([index]);
             setEscalate(index === 0 || index === 2 || index === 3 || index === 5 || index === 6);
@@ -82,7 +82,12 @@ export default function AbuseReporter({setPopupSettings}) {
         {menu[0] === 1 && (
           <section>
             <label>In what way?</label>
-            <Dropdown onChange={() => setEscalate(true)} inPopup>
+            <Dropdown index={menu[1]} onChange={(index) => {
+              
+              setMenu([1, index]);
+              setEscalate(true);
+            
+            }} inPopup>
               <li>This was posted to harass me or someone else</li>
               <li>This is hateful against a protected category, such as race, gender, sex, or disability</li>
             </Dropdown>
@@ -93,7 +98,7 @@ export default function AbuseReporter({setPopupSettings}) {
             <section>
               <label>Did you want to contact the uploader first?</label>
               <p>This isn't required, but maybe there was a misunderstanding. You can always continue your report.</p>
-              <Dropdown onChange={(index) => {
+              <Dropdown index={menu[1]} onChange={(index) => {
 
                 setEscalate(false);
                 setMenu([4, index]);

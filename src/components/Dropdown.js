@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from "../styles/Dropdown.module.css";
 import PropTypes from "prop-types";
 
-export default function Dropdown({index, children, onChange, width, inPopup}) {
+export default function Dropdown({index, children, onChange, width, inPopup, tabIndex}) {
 
   const dropdownRef = useRef();
   const [open, setOpen] = useState(false);
@@ -71,8 +71,6 @@ export default function Dropdown({index, children, onChange, width, inPopup}) {
 
     document.addEventListener("click", checkIfClickedOutside, true);
 
-    console.log("hi");
-
     return () => {
 
       document.removeEventListener("click", checkIfClickedOutside, true);
@@ -83,10 +81,10 @@ export default function Dropdown({index, children, onChange, width, inPopup}) {
 
   return (
     <section className={`${styles.list} ${!open ? styles.closed : ""} ${above ? styles.above : ""}`} ref={dropdownRef}>
-      <section style={{
+      <section tabIndex={tabIndex || null} style={{
         width: width || "auto"
       }} onClick={() => children && checkIfFlipNeeded()}>
-        {childrenComponents ? (childrenComponents[index].props.children || "Choose from a list...") : "No options available"}
+        {childrenComponents ? ((childrenComponents[index] && childrenComponents[index].props.children) || "Choose from a list...") : "No options available"}
       </section>
       <ul>{childrenComponents}</ul>
     </section>

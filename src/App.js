@@ -13,9 +13,9 @@ import TeamCreator from "./components/library/creator/TeamCreator";
 import WorldCreator from "./components/library/creator/WorldCreator";
 import AbuseReporter from "./components/AbuseReporter";
 import ArtViewer from "./components/library/viewer/ArtViewer";
-import ChapterViewer from "./components/library/viewer/ChapterViewer";
 import Popup from "./components/Popup";
 import Authenticator from "./components/Authenticator";
+import LiveNotification from "./components/LiveNotification";
 
 const artRegex = /^\/(?<uploaderName>[^/]+)\/art\/(?<id>[^/]+)\/?$/gm;
 const maintenance = false;
@@ -47,6 +47,7 @@ export default function App() {
   const navigate = useNavigate();
   const [shownLocation, setLocation] = useState(location);
   const [currentUser, setCurrentUser] = useState({});
+  const [notifications, setNotifications] = useState([]);
   let matchedPath;
   let action;
   let pathname;
@@ -143,20 +144,42 @@ export default function App() {
 
   }, [document.cookie]);
 
-  
+  function addNotification(config) {
+
+    setNotifications(notifications => {
+      
+      const notification = (
+        <LiveNotification 
+          title={config.title} 
+          timeout={config.timeout} 
+          key={notifications.length}
+          onClose={() => {
+
+            // Remove the notification from the list
+            setNotifications(notifications => notifications.filter((notificationB) => notification !== notificationB));
+      
+          }}
+        >{config.children}</LiveNotification>
+      );
+      
+      return [...notifications, notification];
+    
+    });
+
+  }
 
   // Listen for theme changes
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => setSystemDark(event.matches));
 
   return (
     <>
-      <Popup open={signInOpen}>
+      <Popup notify={addNotification} open={signInOpen}>
         <Authenticator onSuccess={() => navigate(shownLocation.pathname, {replace: true})} />
       </Popup>
-      <Popup title={popupTitle} open={popupChildren !== null} onClose={() => setPopupChildren(null)} warnUnfinished={popupWarnUnfinished}>
+      <Popup notify={addNotification} title={popupTitle} open={popupChildren !== null} onClose={() => setPopupChildren(null)} warnUnfinished={popupWarnUnfinished}>
         {popupChildren}
       </Popup>
-      <ArtViewer currentUser={currentUser} open={artSlug ? true : false} username={uploaderName} slug={artSlug} onClose={(username) => {
+      <ArtViewer notify={addNotification} currentUser={currentUser} open={artSlug ? true : false} username={uploaderName} slug={artSlug} onClose={(username) => {
         
         navigate(`/${username}/art`);
         setLocation(location);
@@ -164,7 +187,10 @@ export default function App() {
         setArtSlug();
 
       }} />
-      <Header currentUser={currentUser} theme={theme} systemDark={systemDark} setLocation={setLocation} />
+      <Header notify={addNotification} currentUser={currentUser} theme={theme} systemDark={systemDark} setLocation={setLocation} />
+      <section id="live-notifications">
+        {notifications}
+      </section>
       <Routes location={shownLocation}>
         <Route path={"/"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
         <Route path={"/register"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
@@ -173,7 +199,7 @@ export default function App() {
         <Route path={"/library/:category"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
         {["/:username", "/:username/:tab/:id", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id/chapters", "/:username/:tab/:id/characters", "/:username/literature/:id/chapters/:chapter"].map((path, index) => {
           
-          return <Route key={index} path={path} element={<Profile shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} />} />;
+          return <Route key={index} path={path} element={<Profile shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} notify={addNotification} />} />;
 
         })}
       </Routes>

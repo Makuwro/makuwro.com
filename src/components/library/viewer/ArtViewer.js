@@ -26,9 +26,9 @@ export default function ArtViewer({open, currentUser, username, slug, onClose}) 
 
   useEffect(() => {
 
-    if (open) {
+    if (art) {
 
-      document.title = `${username}: Details, details, details! / Makuwro`;
+      document.title = `${username}: ${art.description} / Makuwro`;
 
     }
 

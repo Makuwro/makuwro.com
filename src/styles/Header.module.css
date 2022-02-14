@@ -55,6 +55,7 @@ header > section:first-of-type > section a {
   padding: 0 0.75rem;
   caret-color: white;
   border-radius: 5px;
+  margin-top: 0;
 }
 
 #search-box > input:focus-visible {

@@ -74,12 +74,12 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser}) {
     <section className={`${styles["profile-library"]} ${styles["profile-card"]}`} id={styles["profile-" + tab]}>
       {ready ? (
         <>
-          {items || (!ownProfile && <p>{profileInfo.username} doesn't have much to share right now, but who knows: they're probably working on the next big thing.</p>)}
           {ownProfile && (
             <Link className={styles["profile-library-item"]} style={{backgroundColor: "black"}} to={`?action=create-${plural.test(tab) ? tab.substring(0, tab.length - 1) : tab}`}>
               CREATE NEW
             </Link>
           )}
+          {items || (!ownProfile && <p>{profileInfo.username} doesn't have much to share right now, but who knows: they're probably working on the next big thing.</p>)}
         </>
       ) : (
         <section>
