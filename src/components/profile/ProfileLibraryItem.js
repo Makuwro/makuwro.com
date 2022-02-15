@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 
 const cache = {};
 
-export default function ProfileLibraryItem({tab, profileInfo, currentUser}) {
+export default function ProfileLibraryItem({tab, profileInfo, currentUser, updated}) {
 
   const plural = /s$/g;
   const [items, setItems] = useState(null);
@@ -14,7 +14,11 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser}) {
 
   useEffect(async () => {
 
-    if (profileInfo.username) {
+    if (updated) {
+
+      cache[profileInfo.username] = {};
+      
+    } else if (profileInfo.username) {
 
       setReady(false);
 
@@ -68,7 +72,7 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser}) {
 
     }
 
-  }, [tab, profileInfo.username]);
+  }, [tab, profileInfo.username, updated]);
 
   return (
     <section className={`${styles["profile-library"]} ${styles["profile-card"]}`} id={styles["profile-" + tab]}>

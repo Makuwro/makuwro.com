@@ -8,7 +8,7 @@ import ProfileStats from "./profile/ProfileStats";
 import ProfileTerms from "./profile/ProfileTerms";
 import ProfileBlog from "./profile/ProfileBlog";
 
-export default function Profile({shownLocation, setLocation, currentUser, notify}) {
+export default function Profile({shownLocation, setLocation, currentUser, notify, updated}) {
 
   const {username, tab, id} = useParams();
   const state = {
@@ -81,7 +81,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
   // Set the current view
   components = {
     about: <section>Hello!</section>,
-    art: <ProfileLibraryItem tab="art" profileInfo={profileInfo} currentUser={currentUser} />,
+    art: <ProfileLibraryItem updated={updated} tab="art" profileInfo={profileInfo} currentUser={currentUser} />,
     literature: <ProfileLibraryItem tab="literature" profileInfo={profileInfo} currentUser={currentUser} />,
     worlds: <ProfileLibraryItem tab="worlds" profileInfo={profileInfo} currentUser={currentUser} />,
     teams: <ProfileLibraryItem tab="teams" profileInfo={profileInfo} currentUser={currentUser} />,

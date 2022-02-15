@@ -16,8 +16,9 @@ import ArtViewer from "./components/library/viewer/ArtViewer";
 import Popup from "./components/Popup";
 import Authenticator from "./components/Authenticator";
 import LiveNotification from "./components/LiveNotification";
+import ContentWarning from "./components/ContentWarning";
 
-const artRegex = /^\/(?<uploaderName>[^/]+)\/art\/(?<id>[^/]+)\/?$/gm;
+const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 const maintenance = false;
 const creators = {
   "report-abuse": AbuseReporter,
@@ -40,112 +41,22 @@ export default function App() {
   const [popupChildren, setPopupChildren] = useState(null);
   const [popupTitle, setPopupTitle] = useState();
   const [popupWarnUnfinished, setPopupWarnUnfinished] = useState(false);
-  const [uploaderName, setUploaderName] = useState();
-  const [artSlug, setArtSlug] = useState();
+  const [art, setArt] = useState();
+  const [updated, setUpdated] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const [shownLocation, setLocation] = useState(location);
-  const [currentUser, setCurrentUser] = useState({});
   const [notifications, setNotifications] = useState([]);
   const [ready, setReady] = useState(false);
+  const [contentWarning, setContentWarning] = useState(null);
+  let [currentUser, setCurrentUser] = useState({});
   let matchedPath;
   let action;
   let pathname;
 
   // Check if the website is under maintenance
   if (maintenance) return <Maintenance />;
-
-  // Check if we want to create something
-  action = searchParams.get("action");
-  pathname = location.pathname;
-  useEffect(() => {
-
-    let component = creators[action];
-    let element;
-    let groups;
-
-    // Check if we need the art viewer open
-    matchedPath = [...pathname.matchAll(artRegex)];
-    groups = matchedPath[0] && matchedPath[0].groups;
-    if (groups) {
-
-      // Save the uploader name and id
-      setUploaderName(groups.uploaderName);
-      setArtSlug(groups.id);
-      
-    } else {
-
-      setUploaderName();
-      setArtSlug();
-
-    }
-
-    // Check if we need a popup open
-    if (component) {
-
-      element = React.createElement(component, {
-        currentUser,
-        setPopupSettings: ({title, warnUnfinished}) => {
-
-        if (title) {
-
-          setPopupTitle(title);
-
-        }
-
-        if (warnUnfinished) {
-
-          setPopupWarnUnfinished(warnUnfinished);
-
-        }
-        
-        }
-      });
-
-      setPopupChildren(element);
-
-    } else {
-
-      setPopupChildren(null);
-
-    }
-
-    // Check if we need to sign in
-    if (pathname === "/signin") {
-
-      setSignInOpen(true);
-
-    } else {
-
-      setSignInOpen(false);
-
-    }
-
-  }, [action, pathname, currentUser]);
-
-  useEffect(async () => {
-
-    const token = document.cookie.match("(^|;)\\s*token\\s*=\\s*([^;]+)")?.pop() || null;
-
-    if (token) {
-
-      const response = await fetch(`${process.env.RAZZLE_API_DEV}accounts/user`, {
-        headers: {
-          token
-        }
-      });
-  
-      setCurrentUser(response.ok ? {
-        ...await response.json(),
-        token
-      } : {});
-
-    }
-
-    setReady(true)
-
-  }, [document.cookie]);
 
   function addNotification(config) {
 
@@ -173,6 +84,141 @@ export default function App() {
 
   }
 
+  // Check if we want to create something
+  action = searchParams.get("action");
+  pathname = location.pathname;
+  useEffect(async () => {
+
+    let component = art ? {...creators, "edit-art": ArtCreator}[action] : creators[action];
+    let element;
+    let groups;
+    let cUser;
+    const token = document.cookie.match("(^|;)\\s*token\\s*=\\s*([^;]+)")?.pop() || null;
+
+    if (token && !currentUser.id) {
+
+      const response = await fetch(`${process.env.RAZZLE_API_DEV}accounts/user`, {
+        headers: {
+          token
+        }
+      });
+  
+      cUser = response.ok ? {
+        ...await response.json(),
+        token
+      } : {};
+
+    }
+
+    currentUser = cUser || currentUser;
+
+    // Check if we need the art viewer open
+    matchedPath = [...pathname.matchAll(artRegex)];
+    groups = matchedPath[0] && matchedPath[0].groups;
+    if (groups && (!art || art.refresh || (groups.username !== art.owner.username || groups.slug !== art.slug))) {
+
+      const {username, slug} = groups;
+
+      try {
+
+        // Get the user info from the server.
+        const headers = token ? {token} : {};
+        const userResponse = await fetch(`${process.env.RAZZLE_API_DEV}accounts/users/${username}`, {headers});
+
+        if (userResponse.ok) {
+
+          const artResponse = await fetch(`${process.env.RAZZLE_API_DEV}contents/art/${username}/${slug}`, {headers});
+          const art = await artResponse.json();
+
+          if (artResponse.ok) {
+
+            setArt({...art, owner: await userResponse.json()});
+
+          } else {
+
+            addNotification({
+              title: "Couldn't get that art",
+              children: art.message
+            });
+            navigate(`/${username}/art`);
+            setLocation(location);
+
+          }
+
+        }
+
+      } catch (err) {
+
+        addNotification({
+          title: "Couldn't get that art",
+          children: err.message
+        });
+        navigate(`/${username}/art`);
+        setLocation(location);
+
+      }
+      
+    } else if (!groups) {
+
+      setArt();
+
+    }
+
+    // Check if we need a popup open
+    if (component) {
+
+      element = React.createElement(component, {
+        currentUser,
+        art,
+        updated: () => {
+
+          setArt();
+          setUpdated(true);
+
+        },
+        refreshArt: () => setArt({refresh: true}),
+        setPopupSettings: ({title, warnUnfinished}) => {
+
+          if (title) {
+
+            setPopupTitle(title);
+
+          }
+
+          if (warnUnfinished) {
+
+            setPopupWarnUnfinished(warnUnfinished);
+
+          }
+        
+        }
+      });
+
+      setPopupChildren(element);
+
+    } else {
+
+      setPopupChildren(null);
+
+    }
+
+    // Check if we need to sign in
+    if (pathname === "/signin") {
+
+      setSignInOpen(true);
+
+    } else {
+
+      setSignInOpen(false);
+
+    }
+
+    setUpdated(false);
+    setCurrentUser(currentUser);
+    setReady(true);
+
+  }, [action, pathname, document.cookie, art]);
+
   // Listen for theme changes
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => setSystemDark(event.matches));
 
@@ -184,14 +230,26 @@ export default function App() {
       <Popup notify={addNotification} title={popupTitle} open={popupChildren !== null} onClose={() => setPopupChildren(null)} warnUnfinished={popupWarnUnfinished}>
         {popupChildren}
       </Popup>
-      <ArtViewer notify={addNotification} currentUser={currentUser} open={artSlug ? true : false} username={uploaderName} slug={artSlug} onClose={(username) => {
-        
-        navigate(`/${username}/art`);
-        setLocation(location);
-        setUploaderName();
-        setArtSlug();
+      <Popup title="Content warning" open={contentWarning !== null} onClose={() => setContentWarning(null)}>
+        <ContentWarning>
+          {contentWarning}
+        </ContentWarning>
+      </Popup>
+      <ArtViewer 
+        notify={addNotification} 
+        currentUser={currentUser} 
+        open={art ? true : false} 
+        art={art}
+        artRegex={artRegex}
+        artDeleted={() => setUpdated(true)}
+        confirmContentWarning={(warningText) => setContentWarning(warningText)}
+        onClose={() => {
 
-      }} />
+          setLocation(location);
+          setArt();
+
+        }} 
+      />
       <Header notify={addNotification} currentUser={currentUser} theme={theme} systemDark={systemDark} setLocation={setLocation} />
       <section id="live-notifications">
         {notifications}
@@ -204,7 +262,9 @@ export default function App() {
         <Route path={"/library/:category"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
         {["/:username", "/:username/:tab/:id", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id/chapters", "/:username/:tab/:id/characters", "/:username/literature/:id/chapters/:chapter"].map((path, index) => {
           
-          return <Route key={index} path={path} element={<Profile shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} notify={addNotification} />} />;
+          return <Route key={index} path={path} element={(
+            <Profile updated={updated} shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} notify={addNotification} />
+          )} />;
 
         })}
       </Routes>

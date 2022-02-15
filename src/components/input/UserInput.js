@@ -9,8 +9,26 @@ export default function UserInput({children, onChange, currentUser, notify}) {
   const [phrase, setPhrase] = useState("");
   const [selectedUser, setSelectedUser] = useState();
   const [searchResults, setSearchResults] = useState(null);
+  const [childrenComponents, setChildrenComponents] = useState([]);
   const inputRef = useRef();
   const inputContainerRef = useRef();
+
+  useEffect(() => {
+
+    setChildrenComponents(React.Children.map(children, (user) => {
+
+      return <span onClick={() => {
+    
+        onChange(users => users.filter((user2) => user2 !== user));
+
+      }} key={user.id}>
+        <img src={`https://cdn.makuwro.com/${user.avatarPath}`} />
+        {user.displayName || `@${user.username}`}
+      </span>;
+
+    }));
+
+  }, [children]);
 
   useEffect(() => {
 
@@ -46,45 +64,30 @@ export default function UserInput({children, onChange, currentUser, notify}) {
             setSearchResults(
               <li onClick={() => {
 
-                onChange(comps => {
-
-                  let comp;
+                onChange(users => {
     
                   // Check if the user already exists
-                  if (comps.find((comp) => comp.key === user.id)) {
+                  if (users.find((user2) => user2.id === user.id)) {
     
                     notify({
                       title: "You already added that user!",
                       children: ""
                     });
-                    return comps;
+                    return users;
     
-                  } 
-                  
-                  /*
-                  if (user.id === currentUser.id) {
+                  } else if (user.id === currentUser.id) {
     
                     notify({
                       title: "You can't add yourself",
                       children: "We do that for you ♥"
                     });
-                    return comps;
+                    return users;
     
                   }
-                  */
-    
-                  comp = <span onClick={() => {
-    
-                    onChange(comps => comps.filter((comp2) => comp2 !== comp));
-        
-                  }} key={user.id}>
-                    <img src={`https://cdn.makuwro.com/${user.avatarPath}`} />
-                    {user.displayName || `@${user.username}`}
-                  </span>;
 
                   setSearchResults(null);
-    
-                  return [...comps, comp];
+                  
+                  return [...users, user];
     
                 });
 
@@ -164,7 +167,7 @@ export default function UserInput({children, onChange, currentUser, notify}) {
   return (
     <section className={`${ddStyles.list} ${styles.container} ${searchResults ? styles.open : ""}`} ref={inputContainerRef} >
       <section className={styles.tagInput} onClick={() => inputRef.current.focus()}>
-        {children}
+        {childrenComponents}
         <input tabIndex="0" type="text" onKeyDown={checkSelection} value={phrase} onInput={(event) => setPhrase(event.target.value)} ref={inputRef} className={!children[0] ? styles.none : ""} />
       </section>
       <ul>
