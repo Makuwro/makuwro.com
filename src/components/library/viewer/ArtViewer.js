@@ -7,19 +7,12 @@ const monthNames = ["January", "February", "March", "April", "May", "June", "Jul
 
 export default function ArtViewer({art, open, currentUser, onClose, notify, artRegex, confirmContentWarning, contentWarningStatus, artDeleted}) {
 
-  let [comments, setComments] = useState(
-    <>
-      <Comment name="Christian Toney" username="Christian" avatarUrl="https://pbs.twimg.com/profile_images/1477875323953991682/MM_ZZPTh_400x400.jpg">
-        Test
-      </Comment>
-      <Comment name="Christian Toney" username="Christian" avatarUrl="https://pbs.twimg.com/profile_images/1477875323953991682/MM_ZZPTh_400x400.jpg">
-        Another test comment!
-      </Comment>
-    </>
-  );
+  let [comments, setComments] = useState();
+  const [commentComps, setCommentComps] = useState([]);
   const [commentsOpen, toggleComments] = useState(false);
   const [commentsEnabled, toggleCommentsEnabled] = useState(true);
-  const [commenting, setCommenting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [commentContent, setCommentContent] = useState("");
   const [ready, setReady] = useState(false);
   const [formattedDate, setFormattedDate] = useState(null);
   const [collaborators, setCollaborators] = useState([]);
@@ -93,6 +86,61 @@ export default function ArtViewer({art, open, currentUser, onClose, notify, artR
 
   }, [art]);
 
+  useEffect(async () => {
+
+    if (!comments && art) {
+
+      // Get the comments
+      try {
+
+        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/art/${art.owner.username}/${art.slug}/comments`, {headers: {
+          token: currentUser.token
+        }});
+
+        const comments = await response.json();
+        if (response.ok) {
+
+          setComments(comments);
+
+        } else {
+
+          setComments([]);
+          notify({
+            title: "Couldn't get comments",
+            children: comments.message
+          });
+
+        }
+
+      } catch (err) {
+
+        setComments([]);
+        notify({
+          title: "Couldn't get comments",
+          children: err.message
+        });
+
+      }
+
+    }
+
+    if (comments) {
+
+      console.log(comments);
+
+      const newComps = [];
+      for (let i = comments.length - 1; i >= 0; i--) {
+
+        const comment = comments[i];
+        newComps.push(<Comment name={comment.owner.displayName} username={comment.owner.username} avatarPath={comment.owner.avatarPath} key={comment.id}>{comment.content}</Comment>);
+
+      }
+      setCommentComps(newComps);
+
+    }
+
+  }, [art, comments, currentUser]);
+
   async function deleteArt() {
 
     const sure = confirm("Are you sure you want to delete this art? If it has unresolved reports, it'll be hidden from everyone, but not deleted until the reports are resolved by Makuwro Safety & Security.");
@@ -124,6 +172,51 @@ export default function ArtViewer({art, open, currentUser, onClose, notify, artR
         });
 
       }
+
+    }
+
+  }
+
+  async function submitComment(event) {
+
+    // Don't refresh the page please!
+    event.preventDefault();
+
+    if (!submitting) {
+
+      setSubmitting(true);
+
+      try {
+
+        const formData = new FormData();
+        formData.append("content", commentContent);
+
+        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/art/${art.owner.username}/${art.slug}/comments`, {
+          headers: {
+            token: currentUser.token,
+          }, 
+          method: "POST",
+          body: formData
+        });
+
+        if (response.ok) {
+
+          // Refresh the comments
+          setCommentContent("");
+          setComments();
+
+        }
+
+      } catch (err) {
+
+        notify({
+          title: "Couldn't submit your comment",
+          children: err.message
+        });
+
+      }
+
+      setSubmitting(false);
 
     }
 
@@ -197,12 +290,23 @@ export default function ArtViewer({art, open, currentUser, onClose, notify, artR
                 </section>
               </section>
               <section id={styles["comment-container"]}>
-                <form id={styles["comment-creator"]} className={commenting ? styles.commenting : null}>
-                  <textarea placeholder="Say something nice!"></textarea>
-                  <input type="submit" value="Comment" disabled />
-                </form>
+                {currentUser.id && (
+                  <form id={styles["comment-creator"]} onSubmit={submitComment}>
+                    <img src={`https://cdn.makuwro.com/${currentUser.avatarPath}`} />
+                    <section>
+                      <section id={styles.commentNames}>
+                        {currentUser.displayName && (
+                          <section>{currentUser.displayName}</section>
+                        )}
+                        <section className={styles.username}>@{currentUser.username}</section>
+                      </section>
+                      <textarea placeholder="This is cool!" required value={commentContent} onInput={(event) => setCommentContent(event.target.value)} />
+                      <input type="submit" value="Post" disabled={submitting} />
+                    </section>
+                  </form>
+                )}
                 <ul id={styles.comments}>
-                  {comments}
+                  {commentComps}
                 </ul>
                 <button onClick={() => toggleComments(false)}>Close comments</button>
               </section>

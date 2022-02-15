@@ -2,12 +2,12 @@ import React from "react";
 import styles from "../styles/Comment.module.css";
 import PropTypes from "prop-types";
 
-export default function Comment({name, username, avatarUrl, children}) {
+export default function Comment({name, username, avatarPath, children}) {
 
   return (
     <li className={styles.comment}>
       <section className={styles.author}>
-        <img src={avatarUrl} />
+        <img src={`https://cdn.makuwro.com/${avatarPath}`} />
         <section>
           <h1 className={styles["display-name"]}>{name}</h1>
           <section className={styles.content}>

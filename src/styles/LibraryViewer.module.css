@@ -169,16 +169,43 @@
   background-color: var(--night-input-background);
   margin: 0 1rem;
   border-radius: 5px;
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  cursor: text;
 }
 
-#comment-creator > textarea {
-  max-height: 10rem;
+#comment-creator > img {
+  height: 3rem;
+  width: 3rem;
+  border-radius: 100%;
+}
+
+#comment-creator > section {
+  flex-grow: 1;
+}
+
+#comment-creator > section > textarea {
+  max-height: 5rem;
+  margin-top: 0;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+#comment-creator > section > section {
+  display: flex;
+  gap: 0.5rem;
 }
 
 #comment-creator > input {
   display: none;
   opacity: 0;
   transition: 0.3s;
+}
+
+#comment-creator input[type="submit"] {
+  float: right;
 }
 
 #comments {
@@ -190,9 +217,17 @@
 
 #comment-container > button {
   margin: auto 1rem 0;
+  height: 5.5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.commenting > input {
-  display: block;
-  opacity: 1;
+#commentNames > section:first-of-type {
+  color: white;
+}
+
+#commentNames > section:nth-of-type(2) {
+  color: var(--night-text);
+  font-weight: 300;
 }

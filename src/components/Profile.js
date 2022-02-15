@@ -188,7 +188,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
                 <button onClick={() => navigate("?action=edit-profile")}>Edit profile</button>
               ) : (
                 <>
-                  <button onClick={() => navigate("?action=follow")}>Follow</button>
+                  <button onClick={() => currentUser.id ? navigate("?action=follow") : navigate("/signin")}>Follow</button>
                   <button className="destructive" onClick={() => navigate("?action=block")}>Block</button>
                   <button className="destructive" onClick={() => navigate("?action=report-abuse")}>Report</button>
                 </>
