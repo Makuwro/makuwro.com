@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import styles from "../../../styles/Library.module.css";
-import Dropdown from "../../Dropdown";
-import Checkbox from "../../Checkbox";
+import Dropdown from "../../input/Dropdown";
+import Checkbox from "../../input/Checkbox";
 
 export default function CharacterCreator({username, setPopupSettings}) {
 

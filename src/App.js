@@ -48,6 +48,7 @@ export default function App() {
   const [shownLocation, setLocation] = useState(location);
   const [currentUser, setCurrentUser] = useState({});
   const [notifications, setNotifications] = useState([]);
+  const [ready, setReady] = useState(false);
   let matchedPath;
   let action;
   let pathname;
@@ -142,6 +143,8 @@ export default function App() {
 
     }
 
+    setReady(true)
+
   }, [document.cookie]);
 
   function addNotification(config) {
@@ -159,7 +162,9 @@ export default function App() {
             setNotifications(notifications => notifications.filter((notificationB) => notification !== notificationB));
       
           }}
-        >{config.children}</LiveNotification>
+        >
+          {config.children}
+        </LiveNotification>
       );
       
       return [...notifications, notification];
@@ -171,7 +176,7 @@ export default function App() {
   // Listen for theme changes
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => setSystemDark(event.matches));
 
-  return (
+  return ready ? (
     <>
       <Popup notify={addNotification} open={signInOpen}>
         <Authenticator onSuccess={() => navigate(shownLocation.pathname, {replace: true})} />
@@ -204,7 +209,7 @@ export default function App() {
         })}
       </Routes>
     </>
-  );
+  ) : null;
 
 }
 

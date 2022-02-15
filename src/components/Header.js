@@ -34,7 +34,7 @@ export default function Header({currentUser, theme, systemDark, query, history, 
         {currentUser && currentUser.id ? (
           <>
             <button title="Preferences" onClick={() => history.push("/preferences")} id={styles["account-button"]} style={{
-              backgroundImage: `url(${currentUser.avatarPath})`,
+              backgroundImage: `url(https://cdn.makuwro.com/${currentUser.avatarPath})`,
               backgroundSize: "cover",
               backgroundColor: "gray"
             }}></button>

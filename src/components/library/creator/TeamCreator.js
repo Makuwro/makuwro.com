@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import styles from "../../../styles/Library.module.css";
-import Dropdown from "../../Dropdown";
+import Dropdown from "../../input/Dropdown";
 import Popup from "../../Popup";
 
 export default function TeamCreator() {

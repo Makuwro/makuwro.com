@@ -7,7 +7,7 @@ export default function ProfileTerms() {
   return (
     <>
       <section className={styles["profile-card"]} id={styles["profile-terms"]}>
-        <p>This user didn't share any terms with Makuwro. If you want to commission them, or want to use their characters, art, or literature, you should <Link to="?message=">ask them about their policies</Link> before doing so.</p>
+        <p>This user isn't sharing any terms with Makuwro. If you want to commission them, or want to use their characters, art, or literature, you should ask them about their policies before doing so.</p>
         <button style={{display: "block", marginTop: "1rem"}}>Edit terms</button>
       </section>
     </>

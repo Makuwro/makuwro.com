@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import styles from "../styles/Dropdown.module.css";
+import styles from "../../styles/Dropdown.module.css";
 import PropTypes from "prop-types";
 
 export default function Dropdown({index, children, onChange, width, inPopup, tabIndex}) {
@@ -80,7 +80,7 @@ export default function Dropdown({index, children, onChange, width, inPopup, tab
   }, [index]);
 
   return (
-    <section className={`${styles.list} ${!open ? styles.closed : ""} ${above ? styles.above : ""}`} ref={dropdownRef}>
+    <section className={`${styles.list} ${!open ? styles.closed : ""} ${above ? styles.above : ""} ${!childrenComponents ? styles.none : ""}`} ref={dropdownRef}>
       <section tabIndex={tabIndex || null} style={{
         width: width || "auto"
       }} onClick={() => children && checkIfFlipNeeded()}>

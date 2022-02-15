@@ -57,8 +57,19 @@ export default function ArtViewer({open, currentUser, username, slug, onClose}) 
         if (artResponse.ok) {
 
           const art = await artResponse.json();
-          const date = new Date(art.createdOn);
-          art.createdOn = `${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+          const date = new Date(art.uploadedOn);
+          let i;
+          console.log(art.uploadedOn);
+
+          art.uploadedOn = `${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+
+          // Fix the collaborators
+          for (i = 0; art.collaborators.length > i; i++) {
+
+            const collaborator = art.collaborators[i];
+            art.collaborators[i] = <Link to={`/${collaborator.username}`} key={collaborator.id}>{collaborator.displayName || `@${collaborator.username}`}</Link>;
+
+          }
 
           // Update the art details.
           setArt(art);
@@ -90,7 +101,7 @@ export default function ArtViewer({open, currentUser, username, slug, onClose}) 
               <img src={art.imagePath ? `https://cdn.makuwro.com/${art.imagePath}` : "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/YouTube_loading_symbol_3_%28transparent%29.gif/640px-YouTube_loading_symbol_3_%28transparent%29.gif"} onClick={(event) => event.stopPropagation()} />
             </section>
             <section id={styles.artist}>
-              <img src={owner.avatarPath} />
+              <img src={`https://cdn.makuwro.com/${owner.avatarPath}`} />
               <h1>
                 {owner.displayName || `@${owner.username}`}
               </h1>
@@ -111,7 +122,7 @@ export default function ArtViewer({open, currentUser, username, slug, onClose}) 
                   {art.collaborators && art.collaborators[0] && (
                     <>
                       <dt>Collaborators</dt>
-                      <dd>None</dd>
+                      <dd>{art.collaborators}</dd>
                     </>
                   )}
                   {art.characters && art.characters[0] && (
@@ -120,14 +131,20 @@ export default function ArtViewer({open, currentUser, username, slug, onClose}) 
                       <dd><Link to="/Christian/characters/Sudobeast">Sudobeast</Link></dd>
                     </>
                   )}
-                  <dt>Folders</dt>
-                  <dd><Link to="/Christian/folders/personas">Personas</Link></dd>
-                  <dt>Worlds</dt>
-                  <dd><Link to="/Showrunners/worlds/the-showrunners">Sudobeast Universe</Link> and <Link to="/Showrunners/worlds/the-showrunners">The Showrunners</Link></dd>
-                  <dt>Uploaded</dt>
-                  <dd>{art.createdOn}</dd>
-                  <dt>Visible to</dt>
-                  <dd>Everyone</dd>
+                  {art.folders && art.folders[0] && (
+                    <>
+                      <dt>Folders</dt>
+                      <dd><Link to="/Christian/folders/personas">Personas</Link></dd>
+                    </>
+                  )}
+                  {art.worlds && art.worlds[0] && (
+                    <>
+                      <dt>Folders</dt>
+                      <dd><Link to="/Christian/folders/personas">Personas</Link></dd>
+                    </>
+                  )}
+                  <dt>Uploaded on</dt>
+                  <dd>{art.uploadedOn}</dd>
                 </dl>
               </section>
               <section id={styles.actions}>

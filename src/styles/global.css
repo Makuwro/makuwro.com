@@ -51,7 +51,7 @@ a {
   color: #3673ef;
 }
 
-a:hover, .selected {
+a:hover {
   color: var(--night-link);
   transition: 0.3s;
 }

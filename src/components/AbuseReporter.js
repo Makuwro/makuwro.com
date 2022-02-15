@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Dropdown from "./Dropdown";
+import Dropdown from "./input/Dropdown";
 import styles from "../styles/AbuseReporter.module.css";
-import CountryDropdown from "./CountryDropdown";
-import Checkbox from "./Checkbox";
+import CountryDropdown from "./input/CountryDropdown";
+import Checkbox from "./input/Checkbox";
 
 export default function AbuseReporter({setPopupSettings}) {
 

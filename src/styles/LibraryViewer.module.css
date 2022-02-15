@@ -31,6 +31,7 @@
 
 #image-background > img {
   max-width: 90%;
+  max-height: 75%;
 }
 
 .closed #image-background {

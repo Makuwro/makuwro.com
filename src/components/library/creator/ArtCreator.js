@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import styles from "../../../styles/Library.module.css";
-import Dropdown from "../../Dropdown";
+import Dropdown from "../../input/Dropdown";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+import TagInput from "../../input/TagInput";
+import UserInput from "../../input/UserInput";
 
 export default function ArtCreator({currentUser, setPopupSettings, notify}) {
 
@@ -12,10 +14,7 @@ export default function ArtCreator({currentUser, setPopupSettings, notify}) {
 
   // States
   const state = {
-    art: useState(),
-    caption: useState(""),
-    tags: useState(""),
-    url: useState("")
+    art: useState()
   };
   const [description, setDescription] = useState("");
   const [creatorType, setCreatorType] = useState(0);
@@ -35,12 +34,6 @@ export default function ArtCreator({currentUser, setPopupSettings, notify}) {
   const [submitting, setSubmitting] = useState(false);
   const [ready, setReady] = useState(false);
   const navigate = useNavigate();
-
-  function updateInput({target: {value: value}}, name) {
-      
-    state[name][1](value);
-
-  }
 
   useEffect(() => {
 
@@ -68,15 +61,26 @@ export default function ArtCreator({currentUser, setPopupSettings, notify}) {
 
         let formData;
         let response;
+        let i;
+        let userIds;
 
+        // Turn the collaborators array into an array of user IDs
+        userIds = [];
+        for (i = 0; collaborators.length > i; i++) {
+
+          userIds[i] = collaborators[i].key;
+
+        }
+
+        // Set up form data
         formData = new FormData();
         formData.append("image", image.current.files[0]);
         formData.append("description", description);
-        formData.append("collaborators", collaborators);
-        formData.append("tags", tags);
-        formData.append("folders", folders);
-        formData.append("worlds", worlds);
-        formData.append("permissions", permissions);
+        formData.append("collaborators", JSON.stringify(userIds));
+        formData.append("tags", JSON.stringify(tags));
+        formData.append("folders", JSON.stringify(folders));
+        formData.append("worlds", JSON.stringify(worlds));
+        formData.append("permissions", JSON.stringify(permissions));
         formData.append("ageRestrictionLevel", ageRestriction);
         formData.append("contentWarning", contentWarning);
 
@@ -152,7 +156,15 @@ export default function ArtCreator({currentUser, setPopupSettings, notify}) {
             <li>I collaborated with an off-site artist</li>
           </Dropdown>
         </section>
-        {creatorType !== 0 && (
+        {creatorType === 1 && (
+          <section>
+            <label>Who did you collaborate with?</label>
+            <UserInput currentUser={currentUser} onChange={(collaborators) => setCollaborators(collaborators)} notify={notify}>
+              {collaborators}
+            </UserInput>
+          </section>
+        )}
+        {creatorType === 2 && (
           <section>
             <label>Who did you collaborate with?</label>
             <input tabIndex="0" type="text" required />
@@ -167,7 +179,9 @@ export default function ArtCreator({currentUser, setPopupSettings, notify}) {
             marginLeft: "0.5rem"
           }}>(optional)</span></label>
           <p>You can use tags to sort your characters and easily find them later.</p>
-          <input tabIndex="0" type="text" name="tags" onChange={(event) => updateInput(event, "tags")} value={state.tags[0]} />
+          <TagInput onChange={(tags) => setTags(tags)} notify={notify}>
+            {tags}
+          </TagInput>
         </section>
         <section>
           <label>Folders<span style={{
@@ -273,6 +287,6 @@ ArtCreator.propTypes = {
   username: PropTypes.string,
   setPopupSettings: PropTypes.func,
   currentUser: PropTypes.object,
-  notify: PropTypes.function,
-  setLocation: PropTypes.function
+  notify: PropTypes.func,
+  setLocation: PropTypes.func
 };

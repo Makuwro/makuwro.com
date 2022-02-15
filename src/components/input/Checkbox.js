@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import styles from "../styles/Checkbox.module.css";
+import styles from "../../styles/Checkbox.module.css";
 
 export default function Checkbox({required = false, children, defaultChecked = false}) {
 

@@ -1,0 +1,67 @@
+section.tagInput {
+  display: flex;
+  flex-wrap: wrap;
+  background-color: var(--night-input-background);
+  border-radius: 5px;
+  border: 1px solid #111111;
+  font-weight: 300;
+  margin-top: 1rem;
+  min-height: 47.2px;
+  cursor: text;
+  padding: 0;
+}
+
+.open > section.tagInput {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.container > ul {
+  display: none;
+}
+
+.container.open > ul {
+  display: initial;
+}
+
+section.tagInput:hover {
+  filter: brightness(1);
+}
+
+.tagInput span {
+  background-color: var(--night-article);
+  margin: 10.6px 0 10.6px 10.6px;
+  white-space: nowrap;
+  padding: 0 0.5rem;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 0.5rem;
+  box-sizing: border-box;
+}
+
+.tagInput span > img {
+  height: 2rem;
+  width: 2rem;
+  background-color: gray;
+  border-radius: 100%;
+}
+
+.tagInput span:last-of-type {
+  margin-right: 10.6px;
+}
+
+section.tagInput > input {
+  margin-top: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  background-color: transparent;
+  width: auto;
+}
+
+section.tagInput > .none {
+  padding: 10.6px;
+}

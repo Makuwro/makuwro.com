@@ -6,6 +6,10 @@
   margin: 1rem 0 0;
 }
 
+.none {
+  cursor: not-allowed;
+}
+
 :global(.day) .list > section {
   background-color: #d3d3d3;
   color: #474748;
@@ -68,6 +72,15 @@
   list-style: none;
   background-color: #202021;
   transition: 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.list li img {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 100%;
 }
 
 .list.above > section {
