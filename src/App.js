@@ -17,6 +17,7 @@ import Popup from "./components/Popup";
 import Authenticator from "./components/Authenticator";
 import LiveNotification from "./components/LiveNotification";
 import ContentWarning from "./components/ContentWarning";
+import BlogPost from "./components/BlogPost";
 
 const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 const maintenance = false;
@@ -268,6 +269,7 @@ export default function App() {
           )} />;
 
         })}
+        <Route path={"/:username/blog/:slug"} element={<BlogPost theme={theme} shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} addNotification={addNotification} />} />
       </Routes>
     </>
   ) : null;

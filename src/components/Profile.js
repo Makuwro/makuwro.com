@@ -88,7 +88,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
     stats: <ProfileStats profileInfo={profileInfo} currentUser={currentUser} />,
     characters: <ProfileLibraryItem tab="characters" profileInfo={profileInfo} currentUser={currentUser} />,
     terms: <ProfileTerms profileInfo={profileInfo} currentUser={currentUser} />,
-    blog: <ProfileBlog profileInfo={profileInfo} currentUser={currentUser} />
+    blog: <ProfileBlog profileInfo={profileInfo} currentUser={currentUser} notify={notify} />
   };
   tabComponent = components[tab || "about"];
   action = searchParams.get("action");
@@ -147,7 +147,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
   }, [username]);
 
   return ready ? (
-    <section id={styles.profileEditor} className={`${editorOpen ? styles.open : null} ${leaving ? styles.leaving : null}`} onTransitionEnd={() => {
+    <section id={styles.profileEditor} className={`${editorOpen ? styles.open : null} ${leaving ? "leaving" : null}`} onTransitionEnd={() => {
 
       if (leaving) {
 

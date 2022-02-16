@@ -1,7 +1,7 @@
 footer {
   border-top: 1px solid #5b5e62;
   padding: 2rem 0;
-  margin: 4rem 2rem 0;
+  margin: 0 2rem;
 }
 
 #footer-copyright {
@@ -54,7 +54,7 @@ footer a:hover {
 @media screen and (min-width: 768px) {
 
   footer {
-    margin: 4rem 5rem 0;
+    margin: 0 5rem;
   }
 
   #footer-copyright {
