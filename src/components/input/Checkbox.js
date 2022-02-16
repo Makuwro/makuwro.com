@@ -1,21 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import styles from "../../styles/Checkbox.module.css";
 
-export default function Checkbox({required = false, children, defaultChecked = false}) {
+export default function Checkbox({checked, required = false, children, onClick}) {
 
-  const [checked, setChecked] = useState(defaultChecked);
-
-  function toggle() {
-
-    setChecked(!checked);
-
-  }
-  
   return (
     <section className={styles.checkbox}>
-      <input type="checkbox" required={required} onClick={() => toggle()} checked={checked} />
-      <label onClick={() => toggle()}>
+      <input type="checkbox" required={required} onChange={() => onClick(!checked)} checked={checked} />
+      <label onClick={() => onClick(!checked)}>
         <span>
           {children}
         </span>
@@ -26,7 +18,9 @@ export default function Checkbox({required = false, children, defaultChecked = f
 }
 
 Checkbox.propTypes = {
+  checked: PropTypes.bool,
   required: PropTypes.bool,
   children: PropTypes.node,
-  defaultChecked: PropTypes.bool
+  defaultChecked: PropTypes.bool,
+  onClick: PropTypes.func
 };

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from "../../styles/Dropdown.module.css";
 import PropTypes from "prop-types";
 
-export default function Dropdown({index, children, onChange, width, inPopup, tabIndex}) {
+export default function Dropdown({index, children, onChange, width, inPopup, tabIndex, text}) {
 
   const dropdownRef = useRef();
   const [open, setOpen] = useState(false);
@@ -34,7 +34,7 @@ export default function Dropdown({index, children, onChange, width, inPopup, tab
             
             if (onChange) {
               
-              onChange(childIndex);
+              onChange(childIndex, child.props.children);
 
             }
 
@@ -84,7 +84,7 @@ export default function Dropdown({index, children, onChange, width, inPopup, tab
       <section tabIndex={tabIndex || null} style={{
         width: width || "auto"
       }} onClick={() => children && checkIfFlipNeeded()}>
-        {childrenComponents ? ((childrenComponents[index] && childrenComponents[index].props.children) || "Choose from a list...") : "No options available"}
+        {text || (childrenComponents ? ((childrenComponents[index] && childrenComponents[index].props.children) || "Choose from a list...") : "No options available")}
       </section>
       <ul>{childrenComponents}</ul>
     </section>

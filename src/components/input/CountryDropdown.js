@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import Dropdown from "./Dropdown";
 
 export default function CountryDropdown({ onChange }) {
+
+  const [index, setIndex] = useState();
 
   const countryList = [
     "Afghanistan",
@@ -80,7 +82,12 @@ export default function CountryDropdown({ onChange }) {
   }
 
   return (
-    <Dropdown onChange={onChange}>
+    <Dropdown index={index} onChange={(index, text) => {
+      
+      setIndex(index);
+      onChange(text);
+
+    }}>
       {countryComponents}
     </Dropdown>
   );

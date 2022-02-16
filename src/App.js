@@ -170,6 +170,7 @@ export default function App() {
       element = React.createElement(component, {
         currentUser,
         art,
+        addNotification,
         updated: () => {
 
           setArt();

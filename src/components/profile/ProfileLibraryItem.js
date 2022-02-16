@@ -74,23 +74,17 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
 
   }, [tab, profileInfo.username, updated]);
 
-  return (
-    <section className={`${styles["profile-library"]} ${styles["profile-card"]}`} id={styles["profile-" + tab]}>
-      {ready ? (
-        <>
-          {ownProfile && (
-            <Link className={styles["profile-library-item"]} style={{backgroundColor: "black"}} to={`?action=create-${plural.test(tab) ? tab.substring(0, tab.length - 1) : tab}`}>
-              CREATE NEW
-            </Link>
-          )}
-          {items || (!ownProfile && <p>{profileInfo.username} doesn't have much to share right now, but who knows: they're probably working on the next big thing.</p>)}
-        </>
-      ) : (
-        <section>
-          loading...
-        </section>
-      )}
-    </section>
+  return ready && (
+    <>
+      <section className={`${styles["profile-library"]} ${styles["profile-card"]}`} id={styles["profile-" + tab]}>
+        {ownProfile && (
+          <Link className={styles["profile-library-item"]} style={{backgroundColor: "black"}} to={`?action=create-${plural.test(tab) ? tab.substring(0, tab.length - 1) : tab}`}>
+            CREATE NEW
+          </Link>
+        )}
+        {items || (!ownProfile && <p>{profileInfo.username} doesn't have much to share right now, but who knows: they're probably working on the next big thing.</p>)}
+      </section>
+    </>
   );
 
 }
