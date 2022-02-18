@@ -106,9 +106,14 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
     }
 
-    if (location.pathname !== "/signin" && location.pathname !== "/register") {
+    console.log(tab)
 
-      if (location.pathname.substring(0, username.length + 1) !== shownLocation.pathname.substring(0, username.length + 1)) {
+    const path1 = location.pathname;
+    const path2 = shownLocation.pathname;
+    const length = username.length + 1;
+    if (path1 !== "/signin" && path1 !== "/register") {
+
+      if ((path1.substring(0, length) !== path2.substring(0, length)) || /^\/(?<username>[^/]+)\/blog\/(?<slug>[^/]+)\/?$/gm.test(path1)) {
 
         setLeaving(true);
 
@@ -147,7 +152,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
   }, [username]);
 
   return ready ? (
-    <section id={styles.profileEditor} className={`${editorOpen ? styles.open : null} ${leaving ? "leaving" : null}`} onTransitionEnd={() => {
+    <section id={styles.profileEditor} className={`${editorOpen ? styles.open : ""} ${leaving ? "leaving" : ""}`} onTransitionEnd={() => {
 
       if (leaving) {
 

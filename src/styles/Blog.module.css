@@ -11,6 +11,7 @@
 
 #postInfo {
   gap: 1rem;
+  max-width: 422px;
 }
 
 #postInfo p {
@@ -46,6 +47,13 @@
   padding-top: 2rem;
   width: calc(100% - 4rem);
   max-width: 1010px;
+  white-space: pre-wrap;
+}
+
+[placeholder]:empty::before {
+  content: attr(placeholder);
+  cursor: text;
+  color: var(--night-text);
 }
 
 #actions {

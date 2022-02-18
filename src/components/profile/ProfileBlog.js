@@ -33,7 +33,7 @@ export default function ProfileBlog({currentUser, profileInfo, notify}) {
 
         if (response.ok) {
 
-          navigate(`/${currentUser.username}/blog/${slug}`);
+          navigate(`/${currentUser.username}/blog/${slug}?mode=edit`);
 
         } else {
 
@@ -62,7 +62,7 @@ export default function ProfileBlog({currentUser, profileInfo, notify}) {
       {ownProfile && (
         <form onSubmit={createEmptyBlogPost}>
           <section>Making a blog post is a great way to keep the people interested in your work updated.</section>
-          <input type="submit" value="Start drafting!" />
+          <input type="submit" value="Start drafting!" disabled={submitting} />
         </form>
       )}
       {posts || (!ownProfile ? (<p>Huh, looks like they don't have much to say right now. Check back later!</p>) : null)}
