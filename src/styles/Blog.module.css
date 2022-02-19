@@ -10,11 +10,13 @@
 }
 
 #postInfo {
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
   max-width: 422px;
 }
 
-#postInfo p {
+#postInfo h1, #postInfo p {
   margin: 0;
 }
 

@@ -11,7 +11,6 @@ export default function BlogPost({currentUser, addNotification}) {
   const [leaving, setLeaving] = useState(true);
   const [post, setPost] = useState({});
   const [content, setContent] = useState(null);
-  const [title, setTitle] = useState("");
   const selectedParagraph = useRef();
   const location = useLocation();
   const navigate = useNavigate();
@@ -40,11 +39,11 @@ export default function BlogPost({currentUser, addNotification}) {
 
   useEffect(() => {
 
-    if (content && (content.selection || content.newParagraph) && selectedParagraph?.current) {
+    if (editing && content && (content.selection || content.newParagraph || content.deleteParagraph) && selectedParagraph?.current) {
 
       const currentSelection = document.getSelection();
       const range = document.createRange();
-      range.setStart(selectedParagraph.current.childNodes[0], (content.selection?.focusOffset || 0) + (content.increment || 0));
+      range.setStart(selectedParagraph.current.childNodes[0], !content.deleteParagraph ? (content.selection?.startOffset || 0) + (content.increment || 0) : selectedParagraph.current.childNodes[0].textContent.length + content.increment);
       range.collapse(true);
       currentSelection.removeAllRanges();
       currentSelection.addRange(range);
@@ -268,35 +267,55 @@ export default function BlogPost({currentUser, addNotification}) {
   function handleInput(event) {
 
     const {keyCode, ctrlKey} = event;
-    let selection = document.getSelection();
-    if (!ctrlKey && (keyCode === 32 || keyCode === 8 || keyCode === 46 || (keyCode >= 48 && keyCode <= 90) || (keyCode >= 96 && keyCode <= 111) || (keyCode >= 160 && keyCode <= 165) || (keyCode >= 186 && keyCode <= 223))) {
+    const selection = document.getSelection();
+    const {startOffset, endOffset, startContainer, endContainer} = selection.getRangeAt(0);
+    const onP = startContainer.nodeName === "P";
+    const index = (onP ? [...startContainer.parentNode.childNodes] : [...startContainer.parentNode.parentNode.childNodes]).indexOf(onP ? startContainer : startContainer.parentNode);
+    const atBeginning = startOffset === 0;
+    const backspace = keyCode === 8;
+    const del = keyCode === 46;
+    const sameContainer = startContainer === endContainer;
+    const highlighted = startOffset !== endOffset || !sameContainer;
+    if (!ctrlKey && (keyCode === 32 || backspace || del || (keyCode >= 48 && keyCode <= 90) || (keyCode >= 96 && keyCode <= 111) || (keyCode >= 160 && keyCode <= 165) || (keyCode >= 186 && keyCode <= 223))) {
 
-      const {focusOffset, focusNode} = selection;
-      const index = [...focusNode.parentNode.parentNode.childNodes].indexOf(focusNode.parentNode);
+      // We have to add or remove a character to the document!
       setContent((content) => {
 
-        const backspace = keyCode === 8;
-        const del = keyCode === 46;
-        const deleteParagraph = focusOffset === 0 && backspace;
-        const newContent = {comps: [...content.comps], selection: !deleteParagraph ? {focusOffset} : null, increment: backspace ? -1 : (del ? 0 : 1)};
+        const deleteParagraph = backspace && (atBeginning || !sameContainer);
+        const newContent = {comps: [...content.comps], selection: !deleteParagraph ? {startOffset} : null, increment: backspace ? (highlighted ? 0 : -1) : (del ? 0 : 1), deleteParagraph};
         let i = content.comps.length;
+        let previousContent = "";
         while (i--) {
 
           const isTarget = i === index;
 
           if (isTarget && deleteParagraph) {
 
+            // Append the text to the previous element
+            previousContent = content.comps[i].props.children;
+
+            // Remove <br /> tags
+            if (previousContent.type === "br") {
+
+              previousContent = "";
+              newContent.increment++;
+
+            } else {
+
+              newContent.increment -= previousContent.length - 1;
+
+            }
+
+            // Delete this paragraph.
             newContent.comps.splice(i, 1);
 
           } else {
 
             let child;
-            
             if (isTarget) {
 
               const isEmpty = content.comps[i].props.children.type === "br";
-
-              child = isEmpty ? event.key : [content.comps[i].props.children.slice(0, focusOffset - (backspace ? 1 : 0)), backspace || del ? "" : event.key, content.comps[i].props.children.slice(focusOffset + (del ? 1 : 0))].join("");
+              child = isEmpty ? event.key : [content.comps[i].props.children.slice(0, startOffset - (backspace && !highlighted ? 1 : 0)), backspace || del ? "" : event.key, content.comps[i].props.children.slice((highlighted ? endOffset : startOffset) + (del ? 1 : 0))].join("");
 
               if (!child) {
 
@@ -310,6 +329,20 @@ export default function BlogPost({currentUser, addNotification}) {
 
             }
 
+            if (deleteParagraph && i + 1 === index) {
+
+              if (child.type === "br") {
+
+                child = previousContent || <br />;
+
+              } else {
+
+                child += previousContent;
+
+              }
+
+            }
+
             newContent.comps[i] = <p ref={isTarget || (deleteParagraph && i + 1 === index) ? selectedParagraph : null} key={i}>
               {child}
             </p>;
@@ -317,6 +350,8 @@ export default function BlogPost({currentUser, addNotification}) {
           }
 
         }
+
+        selection.removeAllRanges();
 
         return newContent;
 
@@ -329,21 +364,85 @@ export default function BlogPost({currentUser, addNotification}) {
       // We have to add a new paragraph!
       setContent((content) => {
 
-        const newContent = {...content, selection: null, newParagraph: true, increment: 0};
-        for (let i = 0; content.comps.length > i; i++) {
+        const newContent = {comps: [...content.comps], selection: null, newParagraph: true, increment: 0, deleteParagraph: false};
+        let indexShift = 0;
+        let i;
+        
+        // We're only adding a paragraph if it's in the same container.
+        // Otherwise, we're just replacing paragraphs.
+        for (i = 0; content.comps.length + (sameContainer ? 1 : 0) > i; i++) {
+
+          let child;
           
-          newContent.comps[i] = <p key={i}>{newContent.comps[i].props.children}</p>;
+          if (i - 1 === index) {
+
+            child = content.comps[i - 1].props.children;
+
+            if (!atBeginning) {
+
+              if (sameContainer) {
+
+                child = child.substring(highlighted ? endOffset : startOffset);
+
+              } else {
+
+                child = endContainer.textContent.substring(endOffset);
+
+              }
+
+              // If the string is empty, we need to add a <br /> because Chromium doesn't like when a paragraph is empty :( 
+              // In other words, it's not selectable.
+              child = child || <br />;
+
+            }
+
+            // If we moved the content down, we need to account for the new paragraph.
+            indexShift++;
+
+          } else {
+
+            if (index === i) {
+
+              if (atBeginning) {
+
+                // We don't need to cut off anything; just move the content down.
+                child = <br />;
+
+              } else {
+
+                // Only cut off the part that we're adding to a new paragraph.
+                child = content.comps[i - indexShift].props.children.substring(0, startOffset);
+
+              }
+
+            } else {
+
+              // This content doesn't need to be changed.
+              child = content.comps[i - indexShift].props.children;
+
+            }
+
+          }
+
+          // Return the paragraph component, and the selectedParagraph ref 
+          // so that the caret position is reset to the correct position
+          newContent.comps[i] = <p key={i} ref={i - 1 === index ? selectedParagraph : null}>{child}</p>;
 
         }
-        newContent.comps[content.comps.length] = <p key={content.comps.length} ref={selectedParagraph}><br /></p>;
+
+        // React really likes glitching out the caret when the content is updated, so let's do an illusion. 
+        // I think this is way better than the caret resetting to position 0 of the document, and then
+        // speeding back to where it should be.
+        selection.removeAllRanges();
 
         return newContent;
 
       });
 
+      // We're handling the content, so prevent the default behavior
       event.preventDefault();
 
-    } else if (!ctrlKey && keyCode !== 37 && keyCode !== 38 && keyCode !== 39 && keyCode !== 40) {
+    } else if (backspace || del || (!ctrlKey && keyCode !== 37 && keyCode !== 38 && keyCode !== 39 && keyCode !== 40)) {
 
       // We're handling the content, so prevent the default behavior
       event.preventDefault();
@@ -363,7 +462,7 @@ export default function BlogPost({currentUser, addNotification}) {
     const text = event.clipboardData.getData("text/plain");
     setContent((content) => {
 
-      const newContent = {comps: [...content.comps], selection: {focusOffset}, increment: text.length};
+      const newContent = {comps: [...content.comps], selection: {focusOffset}, increment: text.length, deleteParagraph: false};
       for (let i = 0; content.comps.length > i; i++) {
 
         const isTarget = i === index;
@@ -391,6 +490,12 @@ export default function BlogPost({currentUser, addNotification}) {
 
   }
 
+  function handleCut(event) {
+
+    event.preventDefault();
+
+  }
+
   return ready && (
     <main id={styles.post} className={leaving ? "leaving" : ""}>
       {post.id ? (
@@ -415,7 +520,7 @@ export default function BlogPost({currentUser, addNotification}) {
               </section>
             </section>
           </section>
-          <section id={styles.content} contentEditable={editing} onKeyDown={handleInput} onPaste={handlePaste} suppressContentEditableWarning ref={contentContainer}>
+          <section id={styles.content} contentEditable={editing} onKeyDown={handleInput} onCut={handleCut} onPaste={handlePaste} suppressContentEditableWarning ref={contentContainer}>
             {content ? content.comps : (editing ? (
               <p placeholder="You can start drafting by clicking here!"></p>
             ) : (
