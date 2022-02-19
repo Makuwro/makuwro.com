@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { cloneElement, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import styles from "../styles/Blog.module.css";
 import Footer from "./Footer";
@@ -285,7 +285,7 @@ export default function BlogPost({currentUser, addNotification}) {
       setContent((content) => {
 
         const deleteParagraph = backspace && (atBeginning || !sameContainer);
-        const newContent = {comps: [...content.comps], selection: !deleteParagraph ? {startOffset} : null, increment: backspace ? (highlighted ? 0 : -1) : (del ? 0 : 1), deleteParagraph};
+        const newContent = {comps: [...content.comps], selection: !deleteParagraph ? {startOffset} : null, increment: backspace || del ? 0 : 1, deleteParagraph};
         let i = content.comps.length;
         let previousContent = "";
         while (i--) {
@@ -301,7 +301,6 @@ export default function BlogPost({currentUser, addNotification}) {
             if (previousContent.type === "br") {
 
               previousContent = "";
-              newContent.increment++;
 
             } else {
 
@@ -317,7 +316,7 @@ export default function BlogPost({currentUser, addNotification}) {
             let child;
             if (isTarget) {
 
-              let child = content.comps[i].props.children;
+              child = content.comps[i].props.children;
               const isEmpty = child.type === "br";
               let backspaceIncrement = 0;
               const removing = backspace || del;
@@ -331,19 +330,31 @@ export default function BlogPost({currentUser, addNotification}) {
                 } else if (ctrlKey) {
 
                   // Look for the closest space near the caret position.
-                  backspaceIncrement = child.lastIndexOf(" ", startOffset);
-                  
-                  if (backspaceIncrement === -1) {
+                  let closestSpace;
+                  let offset = 0;
+                  do { 
+                    
+                    closestSpace = child.lastIndexOf(" ", startOffset - offset);
+                    offset++;
 
-                    backspaceIncrement = 0;
+                  } while (closestSpace !== -1 && closestSpace + 1 === startOffset);
+                  backspaceIncrement = startOffset - closestSpace;
+                  
+                  if (closestSpace === -1) {
+
+                    // We want to delete the rest of the paragraph, but there's no space left.
+                    backspaceIncrement = startOffset;
 
                   } else {
 
-                    backspaceIncrement++;
+                    // We want to end with a space.
+                    backspaceIncrement--;
 
                   }
 
                 }
+
+                newContent.increment -= backspaceIncrement;
 
               }
               child = isEmpty ? event.key : [child.slice(0, startOffset - backspaceIncrement), removing ? "" : event.key, child.slice((highlighted ? endOffset : startOffset) + (del ? 1 : 0))].join("");
