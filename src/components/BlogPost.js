@@ -1,4 +1,4 @@
-import React, { cloneElement, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import styles from "../styles/Blog.module.css";
 import Footer from "./Footer";
@@ -33,13 +33,13 @@ export default function BlogPost({currentUser, addNotification}) {
 
     }
 
-    setContent({comps: [<p key={.0}>testing!</p>, <p key={.1}>Test</p>]});
+    setContent({comps: [<p key={.0}>testing!</p>, <p key={.1}>Test1</p>, <p key={.2}>Test2</p>]});
 
   }, [post]);
 
   useEffect(() => {
 
-    if (editing && content && (content.selection || content.newParagraph || content.deleteParagraph) && selectedParagraph?.current) {
+    if (editing && content && (content.selection || content.newParagraph) && selectedParagraph?.current) {
 
       const currentSelection = document.getSelection();
       const range = document.createRange();
@@ -276,50 +276,59 @@ export default function BlogPost({currentUser, addNotification}) {
     const del = keyCode === 46;
     const sameContainer = startContainer === endContainer;
     const highlighted = startOffset !== endOffset || !sameContainer;
-    if ((!ctrlKey || backspace || del) && (keyCode === 32 || backspace || del || (keyCode >= 48 && keyCode <= 90) || (keyCode >= 96 && keyCode <= 111) || (keyCode >= 160 && keyCode <= 165) || (keyCode >= 186 && keyCode <= 223))) {
+    let endIndex = index;
+    if (!sameContainer) {
 
+      onP = startContainer.nodeName === "P";
+      endIndex = (onP ? [...endContainer.parentNode.childNodes] : [...endContainer.parentNode.parentNode.childNodes]).indexOf(onP ? endContainer : endContainer.parentNode);
+
+    }
+    if ((!ctrlKey || backspace || del) && (keyCode === 32 || backspace || del || (keyCode >= 48 && keyCode <= 90) || (keyCode >= 96 && keyCode <= 111) || (keyCode >= 160 && keyCode <= 165) || (keyCode >= 186 && keyCode <= 223))) {
+      
       // Prevent contenteditable from taking over.
       event.preventDefault();
 
       // We have to add or remove characters!
       setContent((content) => {
 
-        const deleteParagraph = backspace && (atBeginning || !sameContainer);
-        const newContent = {comps: [...content.comps], selection: !deleteParagraph ? {startOffset} : null, increment: backspace || del ? 0 : 1, deleteParagraph};
+        const newContent = {comps: [...content.comps], selection: {startOffset}, increment: backspace || del ? 0 : 1};
         let i = content.comps.length;
-        let previousContent = "";
+        let fixFocus = false;
         while (i--) {
 
           const isTarget = i === index;
 
-          if (isTarget && deleteParagraph) {
+          let child;
+          if (isTarget) {
 
-            // Append the text to the previous element
-            previousContent = content.comps[i].props.children;
+            child = content.comps[i].props.children;
+            const isEmpty = child.type === "br";
+            const removing = backspace || del;
 
-            // Remove <br /> tags
-            if (previousContent.type === "br") {
+            if (isEmpty) {
 
-              previousContent = "";
+              if (backspace) {
 
-            } else {
+                // Don't delete the beginning paragraph, please.
+                if (content.comps[i - 1]) {
 
-              newContent.increment -= previousContent.length - 1;
+                  newContent.selection.startOffset = content.comps[i - 1].props.children.length;
+                  newContent.comps.splice(i, 1);
+                  fixFocus = true;
+                  continue;
 
-            }
+                }
 
-            // Delete this paragraph.
-            newContent.comps.splice(i, 1);
+              } else {
 
-          } else {
+                child = event.key;
 
-            let child;
-            if (isTarget) {
+              }
+            
+            } else if (sameContainer) {
 
-              child = content.comps[i].props.children;
-              const isEmpty = child.type === "br";
               let backspaceIncrement = 0;
-              const removing = backspace || del;
+
               if (backspace) {
 
                 if (!ctrlKey && !highlighted) {
@@ -329,6 +338,7 @@ export default function BlogPost({currentUser, addNotification}) {
 
                 } else if (ctrlKey) {
 
+                  // Control + Backspace = remove a word.
                   // Look for the closest space near the caret position.
                   let closestSpace;
                   let offset = 0;
@@ -357,39 +367,31 @@ export default function BlogPost({currentUser, addNotification}) {
                 newContent.increment -= backspaceIncrement;
 
               }
-              child = isEmpty ? event.key : [child.slice(0, startOffset - backspaceIncrement), removing ? "" : event.key, child.slice((highlighted ? endOffset : startOffset) + (del ? 1 : 0))].join("");
 
-              if (!child) {
-
-                child = <br />;
-
-              }
+              child = [child.slice(0, startOffset - backspaceIncrement), removing ? "" : event.key, child.slice((highlighted ? endOffset : startOffset) + (del ? 1 : 0))].join("");
 
             } else {
-              
-              child = content.comps[i].props.children;
+
+              child = [child.slice(0, startOffset), removing ? "" : event.key, endContainer.textContent.slice(endOffset)].join("");
 
             }
 
-            if (deleteParagraph && i + 1 === index) {
+          } else if (!sameContainer && i <= endIndex && i > index) {
 
-              if (child.type === "br") {
-
-                child = previousContent || <br />;
-
-              } else {
-
-                child += previousContent;
-
-              }
-
-            }
-
-            newContent.comps[i] = <p ref={isTarget || (deleteParagraph && i + 1 === index) ? selectedParagraph : null} key={i}>
-              {child}
-            </p>;
+            // This paragraph was completely highlighted, so we should remove it.
+            newContent.comps.splice(i, 1);
+            continue;
+          
+          } else {
+            
+            // This content doesn't need to be changed.
+            child = content.comps[i].props.children;
 
           }
+
+          newContent.comps[i] = <p ref={isTarget || (i + 1 === index && fixFocus) ? selectedParagraph : null} key={i}>
+            {child || <br />}
+          </p>;
 
         }
 
@@ -404,18 +406,14 @@ export default function BlogPost({currentUser, addNotification}) {
 
     } else if (keyCode === 13) {
 
+      // We're handling the content, so prevent the default behavior
+      event.preventDefault();
+
       // We have to add a new paragraph!
       setContent((content) => {
 
         const newContent = {comps: [...content.comps], selection: null, newParagraph: true, increment: 0, deleteParagraph: false};
         let i;
-        let endIndex;
-        if (!sameContainer) {
-
-          onP = startContainer.nodeName === "P";
-          endIndex = (onP ? [...endContainer.parentNode.childNodes] : [...endContainer.parentNode.parentNode.childNodes]).indexOf(onP ? endContainer : endContainer.parentNode);
-
-        }
         
         // We're only adding a paragraph if it's in the same container.
         // Otherwise, we're just replacing paragraphs.
@@ -427,15 +425,10 @@ export default function BlogPost({currentUser, addNotification}) {
           
           if (index === i) {
 
-            if (atBeginning) {
-
-              // We don't need to cut off anything; just move the content down.
-              child = <br />;
-
-            } else {
+            if (!atBeginning) {
 
               // Only cut off the part that we're adding to a new paragraph.
-              child = content.comps[i].props.children.substring(0, startOffset);
+              child = content.comps[i].props.children.slice(0, startOffset);
 
             }
 
@@ -447,38 +440,37 @@ export default function BlogPost({currentUser, addNotification}) {
 
               if (sameContainer) {
 
-                child = child.substring(highlighted ? endOffset : startOffset);
+                child = child.slice(highlighted ? endOffset : startOffset);
 
               } else {
 
-                child = endContainer.textContent.substring(endOffset);
+                child = endContainer.textContent.slice(endOffset);
 
               }
 
-              // If the string is empty, we need to add a <br /> because Chromium doesn't like when a paragraph is empty :( 
-              // In other words, it's not selectable.
-              child = child || <br />;
-
             }
+            console.log(child);
+
+          } else if (!sameContainer && i <= endIndex) {
+
+            // This paragraph is completely in the range, so it should be removed.
+            newContent.comps.splice(i, 1);
+            continue;
 
           } else {
 
-            if (!sameContainer && i <= endIndex) {
-
-              // This paragraph is in the range, so it should be removed.
-              newContent.comps.splice(i, 1);
-              continue;
-
-            }
-
             // This content doesn't need to be changed.
-            child = (content.comps[i] || content.comps[i - 1]).props.children || <br />;
+            child = (content.comps[i] || content.comps[i - 1]).props.children;
 
           }
 
           // Return the paragraph component, and the selectedParagraph ref 
-          // so that the caret position is reset to the correct position
-          newContent.comps[i] = <p key={i} ref={afterIndex ? selectedParagraph : null}>{child}</p>;
+          // so that the caret position is reset to the correct position.
+          // Also, if the string is empty, we need to add a <br /> because Chromium doesn't like when a paragraph is empty :( 
+          // In other words, it's not selectable.
+          newContent.comps[i] = <p key={i} ref={afterIndex ? selectedParagraph : null}>
+            {child || <br />}
+          </p>;
 
         }
 
@@ -490,9 +482,6 @@ export default function BlogPost({currentUser, addNotification}) {
         return newContent;
 
       });
-
-      // We're handling the content, so prevent the default behavior
-      event.preventDefault();
 
     } else if (!ctrlKey && keyCode !== 37 && keyCode !== 38 && keyCode !== 39 && keyCode !== 40) {
 
