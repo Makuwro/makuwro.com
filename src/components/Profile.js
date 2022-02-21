@@ -15,7 +15,6 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
     displayName: useState(username),
     disabled: useState(false)
   };
-  const [editorOpen, setEditorOpen] = useState(false);
   const [leaving, setLeaving] = useState(true);
   const [shifting, setShifting] = useState(false);
   const [searchParams] = useSearchParams();
@@ -61,7 +60,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
       setShifting(true);
 
       // Now it's time to go to the next page
-      navigate(`/${username}${itemLC !== "about" ? `/${itemLC}` : ""}${editorOpen ? "?action=edit-profile" : ""}`);
+      navigate(`/${username}${itemLC !== "about" ? `/${itemLC}` : ""}`);
 
     };
     const element = React.createElement(Link, {
@@ -91,20 +90,6 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
   tabComponent = components[tab || "about"];
   action = searchParams.get("action");
   useEffect(() => {
-
-    if (action === "edit-profile") {
-
-      setEditorOpen(true);
-      document.title = "Editing your profile";
-
-    } else {
-
-      setEditorOpen(false);
-      document.title = `${username} on Makuwro`;
-
-    }
-
-    console.log(tab)
 
     const path1 = location.pathname;
     const path2 = shownLocation.pathname;
@@ -141,7 +126,14 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
     if (response.ok) {
 
-      setProfileInfo(await response.json());
+      const profileInfo = await response.json();
+      document.title = `${profileInfo.displayName || profileInfo.username} on Makuwro`;
+
+      setProfileInfo(profileInfo);
+
+    } else {
+
+      document.title = "Account not found / Makuwro";
 
     }
 
@@ -150,7 +142,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
   }, [username]);
 
   return ready && (
-    <section id={styles.profileEditor} className={`${editorOpen ? styles.open : ""} ${leaving ? "leaving" : ""}`} onTransitionEnd={() => {
+    <main id={styles.profile} className={`${isLiterature ? styles.literature : null} ${leaving ? "leaving" : ""}`} onTransitionEnd={() => {
 
       if (leaving) {
 
@@ -159,74 +151,63 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
       }
 
     }}>
-      <main id={styles.profile} className={isLiterature ? styles.literature : null}>
-        <section id={styles["profile-header"]}>
-          <section id={styles.profileBannerContainer}>
-            {/*<img src="https://i1.sndcdn.com/visuals-000205406223-miu7o4-t2480x520.jpg" />*/}
-          </section>
+      <section id={styles["profile-header"]}>
+        <section id={styles.profileBannerContainer}>
+          {/*<img src="https://i1.sndcdn.com/visuals-000205406223-miu7o4-t2480x520.jpg" />*/}
         </section>
-        <section id={styles["profile-info"]}>
-          {!isLiterature && (
-            <img src={`https://cdn.makuwro.com/${profileInfo ? profileInfo.avatarPath : "global/pfp.png"}`} />
-          )}
-          <section>
-            <h1>
-              {profileInfo ? (profileInfo.displayName || `@${profileInfo.username}`) : `@${username}`}
-              {!isLiterature && profileInfo && profileInfo.isStaff && (
-                <span title="This user is a Makuwro staff member" className={styles["profile-badge"]}>STAFF</span>
-              )}
-            </h1>
-            <h2>
-              {isLiterature ? state.displayName[0] : (profileInfo && profileInfo.displayName ? `@${profileInfo.username}` : null)}
-            </h2>
-            {!profileInfo ? (
-              <p style={{margin: 0}}>This account doesn't exist. {!currentUser.id ? <Link to="/register">But it doesn't have to be that way ;)</Link> : ""}</p>
-            ) : (profileInfo.isBanned ? (
-              <p style={{margin: 0}}>This account has been banned for violating the <a href="https://about.makuwro.com/policies/terms">terms of service</a></p>
-            ) : null)}
-          </section>
-          {profileInfo && (
-            <section id={styles.actions}>
-              {currentUser && currentUser.id === profileInfo.id ? (
-                <>
-                  <button onClick={() => navigate("?action=edit-profile")}>Edit profile</button>
-                  <button onClick={() => navigate("/settings/account")}>Settings</button>
-                </>
-              ) : (
-                <>
-                  <button onClick={() => currentUser.id ? navigate("?action=follow") : navigate("/signin")}>Follow</button>
-                  <button className="destructive" onClick={() => navigate("?action=block")}>Block</button>
-                  <button className="destructive" onClick={() => navigate("?action=report-abuse")}>Report</button>
-                </>
-              )}
-            </section>
-          )}
+      </section>
+      <section id={styles["profile-info"]}>
+        {!isLiterature && (
+          <img src={`https://cdn.makuwro.com/${profileInfo ? profileInfo.avatarPath : "global/pfp.png"}`} />
+        )}
+        <section>
+          <h1>
+            {profileInfo ? (profileInfo.displayName || `@${profileInfo.username}`) : `@${username}`}
+            {!isLiterature && profileInfo && profileInfo.isStaff && (
+              <span title="This user is a Makuwro staff member" className={styles["profile-badge"]}>STAFF</span>
+            )}
+          </h1>
+          <h2>
+            {isLiterature ? state.displayName[0] : (profileInfo && profileInfo.displayName ? `@${profileInfo.username}` : null)}
+          </h2>
+          {!profileInfo ? (
+            <p style={{margin: 0}}>This account doesn't exist. {!currentUser.id ? <Link to="/register">But it doesn't have to be that way ;)</Link> : ""}</p>
+          ) : (profileInfo.isBanned ? (
+            <p style={{margin: 0}}>This account has been banned for violating the <a href="https://about.makuwro.com/policies/terms">terms of service</a></p>
+          ) : null)}
         </section>
-        {profileInfo && !profileInfo.isBanned && (
-          <section id={styles.container}>
-            <nav id={styles.selection}>
-              {navChildren}
-            </nav>
-            <section className={shifting ? styles.invisible : null} onTransitionEnd={(event) => {
-
-              event.stopPropagation();
-              setShifting(false);
-              setLocation(location);
-
-            }}>
-              {tabComponent}
-            </section>
+        {profileInfo && (
+          <section id={styles.actions}>
+            {currentUser && currentUser.id === profileInfo.id ? (
+              <button onClick={() => navigate("/settings/account")}>Settings</button>
+            ) : (
+              <>
+                <button onClick={() => currentUser.id ? navigate("?action=follow") : navigate("/signin")}>Follow</button>
+                <button className="destructive" onClick={() => navigate("?action=block")}>Block</button>
+                <button className="destructive" onClick={() => navigate("?action=report-abuse")}>Report</button>
+              </>
+            )}
           </section>
         )}
-        <Footer />
-      </main>
-      <section id={styles.profileEditorOptions}>
-        <button onClick={() => navigate(location.pathname)}>Close editor</button>
-        <button>Change profile picture</button>
-        <button>Change banner</button>
-        <button>Edit pages</button>
       </section>
-    </section>
+      {profileInfo && !profileInfo.isBanned && (
+        <section id={styles.container}>
+          <nav id={styles.selection}>
+            {navChildren}
+          </nav>
+          <section className={shifting ? styles.invisible : null} onTransitionEnd={(event) => {
+
+            event.stopPropagation();
+            setShifting(false);
+            setLocation(location);
+
+          }}>
+            {tabComponent}
+          </section>
+        </section>
+      )}
+      <Footer />
+    </main>
   );
 
 }

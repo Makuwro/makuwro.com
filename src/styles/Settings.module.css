@@ -3,6 +3,7 @@
   transition: 0.3s;
 }
 
+
 #settings h2:first-of-type, #settings h1:first-of-type {
   margin-top: 0;
 }
@@ -11,7 +12,7 @@
   height: 100%;
 }
 
-#left {
+#left, .content {
   display: none;
 }
 
@@ -30,15 +31,57 @@
   margin-top: 1rem;
 }
 
-#viewer > section > section {
+#options > section {
   background-color: var(--night-article);
-  padding: 1rem;
   border-radius: 5px;
   box-shadow: var(--day-box-shadow);
 }
 
-#viewer > section > h1 {
+#options > section > section:first-of-type {
+  padding: 1rem;
+  cursor: pointer;
+}
+
+#options > section.open > .content {
+  display: block;
+}
+
+.content {
+  padding: 1rem;
+  border-top: 1px solid var(--night-background);
+}
+
+.content > p:first-of-type, .content > form > :first-child {
+  margin-top: 0;
+}
+
+#welcome p, #viewer > section > h1, .header p {
   margin: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+}
+
+.header > section {
+  width: calc(100% - 15px);
+}
+
+.header > span {
+  width: 15px;
+}
+
+.open .header > span {
+  transform: scaleY(-1);
+}
+
+.header p {
+  margin-top: 5px;
+}
+
+#options > section > section:first-of-type > span {
+  float: right;
 }
 
 section#welcome {
@@ -47,15 +90,15 @@ section#welcome {
   text-align: center;
 }
 
-#welcome p {
-  margin: 0;
-}
-
 .avatar {
   height: 100px;
   width: 100px;
   border-radius: 100%;
   display: block;
+}
+
+#options > .destructive {
+  background-color: #544141;
 }
 
 @media screen and (min-width: 1024px) {
