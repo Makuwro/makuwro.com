@@ -33,7 +33,7 @@ export default function Home({theme, shownLocation, setLocation}) {
 
   return (
     <>
-      <main id={styles.home} className={`${theme !== "night" ? theme : null} ${leaving ? styles.leaving : null}`} onTransitionEnd={() => {
+      <main id={styles.home} className={`${theme !== "night" ? theme : null} ${leaving ? "leaving" : null}`} onTransitionEnd={() => {
 
         if (leaving) {
 
@@ -60,27 +60,22 @@ export default function Home({theme, shownLocation, setLocation}) {
             <h1>A place for all your worlds</h1>
             <p>On Makuwro, you can make dedicated pages for your characters and lore. You can share it with a team, friends, or keep it to yourself. You can even group it into a wiki-like world.</p>
           </section>
-
           <section>
             <h1>Collaborate with others with a live editor</h1>
             <p></p>
           </section>
-
           <section>
             <h1>Make it how you want it</h1>
-            <p>Customization is fundamental in Makuwro. Know CSS? Great! Here's a paint bucket, a couple of pens, <a href="https://support.makuwro.com/articles/class-and-id-reference">a giant book</a>, and an infinite supply of blinds.</p> <p>Don't know CSS? That's fine too. We have some themes for you to pick from. Besides the universe <strike>(editor's note: I'm not sure if you're a deity or sumn)</strike>, the power to change anything is your hands.</p>
+            <p>Customization is fundamental in Makuwro. Know CSS? Great! Here's a paint bucket, a couple of pens, <a href="https://help.makuwro.com/articles/dev/css-reference">a giant book</a>, and an infinite supply of blinds.</p> <p>Don't know CSS? That's fine too. We have some themes for you to pick from. Besides the universe <strike>(editor's note: I'm not sure if you're a deity or sumn)</strike>, the power to change anything is your hands.</p>
           </section>
-
           <section>
             <h1>What do you think of roleplay?</h1>
             <p>Of course you can act as yourself on the site, but why not try jumping in Steve's shoes or Clover's boots? <a href="https://www.youtube.com/watch?v=kRWuYHNjc84" target="_blank" rel="noreferrer">Maybe you aren't Satan, but you're Staan!</a></p>
           </section>
-
           <section>
             <h1>An ongoing project</h1>
             <p>Makuwro isn't finished, and we're not going anywhere. We need your feedback to make this the best worldbuilding database for creators.</p>
           </section>
-
           <section>
             <p>Why not give it a try?</p>
             <button>Join today</button>

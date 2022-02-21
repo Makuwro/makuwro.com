@@ -52,7 +52,6 @@ export default function Authenticator({onSuccess}) {
 
   return (
     <section id={styles.authenticator}>
-      <h1>Welcome back to Makuwro!</h1>
       <form onSubmit={authenticate}>
         <label htmlFor="username">Username</label>
         <input type="text" name="username" required value={username} onInput={(event) => setUsername(event.target.value)} />

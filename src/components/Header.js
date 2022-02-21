@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "../styles/Header.module.css";
 import PropTypes from "prop-types";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function Header({currentUser, theme, systemDark, query, history, setLocation}) {
 
   const location = useLocation();
+  const navigate = useNavigate();
   let state = {
     searchResults: useState(null),
     query: useState(query || ""),
@@ -33,7 +34,7 @@ export default function Header({currentUser, theme, systemDark, query, history, 
       <section>
         {currentUser && currentUser.id ? (
           <>
-            <button title="Preferences" onClick={() => history.push("/preferences")} id={styles["account-button"]} style={{
+            <button title={`@${currentUser.username}`} onClick={() => navigate(`/${currentUser.username}`)} id={styles["account-button"]} style={{
               backgroundImage: `url(https://cdn.makuwro.com/${currentUser.avatarPath})`,
               backgroundSize: "cover",
               backgroundColor: "gray"

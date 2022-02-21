@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate, useParams, useSearchParams } from "reac
 import styles from "../styles/Blog.module.css";
 import Footer from "./Footer";
 
-export default function BlogPost({currentUser, addNotification}) {
+export default function BlogPost({currentUser, addNotification, shownLocation, setLocation}) {
 
   const {username, slug} = useParams();
   const [editing, setEditing] = useState(false);
@@ -33,8 +33,6 @@ export default function BlogPost({currentUser, addNotification}) {
 
     }
 
-    setContent({comps: [<p key={.0}>testing!</p>, <p key={.1}>Test1</p>, <p key={.2}>Test2</p>]});
-
   }, [post]);
 
   useEffect(() => {
@@ -54,7 +52,11 @@ export default function BlogPost({currentUser, addNotification}) {
 
   useEffect(() => {
 
-    if (ready) {
+    if (location.pathname !== "/signin" && location.pathname !== "/register" && location.pathname !== shownLocation.pathname) {
+
+      setLeaving(true);
+    
+    } else if (ready) {
 
       setTimeout(() => setLeaving(false), 0);
 
@@ -80,9 +82,9 @@ export default function BlogPost({currentUser, addNotification}) {
       try {
 
         const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/blog/${username}/${slug}`, {
-          headers: {
+          headers: currentUser.token ? {
             token: currentUser.token
-          }
+          } : {}
         });
   
         if (response.ok) {
@@ -112,6 +114,7 @@ export default function BlogPost({currentUser, addNotification}) {
     // Check if we need to toggle edit mode
     if (searchParams.get("mode") === "edit") {
 
+      if (!content) setContent({comps: [<p key={.1} placeholder="You can start drafting by clicking here!"></p>]});
       setEditing(true);
 
     } else {
@@ -254,6 +257,11 @@ export default function BlogPost({currentUser, addNotification}) {
 
         }
 
+      } else {
+
+        // We don't need to do anything, so exit edit mode without calling the API.
+        navigate(`/${username}/blog/${slug}`);
+
       }
 
     } catch (err) {
@@ -285,7 +293,7 @@ export default function BlogPost({currentUser, addNotification}) {
     }
     if ((!ctrlKey || backspace || del) && (keyCode === 32 || backspace || del || (keyCode >= 48 && keyCode <= 90) || (keyCode >= 96 && keyCode <= 111) || (keyCode >= 160 && keyCode <= 165) || (keyCode >= 186 && keyCode <= 223))) {
       
-      // Prevent contenteditable from taking over.
+      // We're handling the content, so prevent the default behavior
       event.preventDefault();
 
       // We have to add or remove characters!
@@ -297,21 +305,20 @@ export default function BlogPost({currentUser, addNotification}) {
         while (i--) {
 
           const isTarget = i === index;
-
           let child;
           if (isTarget) {
 
-            child = content.comps[i].props.children;
+            child = (child = content.comps[i].props).children || child;
             const isEmpty = child.type === "br";
             const removing = backspace || del;
 
-            if (isEmpty) {
+            if (isEmpty || atBeginning) {
 
               if (backspace) {
 
                 // Don't delete the beginning paragraph, please.
                 if (content.comps[i - 1]) {
-
+                  
                   newContent.selection.startOffset = content.comps[i - 1].props.children.length;
                   newContent.comps.splice(i, 1);
                   fixFocus = true;
@@ -375,6 +382,11 @@ export default function BlogPost({currentUser, addNotification}) {
               child = [child.slice(0, startOffset), removing ? "" : event.key, endContainer.textContent.slice(endOffset)].join("");
 
             }
+
+          } else if (fixFocus && i + 1 === index) {
+
+            const oldChild = content.comps[i + 1].props.children;
+            child = content.comps[i].props.children + (oldChild && oldChild.type !== "br" ? oldChild : "");
 
           } else if (!sameContainer && i <= endIndex && i > index) {
 
@@ -490,6 +502,9 @@ export default function BlogPost({currentUser, addNotification}) {
 
     }
 
+    // No else statement because we don't want to block events like CTRL+SHIFT+I.
+    // That messed me up trying to program this editor lol
+
   }
 
   function handlePaste(event) {
@@ -538,35 +553,49 @@ export default function BlogPost({currentUser, addNotification}) {
   }
 
   return ready && (
-    <main id={styles.post} className={leaving ? "leaving" : ""}>
+    <main id={styles.post} className={leaving ? "leaving" : ""} onTransitionEnd={() => {
+
+      if (leaving) {
+
+        setLocation(location);
+
+      }
+
+    }}>
       {post.id ? (
         <>
           <section id={styles.metadata}>
-            <section id={styles.cover}>
-              <img src="https://d1e00ek4ebabms.cloudfront.net/production/ad60a0ef-f43b-4a8c-9279-a3f118c98911.png" />
-            </section>
+            {(post.coverPath || editing) && (
+              <section id={styles.cover}>
+                {post.coverPath && (
+                  <img src={`https://cdn.makuwro.com/${post.coverPath}`} />
+                )}
+              </section>
+            )}
             <section id={styles.postInfo}>
-              <h1 contentEditable={editing} placeholder="Insert title here"></h1>
+              <h1 contentEditable={editing} placeholder={editing ? "Untitled blog" : null}>{post.title || (!editing ? "Untitled blog" : null)}</h1>
               {(editing || post.tagline) && (
-                <p contentEditable={editing} placeholder="Insert tagline here...or not :P"></p>
+                <p contentEditable={editing} placeholder={editing ? "No tagline" : null}></p>
               )}
               <Link to={""} id={styles.creator}>
                 <img src="https://media.discordapp.net/attachments/539176248673566760/942512442427203624/kyew18norlh81.png?width=583&height=583" />
                 <span>Christian Toney</span>
               </Link>
               <section id={styles.actions}>
-                <button onClick={async () => editing ? await save() : navigate("?mode=edit")}>{editing ? "Save" : "Edit"}</button>
-                {!editing && <button>Publish</button>}
-                <button className="destructive" onClick={deletePost}>Delete</button>
+                {currentUser && currentUser.id === post.owner ? (
+                  <>
+                    <button onClick={async () => editing ? await save() : navigate("?mode=edit")}>{editing ? "Save" : "Edit"}</button>
+                    <button className={post.published ? "destructive" : styles.unpublished}>Publish</button>
+                    <button className="destructive" onClick={deletePost}>Delete</button>
+                  </>
+                ) : <button className="destructive" onClick={() => navigate("?action=report-abuse")}>Report</button>}
               </section>
             </section>
           </section>
           <section id={styles.content} contentEditable={editing} onKeyDown={handleInput} onCut={handleCut} onPaste={handlePaste} suppressContentEditableWarning ref={contentContainer}>
-            {content ? content.comps : (editing ? (
-              <p placeholder="You can start drafting by clicking here!"></p>
-            ) : (
+            {content ? content.comps : (
               <p>This blog post doesn't exist...yet ;)</p>
-            ))}
+            )}
           </section>
         </>
       ) : "That one doesn't exist!"}

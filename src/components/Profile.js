@@ -44,8 +44,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
     "Characters",
     "Folders",
     "Literature", 
-    "Stats", 
-    "Teams", 
+    "Stats",
     "Terms", 
     "Worlds"
   ];
@@ -84,7 +83,6 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
     art: <ProfileLibraryItem updated={updated} tab="art" profileInfo={profileInfo} currentUser={currentUser} />,
     literature: <ProfileLibraryItem tab="literature" profileInfo={profileInfo} currentUser={currentUser} />,
     worlds: <ProfileLibraryItem tab="worlds" profileInfo={profileInfo} currentUser={currentUser} />,
-    teams: <ProfileLibraryItem tab="teams" profileInfo={profileInfo} currentUser={currentUser} />,
     stats: <ProfileStats profileInfo={profileInfo} currentUser={currentUser} />,
     characters: <ProfileLibraryItem tab="characters" profileInfo={profileInfo} currentUser={currentUser} />,
     terms: <ProfileTerms profileInfo={profileInfo} currentUser={currentUser} />,
@@ -151,7 +149,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
   }, [username]);
 
-  return ready ? (
+  return ready && (
     <section id={styles.profileEditor} className={`${editorOpen ? styles.open : ""} ${leaving ? "leaving" : ""}`} onTransitionEnd={() => {
 
       if (leaving) {
@@ -190,7 +188,10 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
           {profileInfo && (
             <section id={styles.actions}>
               {currentUser && currentUser.id === profileInfo.id ? (
-                <button onClick={() => navigate("?action=edit-profile")}>Edit profile</button>
+                <>
+                  <button onClick={() => navigate("?action=edit-profile")}>Edit profile</button>
+                  <button onClick={() => navigate("/settings/account")}>Settings</button>
+                </>
               ) : (
                 <>
                   <button onClick={() => currentUser.id ? navigate("?action=follow") : navigate("/signin")}>Follow</button>
@@ -226,7 +227,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
         <button>Edit pages</button>
       </section>
     </section>
-  ) : <>loading</>;
+  );
 
 }
 

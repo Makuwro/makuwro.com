@@ -9,7 +9,6 @@ import Maintenance from "./components/Maintenance";
 import ArtCreator from "./components/library/creator/ArtCreator";
 import LiteratureCreator from "./components/library/creator/LiteratureCreator";
 import CharacterCreator from "./components/library/creator/CharacterCreator";
-import TeamCreator from "./components/library/creator/TeamCreator";
 import WorldCreator from "./components/library/creator/WorldCreator";
 import AbuseReporter from "./components/AbuseReporter";
 import ArtViewer from "./components/library/viewer/ArtViewer";
@@ -18,6 +17,7 @@ import Authenticator from "./components/Authenticator";
 import LiveNotification from "./components/LiveNotification";
 import ContentWarning from "./components/ContentWarning";
 import BlogPost from "./components/BlogPost";
+import Settings from "./components/Settings";
 
 const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 const maintenance = false;
@@ -26,7 +26,6 @@ const creators = {
   "create-art": ArtCreator,
   "create-literature": LiteratureCreator,
   "create-character": CharacterCreator,
-  "create-team": TeamCreator,
   "create-world": WorldCreator
 };
 
@@ -111,7 +110,7 @@ export default function App() {
 
     }
 
-    currentUser = cUser || currentUser;
+    currentUser = token ? cUser || currentUser : {};
 
     // Check if we need the art viewer open
     matchedPath = [...pathname.matchAll(artRegex)];
@@ -226,7 +225,7 @@ export default function App() {
 
   return ready ? (
     <>
-      <Popup notify={addNotification} open={signInOpen}>
+      <Popup notify={addNotification} open={signInOpen} title="Welcome back to Makuwro!">
         <Authenticator onSuccess={() => navigate(shownLocation.pathname, {replace: true})} />
       </Popup>
       <Popup notify={addNotification} title={popupTitle} open={popupChildren !== null} onClose={() => setPopupChildren(null)} warnUnfinished={popupWarnUnfinished}>
@@ -270,6 +269,8 @@ export default function App() {
 
         })}
         <Route path={"/:username/blog/:slug"} element={<BlogPost theme={theme} shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} addNotification={addNotification} />} />
+        <Route path={"/settings"} element={<Settings currentUser={currentUser} shownLocation={shownLocation} setLocation={setLocation} />} />
+        <Route path={"/settings/:tab"} element={<Settings currentUser={currentUser} shownLocation={shownLocation} setLocation={setLocation} setCurrentUser={setCurrentUser} />} />
       </Routes>
     </>
   ) : null;

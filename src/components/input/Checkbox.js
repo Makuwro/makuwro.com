@@ -6,8 +6,8 @@ export default function Checkbox({checked, required = false, children, onClick})
 
   return (
     <section className={styles.checkbox}>
-      <input type="checkbox" required={required} onChange={() => onClick(!checked)} checked={checked} />
-      <label onClick={() => onClick(!checked)}>
+      <input type="checkbox" required={required} onChange={() => onClick && onClick(!checked)} checked={checked} />
+      <label onClick={() => onClick && onClick(!checked)}>
         <span>
           {children}
         </span>
