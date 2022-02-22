@@ -77,6 +77,7 @@
   flex-direction: column;
   gap: 2rem;
   width: 100%;
+  margin-bottom: 2rem;
 }
 
 #container > section.invisible {
@@ -127,6 +128,14 @@
 #profile-bio p {
   margin-top: 10px;
   margin-bottom: 0;
+}
+
+#profile-terms > p:last-of-type {
+  margin-bottom: 0;
+}
+
+#profile-terms > p:first-of-type {
+  margin-top: 0;
 }
 
 #actions {

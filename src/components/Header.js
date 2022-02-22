@@ -35,7 +35,7 @@ export default function Header({currentUser, theme, systemDark, query, history, 
         {currentUser && currentUser.id ? (
           <>
             <button title={`@${currentUser.username}`} onClick={() => navigate(`/${currentUser.username}`)} id={styles["account-button"]} style={{
-              backgroundImage: `url(https://cdn.makuwro.com/${currentUser.avatarPath})`,
+              backgroundImage: `url(${currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`})`,
               backgroundSize: "cover",
               backgroundColor: "gray"
             }}></button>

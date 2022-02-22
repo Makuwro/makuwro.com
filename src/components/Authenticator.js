@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "../styles/Authenticator.module.css";
+import Popup from "./Popup";
 
-export default function Authenticator({onSuccess}) {
+export default function Authenticator({onSuccess, open, addNotification}) {
 
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [username, setUsername] = useState("");
@@ -50,18 +51,30 @@ export default function Authenticator({onSuccess}) {
 
   }
 
+  useEffect(() => {
+    
+    if (open) {
+
+      document.title = "Sign in to Makuwro";
+
+    }
+
+  }, [open]);
+
   return (
-    <section id={styles.authenticator}>
-      <form onSubmit={authenticate}>
-        <label htmlFor="username">Username</label>
-        <input type="text" name="username" required value={username} onInput={(event) => setUsername(event.target.value)} />
-        <label htmlFor="password">Password</label>
-        <input type="password" name="password" required value={password} onInput={(event) => setPassword(event.target.value)} />
-        <p>I forgot my password</p>
-        <input type="submit" disabled={buttonDisabled} />
-        <p>Don't have an account? <Link to="/register">Make one!</Link></p>
-      </form>
-    </section>
+    <Popup title="Welcome back to Makuwro!" open={open}>
+      <section id={styles.authenticator}>
+        <form onSubmit={authenticate}>
+          <label htmlFor="username">Username</label>
+          <input type="text" name="username" required value={username} onInput={(event) => setUsername(event.target.value)} />
+          <label htmlFor="password">Password</label>
+          <input type="password" name="password" required value={password} onInput={(event) => setPassword(event.target.value)} />
+          <p>I forgot my password</p>
+          <input type="submit" disabled={buttonDisabled} />
+          <p>Don't have an account? <Link to="/register">Make one!</Link></p>
+        </form>
+      </section>
+    </Popup>
   );
 
 }

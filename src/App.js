@@ -225,9 +225,7 @@ export default function App() {
 
   return ready ? (
     <>
-      <Popup notify={addNotification} open={signInOpen} title="Welcome back to Makuwro!">
-        <Authenticator onSuccess={() => navigate(shownLocation.pathname, {replace: true})} />
-      </Popup>
+      <Authenticator onSuccess={() => navigate(shownLocation.pathname, {replace: true})} open={signInOpen} addNotification={addNotification} />
       <Popup notify={addNotification} title={popupTitle} open={popupChildren !== null} onClose={() => setPopupChildren(null)} warnUnfinished={popupWarnUnfinished}>
         {popupChildren}
       </Popup>

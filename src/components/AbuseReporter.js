@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Dropdown from "./input/Dropdown";
-import styles from "../styles/AbuseReporter.module.css";
 import CountryDropdown from "./input/CountryDropdown";
 import Checkbox from "./input/Checkbox";
 
@@ -172,7 +171,7 @@ export default function AbuseReporter({setPopupSettings, currentUser, addNotific
               </Dropdown>
             </section>
             {menu[1] === 0 && (
-              <p className={styles.reason}>You can message the uploader by <Link to={`/${username}?action=message`}>clicking here.</Link></p>
+              <p className="info">You can message the uploader by <Link to={`/${username}?action=message`}>clicking here.</Link></p>
             )}
             {menu[1] === 1 && (
               <>
@@ -415,7 +414,7 @@ export default function AbuseReporter({setPopupSettings, currentUser, addNotific
                       </>
                     )}
                     {menu[3] === 1 && (
-                      <p className={styles.reason}>Please contact us at <a href="mailto:legal@makuwro.com" target="_blank" rel="noreferrer">legal@makuwro.com</a>.</p>
+                      <p className="info">Please contact us at <a href="mailto:legal@makuwro.com" target="_blank" rel="noreferrer">legal@makuwro.com</a>.</p>
                     )}
                   </>
                 )}
@@ -424,7 +423,7 @@ export default function AbuseReporter({setPopupSettings, currentUser, addNotific
           </>
         )}
         {menu[0] === 7 && (
-          <p className={styles.reason}>Makuwro only removes content that violates our <a href="https://help.makuwro.com/policies">policies</a>; however, you always have the option to <Link to={`/${username}?action=block`}>block</Link> the creator. You won't be able to see what they post, and they won't be able to interact with you.</p>
+          <p className="info">Makuwro only removes content that violates our <a href="https://help.makuwro.com/policies">policies</a>; however, you always have the option to <Link to={`/${username}?action=block`}>block</Link> the creator. You won't be able to see what they post, and they won't be able to interact with you.</p>
         )}
         {escalate && (
           <section>

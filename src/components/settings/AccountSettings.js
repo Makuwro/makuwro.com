@@ -1,57 +1,28 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../../styles/Settings.module.css";
 import SettingsDropdown from "./SettingsDropdown";
 
-export default function AccountSettings({currentUser, setCurrentUser}) {
+export default function AccountSettings({currentUser, setCurrentUser, menu, setMenu, submitting, setSubmitting}) {
 
   const navigate = useNavigate();
-  const [menu, setMenu] = useState();
-  const [selectedField, setSelectedField] = useState();
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [password, setPassword] = useState("");
   const [passwordAgain, setPasswordAgain] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const avatarImage = useRef();
   document.title = "Account settings / Makuwro";
   
-  function resetFields(newField) {
+  function resetFields() {
 
-    setSelectedField(newField);
     setDisplayName("");
+    setEmail("");
     setUsername("");
-    setOldPassword("");
+    setNewPassword("");
     setPassword("");
     setPasswordAgain("");
-
-  }
-
-  async function disableAccount() {
-
-    if (!submitting && confirm("Are you sure you want to disable your account? You can come back at any time.")) {
-
-      setSubmitting(true);
-
-      // Send a request to disable the account
-
-      // Delete the token cookie
-      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-      // Redirect to the home page
-      navigate("/");
-
-    }
-
-  }
-
-  async function deleteAccount() {
-
-    if (!submitting && confirm("Woahh there, buddy. Are you sure you want to delete your account? You will have 24 hours to change your mind by signing in before everything goes POOF!")) {
-
-      setSubmitting(true);
-
-    }
 
   }
 
@@ -60,7 +31,7 @@ export default function AccountSettings({currentUser, setCurrentUser}) {
     // Don't refresh the page, please.
     event.preventDefault();
 
-    if (key === "password" && passwordAgain !== password) {
+    if (key === "password" && passwordAgain !== newPassword) {
 
       return alert("Your password doesn't match!");
 
@@ -79,11 +50,7 @@ export default function AccountSettings({currentUser, setCurrentUser}) {
           // Turn it into a FormData object.
           const formData = new FormData();
           formData.append(key, value);
-          if (oldPassword) {
-
-            formData.append("oldPassword", oldPassword);
-
-          } else if (key === "email") {
+          if (key === "newPassword" || key === "email" || key === "isDisabled") {
 
             formData.append("password", password);
 
@@ -101,24 +68,35 @@ export default function AccountSettings({currentUser, setCurrentUser}) {
           if (response.ok) {
 
             // Save the new username to the state.
-            if (key !== "password") {
+            if (key !== "newPassword") {
 
-              setCurrentUser({...currentUser, [key]: value});
+              setCurrentUser({...currentUser, [key + (key === "avatar" ? "Url" : "")]: key === "avatar" ? URL.createObjectURL(value) : value});
+
+            } else if (key !== "isDsiabled") {
+
+              alert("Saved!");
 
             }
 
             // Reset the field.
             resetFields();
 
+            // Close the menu.
+            setMenu();
+
+            return true;
+
           } else {
 
-            alert(await response.json().message);
+            const {message} = await response.json();
+
+            alert(message);
             
           }
 
         } catch (err) {
 
-
+          alert(err.message);
 
         }
 
@@ -131,12 +109,47 @@ export default function AccountSettings({currentUser, setCurrentUser}) {
 
   }
 
+  async function disableAccount(event) {
+
+    event.preventDefault();
+
+    if (!submitting && confirm("Are you sure you want to disable your account? You can come back at any time.")) {
+
+      setSubmitting(true);
+
+      // Send a request to disable the account
+      if (await updateAccount(event, "isDisabled", true)) {
+
+        // Delete the token cookie
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+        // Redirect to the home page
+        navigate("/");
+
+      }
+
+    }
+
+  }
+
+  async function deleteAccount(event) {
+
+    event.preventDefault();
+    
+    if (!submitting && confirm("Woahh there, buddy. Are you sure you want to delete your account? You will have 24 hours to change your mind by signing in before everything goes POOF!")) {
+
+      setSubmitting(true);
+
+    }
+
+  }
+
   function toggleMenu(index) {
 
+    resetFields();
     if (index === menu) {
 
       setMenu();
-      resetFields();
 
     } else {
 
@@ -149,7 +162,7 @@ export default function AccountSettings({currentUser, setCurrentUser}) {
   return (
     <>
       <section id={styles.welcome}>
-        <img className={styles.avatar} src={`https://cdn.makuwro.com/${currentUser.avatarPath}`} />
+        <img className={styles.avatar} src={currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`} />
         <h1>Hi, {currentUser.displayName || currentUser.username}!</h1>
         <p>You can manage your account information here.</p>
       </section>
@@ -160,20 +173,14 @@ export default function AccountSettings({currentUser, setCurrentUser}) {
           open={menu === 0} 
           onClick={() => toggleMenu(0)}
         >
-          {selectedField === 0 ? (
-            <form onSubmit={(event) => updateAccount(event, "displayName", displayName)}>
-              <label>New display name</label>
-              <input type="text" placeholder={currentUser.displayName} value={displayName} onInput={(event) => setDisplayName(event.target.value)} />
-              <input type="submit" value="Save" disabled={submitting} />
-            </form>
-          ) : (
-            <>
-              {currentUser.displayName && (
-                <p>Your current display name is <b>{currentUser.displayName}</b>.</p>
-              )}
-              <button onClick={() => resetFields(0)}>Change display name</button>
-            </>
+          {currentUser.displayName && (
+            <p>Your current display name is <b>{currentUser.displayName}</b>.</p>
           )}
+          <form onSubmit={(event) => updateAccount(event, "displayName", displayName)}>
+            <label>New display name</label>
+            <input type="text" value={displayName} onInput={(event) => setDisplayName(event.target.value)} />
+            <input type="submit" value="Save" disabled={submitting} />
+          </form>
         </SettingsDropdown>
         <SettingsDropdown
           title="Username"
@@ -181,71 +188,87 @@ export default function AccountSettings({currentUser, setCurrentUser}) {
           open={menu === 1}
           onClick={() => toggleMenu(1)}
         >
-          {selectedField === 1 ? (
-            <form onSubmit={(event) => updateAccount(event, "username", username)}>
-              <label>New username</label>
-              <input type="text" placeholder={currentUser.username} value={username} onInput={(event) => setUsername(event.target.value)} />
-              <input type="submit" value="Save" disabled={submitting} />
-            </form>
-          ) : (
-            <>
-              <p>Your current username is <b>{currentUser.username}</b>.</p>
-              <button onClick={() => resetFields(1)}>Change username</button>
-            </>
-          )}
+          <p>Your current username is <b>{currentUser.username}</b>.</p>
+          <form onSubmit={(event) => updateAccount(event, "username", username)}>
+            <label>New username</label>
+            <input type="text" value={username} onInput={(event) => setUsername(event.target.value)} required />
+            <label>Password</label>
+            <input type="password" value={password} onInput={(event) => setPassword(event.target.value)} required />
+            <input type="submit" value="Save" disabled={submitting} />
+          </form>
+        </SettingsDropdown>
+        <SettingsDropdown
+          title="Avatar"
+          description="This image will be shown on your profile and on all of your published content."
+          open={menu === 2}
+          onClick={() => toggleMenu(2)}
+        >
+          <img className={styles.avatar} src={`${currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`}`} />
+          <form>
+            <input required={true} type="file" accept="image/*" style={{display: "none"}} ref={avatarImage} onChange={(event) => {
+              
+              updateAccount(event, "avatar", event.target.files[0]);
+            
+            }} />
+            <input style={{marginTop: "1rem"}} type="button" value="Change avatar" onClick={() => avatarImage.current.click()} disabled={submitting} />
+          </form>
         </SettingsDropdown>
         <SettingsDropdown
           title="Password"
           description="This, along with your username, is used for signing you in."
-          open={menu === 2}
-          onClick={() => toggleMenu(2)}
+          open={menu === 3}
+          onClick={() => toggleMenu(3)}
         >
-          {selectedField === 2 ? (
-            <form onSubmit={(event) => updateAccount(event, "password", password)}>
-              <label>Current password</label>
-              <input type="password" required value={oldPassword} onInput={(event) => setOldPassword(event.target.value)}  />
-              <label>New password</label>
-              <input type="password" required value={password} onInput={(event) => setPassword(event.target.value)} />
-              <label>Confirm new password</label>
-              <input type="password" required value={passwordAgain} onInput={(event) => setPasswordAgain(event.target.value)}  />
-              <input type="submit" value="Save" disabled={submitting} />
-            </form>
-          ) : <button onClick={() => resetFields(2)}>Change password</button>}
+          <form onSubmit={(event) => updateAccount(event, "newPassword", newPassword)}>
+            <label>Current password</label>
+            <input type="password" required value={password} onInput={(event) => setPassword(event.target.value)}  />
+            <label>New password</label>
+            <input type="password" required value={newPassword} onInput={(event) => setNewPassword(event.target.value)} />
+            <label>Confirm new password</label>
+            <input type="password" required value={passwordAgain} onInput={(event) => setPasswordAgain(event.target.value)}  />
+            <input type="submit" value="Save" disabled={submitting} />
+          </form>
         </SettingsDropdown>
         <SettingsDropdown 
           title="Email address"
           description="This email address is only used for authenticating you. If you forgot your password, you can use this email to reset it."
-          open={menu === 3} 
-          onClick={() => toggleMenu(3)}
+          open={menu === 4} 
+          onClick={() => toggleMenu(4)}
         >
-          {selectedField === 3 ? (
-            <form>
-              <label>Email address</label>
-              <input type="email" required />
-              <label>Password</label>
-              <input type="password" required />
-              <input type="submit" value="Save" disabled={submitting} />
-            </form>
-          ) : <button onClick={() => resetFields(3)}>Change email address</button>}
+          <form onSubmit={(event) => updateAccount(event, "email", email)}>
+            <label>New email address</label>
+            <input type="email" value={email} onInput={(event) => setEmail(event.target.value)} required />
+            <label>Password</label>
+            <input type="password" value={password} onInput={(event) => setPassword(event.target.value)} required />
+            <input type="submit" value="Save" disabled={submitting} />
+          </form>
         </SettingsDropdown>
         <SettingsDropdown
           title="Disable your account"
           description="If you want to take a break, you can disable your account."
-          open={menu === 4} 
-          onClick={() => toggleMenu(4)}
-        >
-          <p>Your profile and content will become private and you'll be logged out everywhere.</p>
-          <p>You can re-enable your account by signing back in.</p>
-          <button className="destructive" onClick={disableAccount}>Disable account</button>
-        </SettingsDropdown>
-        <SettingsDropdown 
-          title="Delete your account"
           open={menu === 5} 
           onClick={() => toggleMenu(5)}
         >
+          <p>Your profile and content will become private and you'll be logged out everywhere.</p>
+          <p>You can re-enable your account by signing back in.</p>
+          <form onSubmit={disableAccount}>
+            <label>Password</label>
+            <input type="password" value={password} onInput={(event) => setPassword(event.target.value)} />
+            <input type="submit" className="destructive" value="Disable account" />
+          </form>
+        </SettingsDropdown>
+        <SettingsDropdown 
+          title="Delete your account"
+          open={menu === 6} 
+          onClick={() => toggleMenu(6)}
+        >
           <p>If you want to permanently delete your account and all content you uploaded, you may request to do so by pressing the button below.</p>
           <p>You will have 24 hours to cancel your request by signing back in, but after the time passes, all information you gave us will be deleted.</p>
-          <button className="destructive" onClick={deleteAccount}>Delete account</button>
+          <form onSubmit={deleteAccount}>
+            <label>Password</label>
+            <input type="password" value={password} onInput={(event) => setPassword(event.target.value)} />
+            <input type="submit" className="destructive" value="Delete account" />
+          </form>
         </SettingsDropdown>
       </section>
     </>

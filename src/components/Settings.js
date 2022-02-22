@@ -9,14 +9,16 @@ import ProfileSettings from "./settings/ProfileSettings";
 
 export default function Settings({currentUser, setLocation, setCurrentUser}) {
 
+  const [menu, setMenu] = useState();
+  const [leaving, setLeaving] = useState(true);
+  const [ready, setReady] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const tabs = {
-    "account": <AccountSettings currentUser={currentUser} setCurrentUser={setCurrentUser} />,
-    "profile": <ProfileSettings currentUser={currentUser} setCurrentUser={setCurrentUser} />,
+    "account": <AccountSettings currentUser={currentUser} setCurrentUser={setCurrentUser} menu={menu} setMenu={setMenu} submitting={submitting} setSubmitting={setSubmitting} />,
+    "profile": <ProfileSettings currentUser={currentUser} setCurrentUser={setCurrentUser} menu={menu} setMenu={setMenu} submitting={submitting} setSubmitting={setSubmitting} />,
     "appearance": <AppearanceSettings currentUser={currentUser} />,
     "privacy": <PrivacySettings currentUser={currentUser} />
   };
-  const [leaving, setLeaving] = useState(true);
-  const [ready, setReady] = useState(false);
   const {tab} = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,7 +66,7 @@ export default function Settings({currentUser, setLocation, setCurrentUser}) {
 
     menuOptions[i] = (
       <li key={i}>
-        <Link to={path} className={path === location.pathname ? styles.selected : ""}>
+        <Link to={path} className={path === location.pathname ? styles.selected : ""} onClick={() => setMenu()}>
           {name}
         </Link>
       </li>

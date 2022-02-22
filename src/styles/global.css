@@ -277,7 +277,7 @@ p, li {
   background-color: #7a7a7a;
 }
 
-button.destructive {
+button.destructive, input.destructive {
   background-color: #f65151;
 }
 
@@ -287,7 +287,7 @@ dd {
   font-weight: 300;
 }
 
-input[type="submit"]:disabled {
+input[type="submit"]:disabled, input[type="button"]:disabled {
   filter: saturate(0) brightness(0.5);
   cursor: not-allowed;
 }
@@ -322,4 +322,13 @@ input[type="submit"] {
 .leaving {
   opacity: 0;
   margin-top: 100px;
+}
+
+.info {
+  border: 1px solid #219cf3;
+  padding: 1rem;
+  border-radius: 5px;
+  background-color: #292a34;
+  color: var(--night-text);
+  font-weight: 300;
 }

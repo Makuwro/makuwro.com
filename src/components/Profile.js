@@ -162,19 +162,21 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
         )}
         <section>
           <h1>
-            {profileInfo ? (profileInfo.displayName || `@${profileInfo.username}`) : `@${username}`}
+            {profileInfo && !profileInfo.isBanned && !profileInfo.isDisabled ? (profileInfo.displayName || `@${profileInfo.username}`) : `@${username}`}
             {!isLiterature && profileInfo && profileInfo.isStaff && (
               <span title="This user is a Makuwro staff member" className={styles["profile-badge"]}>STAFF</span>
             )}
           </h1>
           <h2>
-            {isLiterature ? state.displayName[0] : (profileInfo && profileInfo.displayName ? `@${profileInfo.username}` : null)}
+            {isLiterature ? state.displayName[0] : (profileInfo && !profileInfo.isBanned && !profileInfo.isDisabled && profileInfo.displayName ? `@${profileInfo.username}` : null)}
           </h2>
           {!profileInfo ? (
             <p style={{margin: 0}}>This account doesn't exist. {!currentUser.id ? <Link to="/register">But it doesn't have to be that way ;)</Link> : ""}</p>
           ) : (profileInfo.isBanned ? (
             <p style={{margin: 0}}>This account has been banned for violating the <a href="https://about.makuwro.com/policies/terms">terms of service</a></p>
-          ) : null)}
+          ) : (profileInfo.isDisabled && 
+            <p style={{margin: 0}}>This account is currently disabled. Try again later!</p>
+          ))}
         </section>
         {profileInfo && (
           <section id={styles.actions}>
@@ -190,7 +192,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
           </section>
         )}
       </section>
-      {profileInfo && !profileInfo.isBanned && (
+      {profileInfo && !profileInfo.isBanned && !profileInfo.isDisabled && (
         <section id={styles.container}>
           <nav id={styles.selection}>
             {navChildren}
