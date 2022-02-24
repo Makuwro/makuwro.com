@@ -7,6 +7,7 @@ import ProfileLibraryItem from "./profile/ProfileLibraryItem";
 import ProfileStats from "./profile/ProfileStats";
 import ProfileTerms from "./profile/ProfileTerms";
 import ProfileBlog from "./profile/ProfileBlog";
+import ProfileAbout from "./profile/ProfileAbout";
 
 export default function Profile({shownLocation, setLocation, currentUser, notify, updated}) {
 
@@ -20,10 +21,10 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
   const [searchParams] = useSearchParams();
   const [profileInfo, setProfileInfo] = useState();
   const [ready, setReady] = useState(false);
+  const [styleElem, setStyleElem] = useState();
   const navigate = useNavigate();
   const location = useLocation();
-  let components;
-  let tabComponent;
+  const [tabComponent, setTabComponent] = useState(null);
   let i;
   let navChildren;
   let navItems;
@@ -65,8 +66,8 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
     };
     const element = React.createElement(Link, {
       to: `/${username}${itemLC !== "about" ? (`/${isLiterature ? `literature/${id}/` : ""}${itemLC}`) : ""}`,
-      className: itemLC === tab || (itemLC === "about" && !tab) ? styles.selected : null,
-      onClick: itemLC !== tab && (itemLC !== "about" || !tab) ? onClick : null,
+      className: itemLC === tab || (!tab && itemLC === "about") ? styles.selected : null,
+      onClick: itemLC !== tab && (tab || itemLC !== "about") ? onClick : null,
       onTransitionEnd: (event) => event.stopPropagation(),
       key: itemLC
     }, item);
@@ -77,17 +78,23 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
   }
 
   // Set the current view
-  components = {
-    about: <section>Hello!</section>,
-    art: <ProfileLibraryItem updated={updated} tab="art" profileInfo={profileInfo} currentUser={currentUser} />,
-    literature: <ProfileLibraryItem tab="literature" profileInfo={profileInfo} currentUser={currentUser} />,
-    worlds: <ProfileLibraryItem tab="worlds" profileInfo={profileInfo} currentUser={currentUser} />,
-    stats: <ProfileStats profileInfo={profileInfo} currentUser={currentUser} />,
-    characters: <ProfileLibraryItem tab="characters" profileInfo={profileInfo} currentUser={currentUser} />,
-    terms: <ProfileTerms profileInfo={profileInfo} currentUser={currentUser} />,
-    blog: <ProfileBlog profileInfo={profileInfo} currentUser={currentUser} notify={notify} />
-  };
-  tabComponent = components[tab || "about"];
+  useEffect(() => {
+
+    const components = {
+      about: <ProfileAbout profileInfo={profileInfo} currentUser={currentUser} />,
+      art: <ProfileLibraryItem updated={updated} tab="art" profileInfo={profileInfo} currentUser={currentUser} />,
+      literature: <ProfileLibraryItem tab="literature" profileInfo={profileInfo} currentUser={currentUser} />,
+      worlds: <ProfileLibraryItem tab="worlds" profileInfo={profileInfo} currentUser={currentUser} />,
+      stats: <ProfileStats profileInfo={profileInfo} currentUser={currentUser} />,
+      characters: <ProfileLibraryItem tab="characters" profileInfo={profileInfo} currentUser={currentUser} />,
+      terms: <ProfileTerms profileInfo={profileInfo} currentUser={currentUser} />,
+      blog: <ProfileBlog profileInfo={profileInfo} currentUser={currentUser} notify={notify} />
+    };  
+
+    setTabComponent(components[tab || "about"]);
+
+  }, [tab, profileInfo]);
+  
   action = searchParams.get("action");
   useEffect(() => {
 
@@ -104,7 +111,13 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
     }
 
-  }, [action, location]);
+    if (path1 === path2) {
+
+      setShifting(false);
+
+    }
+
+  }, [action, location, shownLocation]);
 
   useEffect(() => {
 
@@ -129,6 +142,15 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
       const profileInfo = await response.json();
       document.title = `${profileInfo.displayName || profileInfo.username} on Makuwro`;
 
+      if (profileInfo.css) {
+
+        const style = document.createElement("style");
+        style.textContent = profileInfo.css;
+        document.head.appendChild(style);
+        setStyleElem(style);
+
+      }
+
       setProfileInfo(profileInfo);
 
     } else {
@@ -146,6 +168,12 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
       if (leaving) {
 
+        if (styleElem) {
+
+          styleElem.parentNode.removeChild(styleElem);
+          setStyleElem();
+
+        }
         setLocation(location);
 
       }
@@ -153,7 +181,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
     }}>
       <section id={styles["profile-header"]}>
         <section id={styles.profileBannerContainer}>
-          {/*<img src="https://i1.sndcdn.com/visuals-000205406223-miu7o4-t2480x520.jpg" />*/}
+          {profileInfo && profileInfo.bannerPath && <img src={`https://cdn.makuwro.com/${profileInfo.bannerPath}`} />}
         </section>
       </section>
       <section id={styles["profile-info"]}>
@@ -200,7 +228,6 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
           <section className={shifting ? styles.invisible : null} onTransitionEnd={(event) => {
 
             event.stopPropagation();
-            setShifting(false);
             setLocation(location);
 
           }}>

@@ -11,11 +11,6 @@ header {
   box-sizing: border-box;
 }
 
-header:global(.day), main:global(.day) {
-  background-color: white;
-  color: #26272b;
-}
-
 header > section {
   margin: 0;
   display: flex;
@@ -89,10 +84,6 @@ input.no-results {
   border-bottom-right-radius: 5px;
 }
 
-:global(.day) #search-results > li {
-  background-color: #d3d3d3;
-}
-
 #search-results > li {
   background-color: #202021;
   border-radius: 0;
@@ -100,10 +91,6 @@ input.no-results {
 
 #search-results > li:hover {
   color: white;
-}
-
-:global(.day) #search-results > li:hover {
-  color: black;
 }
 
 #search-results > li > a {

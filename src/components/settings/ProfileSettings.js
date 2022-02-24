@@ -1,12 +1,17 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "../../styles/Settings.module.css";
 import Checkbox from "../input/Checkbox";
+import Dropdown from "../input/Dropdown";
 import SettingsDropdown from "./SettingsDropdown";
+import Editor from "@monaco-editor/react";
 
-export default function ProfileSettings({currentUser, setCurrentUser, menu, setMenu, submitting, setSubmitting}) {
+export default function ProfileSettings({currentUser, menu, setMenu, submitting, updateAccount}) {
 
-  document.title = "Profile settings / Makuwro";
+  const [terms, setTerms] = useState(currentUser.terms || "");
+  const [css, setCSS] = useState(currentUser.css || "");
+  const [about, setAbout] = useState(currentUser.about || "");
+  const bannerImage = useRef();
 
   function toggleMenu(index) {
 
@@ -22,35 +27,76 @@ export default function ProfileSettings({currentUser, setCurrentUser, menu, setM
 
   }
 
+  function resetFields() {
+
+    setTerms(currentUser.terms || "");
+    setCSS(currentUser.css || "");
+
+  }
+
+  async function updateAccountWrapper(event, key, value) {
+
+    return await updateAccount(event, key, value, resetFields);
+
+  }
+
+  document.title = "Profile settings / Makuwro";
+
   return (
     <>
       <section id={styles.options}>
         <SettingsDropdown
-          title="Cover image"
+          title="Banner image"
           description="This image will be shown at the top of your profile."
           open={menu === 1}
           onClick={() => toggleMenu(1)}
         >
-          <button>Change cover image</button>
+          <form>
+            <input type="file" ref={bannerImage} accept="image/*" style={{display: "none"}} onChange={(event) => {
+              
+              updateAccountWrapper(event, "banner", event.target.files[0]);
+            
+            }} />
+            <input type="button" value="Change banner image" disabled={submitting} onClick={() => bannerImage.current.click()} />
+          </form>
         </SettingsDropdown>
         <SettingsDropdown
           title="Badges"
-          description="We might give you some cool badges you can hang up on your profile. You can manage these badges here."
+          description="We might give you some cool badges you can hang up on your profile. You can choose which badge you want to show here."
           open={menu === 2}
           onClick={() => toggleMenu(2)}
         >
-          {currentUser.isStaff && (
-            <Checkbox>Show STAFF badge</Checkbox>
-          )}
-          <Checkbox>Show ALPHA badge</Checkbox>
-          <button>Manage badges</button>
+          <form>
+            <label>Shown badge</label>
+            <Dropdown>
+
+            </Dropdown>
+            <input type="submit" value="Save" />
+          </form>
         </SettingsDropdown>
         <SettingsDropdown
-          title="Pages"
-          description="View and manage your profile pages."
+          title="About"
+          description="Manage the about section of your profile."
           open={menu === 3}
           onClick={() => toggleMenu(3)}
         >
+          <form onSubmit={(event) => updateAccountWrapper(event, "about", about)}>
+            <Editor
+              height="150px"
+              defaultLanguage="html"
+              theme="vs-dark"
+              defaultValue={about}
+              onChange={(value) => setAbout(value)}
+              options={{
+                minimap: {
+                  enabled: false
+                },
+                contextmenu: false,
+                tabSize: 2
+              }}
+            />
+            <input type="submit" value="Save" disabled={submitting} />
+          </form>
         </SettingsDropdown>
         <SettingsDropdown
           title="Profile CSS"
@@ -58,6 +104,25 @@ export default function ProfileSettings({currentUser, setCurrentUser, menu, setM
           open={menu === 4}
           onClick={() => toggleMenu(4)}
         >
+          <p>Need to find class and ID names? Use inspect element (F12 or CTRL+SHIFT+I) and check out our <a href="https://help.makuwro.com/dev/css-reference">CSS reference guide</a>!</p>
+          <p className="info">If you hide the report and block buttons, you must provide an alternative.</p>
+          <form onSubmit={(event) => updateAccountWrapper(event, "css", css)}>
+            <Editor
+              height="150px"
+              defaultLanguage="css"
+              theme="vs-dark"
+              defaultValue={css}
+              onChange={(value) => setCSS(value)}
+              options={{
+                minimap: {
+                  enabled: false
+                },
+                contextmenu: false,
+                tabSize: 2
+              }}
+            />
+            <input type="submit" value="Save" disabled={submitting} />
+          </form>
         </SettingsDropdown>
         <SettingsDropdown
           title="Terms"
@@ -66,7 +131,10 @@ export default function ProfileSettings({currentUser, setCurrentUser, menu, setM
           onClick={() => toggleMenu(5)}
         >
           <p>This will be shown on <Link to={`/${currentUser.username}/terms`}>your profile</Link>.</p>
-          <textarea placeholder="All rights reserved. Do not use my work without my explicit permission." />
+          <form onSubmit={(event) => updateAccountWrapper(event, "terms", terms)}>
+            <textarea placeholder="All rights reserved. Do not use my work without my explicit permission." value={terms} onInput={(event) => setTerms(event.target.value)} />
+            <input type="submit" value="Save" disabled={submitting} />
+          </form>
         </SettingsDropdown>
       </section>
     </>

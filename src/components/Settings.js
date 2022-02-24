@@ -14,16 +14,113 @@ export default function Settings({currentUser, setLocation, setCurrentUser}) {
   const [ready, setReady] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const tabs = {
-    "account": <AccountSettings currentUser={currentUser} setCurrentUser={setCurrentUser} menu={menu} setMenu={setMenu} submitting={submitting} setSubmitting={setSubmitting} />,
-    "profile": <ProfileSettings currentUser={currentUser} setCurrentUser={setCurrentUser} menu={menu} setMenu={setMenu} submitting={submitting} setSubmitting={setSubmitting} />,
-    "appearance": <AppearanceSettings currentUser={currentUser} />,
-    "privacy": <PrivacySettings currentUser={currentUser} />
+    "account": <AccountSettings 
+      currentUser={currentUser} 
+      menu={menu} 
+      setMenu={setMenu} 
+      submitting={submitting}
+      updateAccount={updateAccount} />,
+    "profile": <ProfileSettings 
+      currentUser={currentUser} 
+      setCurrentUser={setCurrentUser} 
+      menu={menu} 
+      setMenu={setMenu} 
+      submitting={submitting}
+      updateAccount={updateAccount} />,
+    "appearance": <AppearanceSettings 
+      currentUser={currentUser} />,
+    "privacy": <PrivacySettings 
+      currentUser={currentUser} />
   };
   const {tab} = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const menuOptions = ["Account", "Profile", "Appearance", "Privacy"];
   let i;
+
+  async function updateAccount(event, key, value, resetFields, password, passwordAgain) {
+
+    // Don't refresh the page, please.
+    event.preventDefault();
+
+    if (key === "newPassword" && passwordAgain !== value) {
+
+      return alert("Your password doesn't match!");
+
+    }
+
+
+    if (!submitting && value !== currentUser[key]) {
+
+      // Prevent multiple requests while we do this.
+      setSubmitting(true);
+        
+      try {
+
+        // Turn it into a FormData object.
+        const formData = new FormData();
+        formData.append(key, value);
+        if (key === "newPassword" || key === "email" || key === "isDisabled") {
+
+          formData.append("password", password);
+
+        }
+
+        // Send the request to change the value.
+        const response = await fetch(`${process.env.RAZZLE_API_DEV}accounts/user`, {
+          method: "PATCH",
+          headers: {
+            token: currentUser.token
+          },
+          body: formData
+        });
+
+        if (response.ok) {
+
+          // Save the new username to the state.
+          if (key !== "newPassword") {
+
+            setCurrentUser({...currentUser, [key + (key === "avatar" || key === "banner" ? "Url" : "")]: key === "avatar" || key === "banner" ? URL.createObjectURL(value) : value});
+
+          }
+          
+          if (key !== "isDsiabled") {
+
+            alert("Saved!");
+
+          }
+
+          // Reset the field.
+          resetFields();
+
+          // Close the menu.
+          setMenu();
+
+          // We can submit requests again!
+          setSubmitting(false);
+
+          return true;
+
+        } else {
+
+          const {message} = await response.json();
+
+          alert(message);
+          
+        }
+
+      } catch (err) {
+
+        alert(err.message);
+
+      }
+
+      // We can submit requests again!
+      setSubmitting(false);
+
+    }
+
+  }
 
   useEffect(() => {
 

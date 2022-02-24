@@ -10,11 +10,6 @@
   cursor: not-allowed;
 }
 
-:global(.day) .list > section {
-  background-color: #d3d3d3;
-  color: #474748;
-}
-
 .list > section {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
@@ -58,11 +53,6 @@
   display: none;
 }
 
-:global(.day) .list li {
-  background-color: #d3d3d3;
-  color: #474748;
-}
-
 .list li {
   padding: 10.6px;
   width: 100%;
@@ -103,11 +93,6 @@
 .list.above > ul > li:last-of-type {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-}
-
-:global(.day) li.selected {
-  background-color: #b6b6b6;
-  color: black;
 }
 
 li.selected {

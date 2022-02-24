@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "../../styles/Settings.module.css";
 import SettingsDropdown from "./SettingsDropdown";
 
-export default function AccountSettings({currentUser, setCurrentUser, menu, setMenu, submitting, setSubmitting}) {
+export default function AccountSettings({currentUser, menu, setMenu, submitting, updateAccount}) {
 
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
@@ -13,7 +13,6 @@ export default function AccountSettings({currentUser, setCurrentUser, menu, setM
   const [password, setPassword] = useState("");
   const [passwordAgain, setPasswordAgain] = useState("");
   const avatarImage = useRef();
-  document.title = "Account settings / Makuwro";
   
   function resetFields() {
 
@@ -26,99 +25,14 @@ export default function AccountSettings({currentUser, setCurrentUser, menu, setM
 
   }
 
-  async function updateAccount(event, key, value) {
-
-    // Don't refresh the page, please.
-    event.preventDefault();
-
-    if (key === "password" && passwordAgain !== newPassword) {
-
-      return alert("Your password doesn't match!");
-
-    }
-
-    if (!submitting) {
-
-      // Prevent multiple requests while we do this.
-      setSubmitting(true);
-      
-      // Make sure the username was changed before submitting the request.
-      if (value && value !== currentUser[key]) {
-        
-        try {
-
-          // Turn it into a FormData object.
-          const formData = new FormData();
-          formData.append(key, value);
-          if (key === "newPassword" || key === "email" || key === "isDisabled") {
-
-            formData.append("password", password);
-
-          }
-
-          // Send the request to change the value.
-          const response = await fetch(`${process.env.RAZZLE_API_DEV}accounts/user`, {
-            method: "PATCH",
-            headers: {
-              token: currentUser.token
-            },
-            body: formData
-          });
-
-          if (response.ok) {
-
-            // Save the new username to the state.
-            if (key !== "newPassword") {
-
-              setCurrentUser({...currentUser, [key + (key === "avatar" ? "Url" : "")]: key === "avatar" ? URL.createObjectURL(value) : value});
-
-            } else if (key !== "isDsiabled") {
-
-              alert("Saved!");
-
-            }
-
-            // Reset the field.
-            resetFields();
-
-            // Close the menu.
-            setMenu();
-
-            return true;
-
-          } else {
-
-            const {message} = await response.json();
-
-            alert(message);
-            
-          }
-
-        } catch (err) {
-
-          alert(err.message);
-
-        }
-
-      }
-
-      // We can submit requests again!
-      setSubmitting(false);
-
-    }
-
-  }
-
   async function disableAccount(event) {
 
     event.preventDefault();
 
     if (!submitting && confirm("Are you sure you want to disable your account? You can come back at any time.")) {
 
-      setSubmitting(true);
-
       // Send a request to disable the account
-      if (await updateAccount(event, "isDisabled", true)) {
+      if (await updateAccountWrapper(event, "isDisabled", true)) {
 
         // Delete the token cookie
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -138,9 +52,15 @@ export default function AccountSettings({currentUser, setCurrentUser, menu, setM
     
     if (!submitting && confirm("Woahh there, buddy. Are you sure you want to delete your account? You will have 24 hours to change your mind by signing in before everything goes POOF!")) {
 
-      setSubmitting(true);
+
 
     }
+
+  }
+
+  async function updateAccountWrapper(event, key, value) {
+
+    return await updateAccount(event, key, value, resetFields, password, passwordAgain);
 
   }
 
@@ -159,6 +79,8 @@ export default function AccountSettings({currentUser, setCurrentUser, menu, setM
 
   }
 
+  document.title = "Account settings / Makuwro";
+
   return (
     <>
       <section id={styles.welcome}>
@@ -176,7 +98,7 @@ export default function AccountSettings({currentUser, setCurrentUser, menu, setM
           {currentUser.displayName && (
             <p>Your current display name is <b>{currentUser.displayName}</b>.</p>
           )}
-          <form onSubmit={(event) => updateAccount(event, "displayName", displayName)}>
+          <form onSubmit={(event) => updateAccountWrapper(event, "displayName", displayName)}>
             <label>New display name</label>
             <input type="text" value={displayName} onInput={(event) => setDisplayName(event.target.value)} />
             <input type="submit" value="Save" disabled={submitting} />
@@ -189,7 +111,7 @@ export default function AccountSettings({currentUser, setCurrentUser, menu, setM
           onClick={() => toggleMenu(1)}
         >
           <p>Your current username is <b>{currentUser.username}</b>.</p>
-          <form onSubmit={(event) => updateAccount(event, "username", username)}>
+          <form onSubmit={(event) => updateAccountWrapper(event, "username", username)}>
             <label>New username</label>
             <input type="text" value={username} onInput={(event) => setUsername(event.target.value)} required />
             <label>Password</label>
@@ -207,7 +129,7 @@ export default function AccountSettings({currentUser, setCurrentUser, menu, setM
           <form>
             <input required={true} type="file" accept="image/*" style={{display: "none"}} ref={avatarImage} onChange={(event) => {
               
-              updateAccount(event, "avatar", event.target.files[0]);
+              updateAccountWrapper(event, "avatar", event.target.files[0]);
             
             }} />
             <input style={{marginTop: "1rem"}} type="button" value="Change avatar" onClick={() => avatarImage.current.click()} disabled={submitting} />
@@ -219,7 +141,7 @@ export default function AccountSettings({currentUser, setCurrentUser, menu, setM
           open={menu === 3}
           onClick={() => toggleMenu(3)}
         >
-          <form onSubmit={(event) => updateAccount(event, "newPassword", newPassword)}>
+          <form onSubmit={(event) => updateAccountWrapper(event, "newPassword", newPassword)}>
             <label>Current password</label>
             <input type="password" required value={password} onInput={(event) => setPassword(event.target.value)}  />
             <label>New password</label>
@@ -235,7 +157,7 @@ export default function AccountSettings({currentUser, setCurrentUser, menu, setM
           open={menu === 4} 
           onClick={() => toggleMenu(4)}
         >
-          <form onSubmit={(event) => updateAccount(event, "email", email)}>
+          <form onSubmit={(event) => updateAccountWrapper(event, "email", email)}>
             <label>New email address</label>
             <input type="email" value={email} onInput={(event) => setEmail(event.target.value)} required />
             <label>Password</label>
