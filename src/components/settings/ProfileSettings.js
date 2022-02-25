@@ -92,7 +92,9 @@ export default function ProfileSettings({currentUser, menu, setMenu, submitting,
                   enabled: false
                 },
                 contextmenu: false,
-                tabSize: 2
+                tabSize: 2,
+                wordWrap: true,
+                wrappingStrategy: "advanced"
               }}
             />
             <input type="submit" value="Save" disabled={submitting} />

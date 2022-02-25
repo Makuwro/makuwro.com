@@ -296,5 +296,5 @@ div.monaco-editor, .monaco-editor-background, .monaco-editor .inputarea.ime-inpu
 }
 
 button:active:hover, input[type="submit"]:active:hover, input[type="button"]:active:hover {
-  transform: scale(0.95);
+  transform: scale(0.97);
 }

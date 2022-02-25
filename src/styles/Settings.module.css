@@ -126,12 +126,8 @@ section#welcome {
     margin-top: 10px;
   }
 
-  #left li:active:hover {
-    transform: scale(0.975);
-  }
-
-  #left li button:active:hover {
-    transform: scale(0.975);
+  #left li:active:hover, #left li button:active:hover {
+    transform: scale(0.97);
   }
 
   #left li a, #left li button {

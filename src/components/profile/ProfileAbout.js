@@ -15,7 +15,7 @@ export default function ProfileAbout({profileInfo, currentUser}) {
       if (profileInfo.about) {
 
         // Protect us from bad HTML, please!
-        const sanitizedHtml = sanitize(profileInfo.about);
+        const sanitizedHtml = sanitize(profileInfo.about, {allowedAttributes: false, allowedClasses: false});
 
         // Now convert the HTML into a React component!
         const comp = parse(sanitizedHtml, {
