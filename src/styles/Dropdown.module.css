@@ -16,20 +16,21 @@
   padding: 10.6px;
   background-color: #202021;
   box-sizing: border-box;
-  transition: 0.15s;
+  transition: color 0.3s;
   border: 1px solid #111111;
 }
 
-:global(.light) .list > section {
+:global(.light) .list > section, :global(.light) .list li, :global(.light) .list > ul {
   background-color: var(--light-input-background);
-  border-color: transparent;
+  border-color: #b6b6b6;
+  color: var(--light-text);
 }
 
 .list > section:hover, .list li:hover {
   filter: brightness(1.2);
 }
 
-:global(.light) .list > section:hover {
+:global(.light) .list > section:hover, :global(.light) .list li:hover {
   filter: brightness(0.9);
 }
 
@@ -70,7 +71,7 @@
   box-sizing: border-box;
   list-style: none;
   background-color: #202021;
-  transition: 0.15s;
+  transition: 0.3s;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -106,4 +107,8 @@
 
 li.selected {
   background-color: #121212;
+}
+
+:global(.light) li.selected {
+  background-color: rgb(194, 194, 194);
 }

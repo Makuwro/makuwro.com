@@ -51,6 +51,10 @@
   color: var(--night-text);
 }
 
+:global(.light) #profile-info h2 {
+  color: var(--light-text);
+}
+
 #profile-info > section:nth-of-type(2) {
   margin-left: auto;
 }
@@ -89,6 +93,7 @@
   flex-wrap: wrap;
   box-sizing: border-box;
   font-size: 1rem;
+  height: 40px;
 }
 
 #selection > a {
@@ -96,15 +101,13 @@
   flex: 1 1 0;
   display: flex;
   justify-content: center;
+  height: 100%;
+  box-sizing: border-box;
+  border-color: rgba(0, 0, 0, 0);
 }
 
-#selection > a:hover {
-  border-bottom: 2px solid;
-}
-
-.selected {
-  color: var(--night-link);
-  border-bottom: 2px solid;
+#selection > a:hover, #selection > a.selected {
+  border-bottom: 2px solid var(--night-link);
 }
 
 #profile-container-center > section {

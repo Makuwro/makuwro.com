@@ -85,6 +85,7 @@ export default function App() {
   pathname = location.pathname;
   useEffect(async () => {
 
+    let mounted = true;
     let component = art ? {...creators, "edit-art": ArtCreator}[action] : creators[action];
     let element;
     let groups;
@@ -117,18 +118,14 @@ export default function App() {
 
       try {
 
-        // Get the user info from the server.
-        const headers = token ? {token} : {};
-        const userResponse = await fetch(`${process.env.RAZZLE_API_DEV}accounts/users/${username}`, {headers});
+        const artResponse = await fetch(`${process.env.RAZZLE_API_DEV}contents/art/${username}/${slug}`, {headers: token ? {token} : {}});
+        const art = await artResponse.json();
 
-        if (userResponse.ok) {
-
-          const artResponse = await fetch(`${process.env.RAZZLE_API_DEV}contents/art/${username}/${slug}`, {headers});
-          const art = await artResponse.json();
+        if (mounted) {
 
           if (artResponse.ok) {
 
-            setArt({...art, owner: await userResponse.json()});
+            setArt(art);
 
           } else {
 
@@ -145,12 +142,16 @@ export default function App() {
 
       } catch (err) {
 
-        addNotification({
-          title: "Couldn't get that art",
-          children: err.message
-        });
-        navigate(`/${username}/art`);
-        setLocation(location);
+        if (mounted) {
+
+          addNotification({
+            title: "Couldn't get that art",
+            children: err.message
+          });
+          navigate(`/${username}/art`);
+          setLocation(location);
+
+        }
 
       }
       
@@ -160,59 +161,69 @@ export default function App() {
 
     }
 
-    // Check if we need a popup open
-    if (component) {
+    if (mounted) {
 
-      element = React.createElement(component, {
-        currentUser,
-        art,
-        addNotification,
-        updated: () => {
+      // Check if we need a popup open
+      if (component) {
 
-          setArt();
-          setUpdated(true);
+        element = React.createElement(component, {
+          currentUser,
+          art,
+          addNotification,
+          updated: () => {
 
-        },
-        refreshArt: () => setArt({refresh: true}),
-        setPopupSettings: ({title, warnUnfinished}) => {
+            setArt();
+            setUpdated(true);
 
-          if (title) {
+          },
+          refreshArt: () => setArt({refresh: true}),
+          setPopupSettings: ({title, warnUnfinished}) => {
 
-            setPopupTitle(title);
+            if (title) {
 
+              setPopupTitle(title);
+
+            }
+
+            if (warnUnfinished) {
+
+              setPopupWarnUnfinished(warnUnfinished);
+
+            }
+          
           }
+        });
 
-          if (warnUnfinished) {
+        setPopupChildren(element);
 
-            setPopupWarnUnfinished(warnUnfinished);
+      } else {
 
-          }
-        
-        }
-      });
+        setPopupChildren(null);
 
-      setPopupChildren(element);
+      }
 
-    } else {
+      // Check if we need to sign in
+      if (pathname === "/signin") {
 
-      setPopupChildren(null);
+        setSignInOpen(true);
+
+      } else {
+
+        setSignInOpen(false);
+
+      }
+
+      setUpdated(false);
+      setCurrentUser(currentUser);
+      setReady(true);
 
     }
 
-    // Check if we need to sign in
-    if (pathname === "/signin") {
+    return () => {
+      
+      mounted = false;
 
-      setSignInOpen(true);
-
-    } else {
-
-      setSignInOpen(false);
-
-    }
-
-    setUpdated(false);
-    setCurrentUser(currentUser);
-    setReady(true);
+    };
 
   }, [action, pathname, document.cookie, art]);
 
@@ -269,7 +280,9 @@ export default function App() {
         <Route path={"/signin"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
         <Route path={"/library"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
         <Route path={"/library/:category"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
-        {["/:username", "/:username/:tab/:id", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id/chapters", "/:username/:tab/:id/characters", "/:username/literature/:id/chapters/:chapter"].map((path, index) => {
+        {[
+          "/:username", "/:username/:tab/:id", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id/:subtab"
+        ].map((path, index) => {
           
           return <Route key={index} path={path} element={(
             <Profile updated={updated} shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} notify={addNotification} />
@@ -277,7 +290,11 @@ export default function App() {
 
         })}
         <Route path={"/:username/blog/:slug"} element={<BlogPost shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} addNotification={addNotification} />} />
-        <Route path={"/settings"} element={<Settings currentUser={currentUser} shownLocation={shownLocation} setLocation={setLocation} />} />
+        {["/settings", "/:username/:category/:slug/settings/:tab"].map((path, index) => {
+          
+          return <Route key={index} path={path} element={<Settings currentUser={currentUser} shownLocation={shownLocation} setLocation={setLocation} />} />;
+
+        })}
         <Route path={"/settings/:tab"} element={<Settings currentUser={currentUser} shownLocation={shownLocation} setLocation={setLocation} setCurrentUser={setCurrentUser} />} />
       </Routes>
     </>

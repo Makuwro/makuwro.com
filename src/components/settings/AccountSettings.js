@@ -84,7 +84,7 @@ export default function AccountSettings({currentUser, menu, setMenu, submitting,
   return (
     <>
       <section id={styles.welcome}>
-        <img className={styles.avatar} src={currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`} />
+        <img className="avatar-preview" src={currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`} />
         <h1>Hi, {currentUser.displayName || currentUser.username}!</h1>
         <p>You can manage your account information here.</p>
       </section>
@@ -125,7 +125,7 @@ export default function AccountSettings({currentUser, menu, setMenu, submitting,
           open={menu === 2}
           onClick={() => toggleMenu(2)}
         >
-          <img className={styles.avatar} src={`${currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`}`} />
+          <img className="avatar-preview" src={`${currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`}`} />
           <form>
             <input required={true} type="file" accept="image/*" style={{display: "none"}} ref={avatarImage} onChange={(event) => {
               

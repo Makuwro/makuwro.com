@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 
 const cache = {};
 
-export default function ProfileLibraryItem({tab, profileInfo, currentUser, updated}) {
+export default function ProfileLibraryItem({tab, profileInfo, currentUser, updated, isCharacter}) {
 
   const plural = /s$/g;
   const [items, setItems] = useState(null);
@@ -14,13 +14,13 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
 
   useEffect(async () => {
 
+    let mounted = true;
+
     if (updated) {
 
       cache[profileInfo.username] = {};
       
     } else if (profileInfo.username) {
-
-      setReady(false);
 
       if (!cache[profileInfo.username]) {
 
@@ -38,31 +38,34 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
         const headers = currentUser.token ? {
           token: currentUser.token
         } : {};
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/${tab}/${profileInfo.username}`, {headers});
+        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/${isCharacter ? `characters/${profileInfo.owner.username}/${profileInfo.slug}/${tab}` : `${tab}/${profileInfo.username}`}`, {headers});
 
         // Check if everything's OK.
-        if (response.ok) {
+        if (mounted) {
 
-          // Iterate through the items and turn them into links.
-          const content = await response.json();
-          let i;
-          for (i = 0; content.length > i; i++) {
+          if (response.ok) {
 
-            content[i] = <Link className={styles["profile-library-item"]} key={i} to={`/${profileInfo.username}/${tab}/${content[i].slug}`}>
-              <img src={`https://cdn.makuwro.com/${content[i].imagePath}`} />
-            </Link>;
+            // Iterate through the items and turn them into links.
+            const content = await response.json();
+            for (let i = 0; content.length > i; i++) {
+
+              content[i] = <Link className={styles["profile-library-item"]} key={i} to={`/${profileInfo.username}/${tab}/${content[i].slug}`}>
+                <img src={`https://cdn.makuwro.com/${content[i].imagePath || content[i].avatarPath}`} />
+              </Link>;
+
+            }
+
+            // Push the items to render.
+            if (mounted) setItems(content);
+
+            // Cache the content so we don't spam the API.
+            cache[profileInfo.username][tab] = content;
+
+          } else {
+
+            setItems([]);
 
           }
-
-          // Push the items to render.
-          setItems(content);
-
-          // Cache the content so we don't spam the API.
-          cache[profileInfo.username][tab] = content;
-
-        } else {
-
-          setItems([]);
 
         }
 
@@ -72,7 +75,13 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
 
     }
 
-  }, [tab, profileInfo.username, updated]);
+    return () => {
+
+      mounted = false;
+
+    };
+
+  }, [tab, profileInfo, updated]);
 
   return ready && (
     <section className={`${styles["profile-library"]} ${styles["profile-card"]}`} id={styles["profile-" + tab]}>
@@ -81,7 +90,7 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
           CREATE NEW
         </Link>
       )}
-      {items || (!ownProfile && <p>{profileInfo.username} doesn't have much to share right now, but who knows: they're probably working on the next big thing.</p>)}
+      {items || (!ownProfile && <p>{profileInfo.owner.username} doesn't have much to share right now, but who knows: they're probably working on the next big thing.</p>)}
     </section>
   );
 

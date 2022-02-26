@@ -1,15 +1,10 @@
 #settings {
-  overflow: hidden;
+  display: flex;
   transition: 0.3s;
 }
 
-
 #settings h2:first-of-type, #settings h1:first-of-type {
   margin-top: 0;
-}
-
-#settings > section {
-  height: 100%;
 }
 
 #left, .content {
@@ -18,6 +13,10 @@
 
 .highlighted {
   border: 2px solid white;
+}
+
+:global(.light) .highlighted {
+  border-color: #637ce1;
 }
 
 #viewer {
@@ -39,6 +38,7 @@
   background-color: var(--night-article);
   border-radius: 5px;
   box-shadow: var(--day-box-shadow);
+  transition: 0.3s;
 }
 
 :global(.light) #options > section {
@@ -57,13 +57,14 @@
 .content {
   padding: 1rem;
   border-top: 1px solid var(--night-background);
+  transition: 0.3s;
 }
 
 :global(.light) .content {
   border-color: var(--light-background);
 }
 
-.content > p:first-of-type, .content > form > :first-child, .content textarea {
+.content > :first-child, .content > form > :first-child, .content textarea {
   margin-top: 0;
 }
 
@@ -102,22 +103,11 @@ section#welcome {
   text-align: center;
 }
 
-.avatar {
-  height: 100px;
-  width: 100px;
-  border-radius: 100%;
-  display: block;
-}
-
 #options > .destructive {
   background-color: #544141;
 }
 
 @media screen and (min-width: 1024px) {
-
-  #settings > section {
-    display: flex;
-  }
 
   #left {
     display: block;

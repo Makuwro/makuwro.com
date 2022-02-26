@@ -16,7 +16,20 @@ export default function ProfileAbout({profileInfo}) {
       if (profileInfo.about) {
 
         // Protect us from bad HTML, please!
-        const sanitizedHtml = sanitize(profileInfo.about, {allowedAttributes: false, allowedClasses: false});
+        const sanitizedHtml = sanitize(profileInfo.about, {
+          allowedAttributes: false, 
+          allowedClasses: false,
+          allowedTags: [
+            "address", "article", "aside", "footer", "header", "h1", "h2", "h3", "h4",
+            "h5", "h6", "hgroup", "main", "nav", "section", "blockquote", "dd", "div",
+            "dl", "dt", "figcaption", "figure", "hr", "li", "main", "ol", "p", "pre",
+            "ul", "a", "abbr", "b", "bdi", "bdo", "br", "cite", "code", "data", "dfn",
+            "em", "i", "kbd", "mark", "q", "rb", "rp", "rt", "rtc", "ruby", "s", "samp",
+            "small", "span", "strong", "sub", "sup", "time", "u", "var", "wbr", "caption",
+            "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr",
+            "audio", "source", "video"
+          ]
+        });
 
         // Now convert the HTML into a React component!
         const comp = parse(sanitizedHtml, {
@@ -50,9 +63,7 @@ export default function ProfileAbout({profileInfo}) {
 
   return ready ? (
     comp || (
-      <section>
-        We don't know a lot about {profileInfo.username}, but I'm sure they're really cool.
-      </section>
+      <p>We don't know a lot about {profileInfo.username || profileInfo.name}, but I'm sure they're really cool.</p>
     )
   ) : null;
 

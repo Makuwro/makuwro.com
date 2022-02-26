@@ -11,6 +11,11 @@ section.tagInput {
   padding: 0;
 }
 
+:global(.light) section.tagInput {
+  background-color: var(--light-input-background);
+  border-color: #b6b6b6;
+}
+
 .open > section.tagInput {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
@@ -39,6 +44,10 @@ section.tagInput:hover {
   cursor: pointer;
   gap: 0.5rem;
   box-sizing: border-box;
+}
+
+:global(.light) .tagInput span {
+  background-color: var(--light-article);
 }
 
 .tagInput span > img {

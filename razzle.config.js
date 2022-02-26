@@ -19,7 +19,7 @@ module.exports = {
             value.options.modules = {
               
               ...value.options.modules,
-              localIdentName: "[name]__[local]"
+              localIdentName: "[name]-[local]"
             
             };
 

@@ -4,7 +4,7 @@ import styles from "../../styles/TagInput.module.css";
 import ddStyles from "../../styles/Dropdown.module.css";
 
 const userCache = {};
-export default function UserInput({children, onChange, currentUser, notify}) {
+export default function UserInput({children, onChange, currentUser}) {
 
   const [phrase, setPhrase] = useState("");
   const [selectedUser, setSelectedUser] = useState();
@@ -69,18 +69,12 @@ export default function UserInput({children, onChange, currentUser, notify}) {
                   // Check if the user already exists
                   if (users.find((user2) => user2.id === user.id)) {
     
-                    notify({
-                      title: "You already added that user!",
-                      children: ""
-                    });
+                    alert("You already added that user!");
                     return users;
     
                   } else if (user.id === currentUser.id) {
     
-                    notify({
-                      title: "You can't add yourself",
-                      children: "We do that for you ♥"
-                    });
+                    alert("You can't add yourself");
                     return users;
     
                   }

@@ -6,7 +6,7 @@ footer {
 
 #footer-copyright {
   border-top: 1px solid #5b5e62;
-  margin-top: 2rem;
+  margin: 2rem 0 0 0;
   padding-top: 2rem;
   color: var(--night-text);
   text-align: center;
@@ -38,10 +38,10 @@ footer {
 
 footer a {
   border-bottom: none;
+  font-weight: 300;
 }
 
 footer a:hover {
-  font-weight: normal;
   transition: 0.3s;
 }
 

@@ -1,38 +1,37 @@
 import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
-import styles from "../../../styles/Library.module.css";
 import Dropdown from "../../input/Dropdown";
 import Checkbox from "../../input/Checkbox";
+import TagInput from "../../input/TagInput";
+import Optional from "../../Optional";
+import UserInput from "../../input/UserInput";
+import { useNavigate } from "react-router-dom";
 
-export default function CharacterCreator({username, setPopupSettings}) {
+export default function CharacterCreator({currentUser, setPopupSettings, character}) {
 
-  const state = {
-    name: useState(""),
-    avatar: useState(),
-    tags: useState(),
-    url: useState()
-  };
-  const ref = {
-    avatar: useRef(),
-    url: useRef()
-  };
-
-  function updateAvatar([file]) {
-
-    // Make sure we have a file
-    if (file) state.avatarURL[1](URL.createObjectURL(file));
-
-  }
-
-  function updateInput({target: {value: value}}, name) {
-
-    //if (name !== "characterURL" || !value || /^(?!\.|-)(\w|[-.])+(?<!\.|-)$/.test(value)) {
-      
-    state[name][1](value);
-
-    //}
-
-  }
+  const [ready, setReady] = useState(false);
+  const [tags, setTags] = useState([]);
+  const [avatar, setAvatar] = useState();
+  const [name, setName] = useState("");
+  const [terms, setTerms] = useState("");
+  const [description, setDescription] = useState("");
+  const [slug, setSlug] = useState("");
+  const [contentWarning, setContentWarning] = useState("");
+  const [folders, setFolders] = useState([]);
+  const [worlds, setWorlds] = useState([]);
+  const [ageRestrictionLevel, setAgeRestrictionLevel] = useState(0);
+  const [collaborators, setCollaborators] = useState([]);
+  const [creatorType, setCreatorType] = useState(0);
+  const [permissions, setPermissions] = useState({
+    view: 0,
+    viewOriginal: 0,
+    viewComments: 0,
+    postComments: 1
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const avatarInput = useRef();
+  const slugRef = useRef();
 
   useEffect(() => {
 
@@ -41,59 +40,136 @@ export default function CharacterCreator({username, setPopupSettings}) {
       warnUnfinished: true
     });
 
+    setReady(true);
+
   }, []);
 
-  return (
-    <form id={styles["upload-character"]}>
+  async function createCharacter(event) {
+
+    event.preventDefault();
+
+    if (!submitting) {
+
+      setSubmitting(true);
+      
+      const slug = slug || name.toLowerCase().replaceAll(name.replaceAll(/[^a-zA-Z0-9_]/gm, "-"));
+
+      try {
+
+        let form;
+        let response;
+
+        // Package the form data.
+        form = new FormData();
+        form.append("name", name);
+        form.append("avatar", avatar);
+        form.append("description", description);
+        form.append("tags", JSON.stringify(tags));
+        form.append("folders", JSON.stringify(folders));
+        form.append("worlds", JSON.stringify(worlds));
+        form.append("permissions", JSON.stringify(permissions));
+        form.append("ageRestrictionLevel", ageRestrictionLevel);
+        form.append("contentWarning", contentWarning);
+        form.append("slug", slug);
+
+        response = await fetch(`${process.env.RAZZLE_API_DEV}contents/characters/${currentUser.username}/${character ? character.slug : slug}`, {
+          headers: {
+            token: currentUser.token
+          },
+          body: form,
+          method: character ? "PATCH" : "POST"
+        });
+
+        if (response.ok) {
+
+          navigate(`/${currentUser.username}/characters/${slug}`);
+
+        } else {
+
+          const {message} = await response.json();
+          throw new Error(message);
+
+        }
+
+      } catch (err) {
+
+        alert(`Couldn't upload your character: ${err.message}`);
+        setSubmitting(false);
+
+      }
+
+    }
+
+  }
+
+  return ready ? (
+    <form onSubmit={createCharacter}>
       <section>
         <h1>Basics</h1>
         <section>
           <label htmlFor="name">Character name</label>
           <p>This name will be the first thing people see on the page.</p>
-          <input type="text" required onChange={(event) => updateInput(event, "name")} value={state.name[0]} />
+          <input type="text" required onInput={(event) => setName(event.target.value)} value={name} />
         </section>
         <section>
-          <input type="file" style={{display: "none"}} ref={ref.avatar} onChange={({target}) => updateAvatar(target.files)} accept="image/*" />
-          <label>Character avatar</label>
+          <input type="file" style={{display: "none"}} ref={avatarInput} onChange={({target}) => setAvatar(target.files[0])} accept="image/*" />
+          <label>Character avatar<Optional /></label>
           <p>This is the image that people see before clicking on your character. You can add more art later.</p>
-          <img src={state.avatar[0]} onClick={() => ref.avatarUrl.current.click()} id={styles.avatar} />
+          {avatar && (
+            <img style={{marginTop: "1rem"}} src={URL.createObjectURL(avatar)} className="avatar-preview" />
+          )}
+          <section style={{marginTop: "1rem"}}>
+            <input type="button" value="Change avatar" onClick={() => avatarInput.current.click()} />
+            <input type="button" className="destructive" value="Remove avatar" style={{marginLeft: "10px"}} onClick={() => setAvatar()} disabled={!avatar} />
+          </section>
         </section>
         <section>
-          <label>Description</label>
+          <label>Description<Optional /></label>
           <p>This description is shown below your character's name on their page.</p>
-          <textarea onChange={(e) => {
-
-            e.preventDefault();
-            //setDescription(e.target.value);
-
-          }}></textarea>
+          <textarea value={description} onInput={(event) => setDescription(event.target.value)}></textarea>
         </section>
         <section>
           <label>Who created this character?</label>
-          <Dropdown index={0}>
+          <Dropdown index={creatorType} onChange={(index) => setCreatorType(index)}>
             <li>I am the sole creator of this character</li>
             <li>I collaborated with another on-site creator</li>
             <li>I collaborated with an off-site creator</li>
           </Dropdown>
         </section>
+        {creatorType === 1 && (
+          <section>
+            <label>Who did you collaborate with?</label>
+            <UserInput currentUser={currentUser} onChange={(collaborators) => setCollaborators(collaborators)}>
+              {collaborators}
+            </UserInput>
+          </section>
+        )}
+        {creatorType === 2 && (
+          <section>
+            <label>Who did you collaborate with?</label>
+            <input tabIndex="0" type="text" required />
+          </section>
+        )}
       </section>
       <section>
         <h1>Organization</h1>
         <section>
-          <label htmlFor="tags">Tags</label>
-          <p>You can use tags to sort your characters and easily find them later.</p>
-          
+          <label htmlFor="tags">Tags<Optional /></label>
+          <p>You can use tags to sort your characters and easily find them later. These will also help people find your characters.</p>
+          <TagInput onChange={(tags) => setTags(tags)}>
+            {tags}
+          </TagInput>
         </section>
         <section>
-          <label>Folders</label>
+          <label>Folders<Optional /></label>
           <p>You can add your character to multiple folders.</p>
           <Dropdown>
 
           </Dropdown>
         </section>
         <section>
-          <label>Worlds</label>
-          <p>You can directly add your character to worlds you manage here. To add your character to a world you don't manage, you have to create this character first, then submit a request to the world admins.</p>
+          <label>Worlds<Optional /></label>
+          <p>You can directly add your character to worlds you manage here. To add your character to a world that you don't manage, you have to create this character first, then submit a request to the world admins.</p>
           <Dropdown>
 
           </Dropdown>
@@ -107,16 +183,16 @@ export default function CharacterCreator({username, setPopupSettings}) {
           <section className="input-with-prefix">
             <span onClick={() => {
 
-              ref.characterURL.current.focus();
-              ref.characterURL.current.setSelectionRange(0, 0);
+              slugRef.current.focus();
+              slugRef.current.setSelectionRange(0, 0);
 
-            }}>{`makuwro.com/${username}/characters/`}</span>
-            <input type="text" name="url" ref={ref.url} onChange={(event) => updateInput(event, "characterURL")} value={state.url[0]} placeholder={state.name[0].replaceAll(" ", "-")}/>
+            }}>{`makuwro.com/${currentUser.username}/characters/`}</span>
+            <input type="text" name="url" ref={slugRef} onChange={(event) => setSlug(event.target.value)} value={slug} placeholder={name.replaceAll(/[^a-zA-Z0-9_]/gm, "-")}/>
           </section>
         </section>
         <section>
           <label>Who can view this character?</label>
-          <Dropdown index={0}>
+          <Dropdown tabIndex="0" index={permissions.view} onChange={(permission) => setPermissions((permissions) => ({...permissions, view: permission}))}>
             <li>Everyone, including visitors who aren't logged in</li>
             <li>Registered Makuwro users</li>
             <li>My followers</li>
@@ -126,7 +202,7 @@ export default function CharacterCreator({username, setPopupSettings}) {
         </section>
         <section>
           <label>Who can comment on this character?</label>
-          <Dropdown index={0}>
+          <Dropdown tabIndex="0" index={permissions.postComments - 1} onChange={(permission) => setPermissions((permissions) => ({...permissions, postComments: permission + 1}))}>
             <li>Registered Makuwro users</li>
             <li>My followers</li>
             <li>My friends</li>
@@ -135,7 +211,7 @@ export default function CharacterCreator({username, setPopupSettings}) {
         </section>
         <section>
           <label>Who can view comments on this character?</label>
-          <Dropdown index={0}>
+          <Dropdown tabIndex="0" index={permissions.viewComments} onChange={(permission) => setPermissions((permissions) => ({...permissions, viewComments: permission}))}>
             <li>Everyone, including visitors who aren't logged in</li>
             <li>Registered Makuwro users</li>
             <li>My followers</li>
@@ -144,31 +220,27 @@ export default function CharacterCreator({username, setPopupSettings}) {
           </Dropdown>
         </section>
         <section>
-          <label>Character transferability</label>
-          <Checkbox>
-            This character is tradable
-          </Checkbox>
-          <Checkbox>
-            This character is sellable
-          </Checkbox>
-          <Checkbox>
-            This character is giftable
-          </Checkbox>
+          <label>Character terms of use<Optional /></label>
+          <p>This will be shown on your character's page. Your <a target="_blank" href={`/${currentUser.username}/terms`} rel="noreferrer">global terms of use</a> will be shown below this.</p>
+          <textarea placeholder="All rights reserved. Do not use this character without my approval." value={terms} onInput={(event) => setTerms(event.target.value)}>
+
+          </textarea>
         </section>
         <section>
-          <label>Character terms of use</label>
-          <p>This will be shown on your character's page. Your <a target="_blank" href={`/${username}/terms`} rel="noreferrer">global terms of use</a> will be shown below this.</p>
-          <textarea placeholder="All rights reserved. Do not use this character without my approval.">
+          <label>Content warning<Optional /></label>
+          <p>This text will be shown to viewers before they view this character's profile. Content attached to this character <b>will not</b> inherit this content warning.</p>
+          <textarea value={contentWarning} onInput={(event) => setContentWarning(event.target.value)}>
 
           </textarea>
         </section>
       </section>
-      <input type="submit" value="Create character" />
+      <input type="submit" value="Create character" disabled={submitting} />
     </form>
-  );
+  ) : null;
 
 }
 
 CharacterCreator.propTypes = {
-  username: PropTypes.string
+  currentUser: PropTypes.object,
+  setPopupSettings: PropTypes.func
 };

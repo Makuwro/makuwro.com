@@ -9,6 +9,7 @@ header {
   background-color: #26272b;
   filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.2));
   box-sizing: border-box;
+  transition: 0.3s;
 }
 
 :global(.light) header {
@@ -34,11 +35,7 @@ header > section:first-of-type > section a {
   margin-left: 0.75rem;
 }
 
-:global(.light) #wiki-name {
-  color: white;
-}
-
-#wiki-name:hover {
+:global(.light) #wiki-name, #wiki-name:hover {
   color: white;
 }
 
@@ -59,6 +56,11 @@ header > section:first-of-type > section a {
   caret-color: white;
   border-radius: 5px;
   margin-top: 0;
+  transition: 0.3s;
+}
+
+:global(.light) #search-box > input {
+  caret-color: initial;
 }
 
 #search-box > input:focus-visible {

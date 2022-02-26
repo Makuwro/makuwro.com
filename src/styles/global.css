@@ -12,42 +12,40 @@
   --day-box-shadow: rgba(0, 0, 0, 0.133) 0px 1.6px 3.6px 0px, rgba(0, 0, 0, 0.11) 0px 0.3px 0.9px 0px;
 }
 
-#root {
+html, body, #root {
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
 :focus-visible {
   outline: none;
 }
 
-body, button, input, textarea {
+html, body, button, input, textarea {
   font-family: "Lexend Deca";
 }
 
-html {
-  height: 100%;
-}
-
 body {
-  height: 100%;
   margin: 0;
   line-height: 1.5;
-  overflow: hidden;
   user-select: none;
   background-color: var(--night-background);
   color: white;
+  transition: 0.3s;
 }
 
 body.light {
   background-color: var(--light-background);
-  color: var(--light-text);
+}
+
+a, b, p {
+  transition: 0.3s;
 }
 
 a {
   text-decoration: none;
   color: white;
-  transition: 0.3s;
 }
 
 a:hover, .light a:hover {
@@ -60,7 +58,7 @@ h1, h2, h3, h4, h5, h6 {
   color: white;
 }
 
-.light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
+.light h1, .light h2, .light h3, .light h4, .light h5, .light h6, .light input[type="checkbox"] + label, .light p, .light li, .light dd, .light dt, .light b, .light a, .light .input-with-prefix span, .light textarea, .light form input[type="text"], .light form input[type="password"], .light form input[type="email"], .light .input-with-prefix, .light input[type="checkbox"] + label, .light .optional, body.light {
   color: var(--light-text);
 }
 
@@ -123,8 +121,7 @@ textarea, form input[type="text"], form input[type="password"], form input[type=
 
 .light textarea, .light form input[type="text"], .light form input[type="password"], .light form input[type="email"], .light .input-with-prefix {
   background-color: var(--light-input-background);
-  border-color: transparent;
-  color: var(--light-text);
+  border-color: #b6b6b6;
 }
 
 textarea {
@@ -223,10 +220,6 @@ p, li, dd, .info {
   color: var(--night-text);
 }
 
-.light p, .light li, .light dd, .light dt, .light b, .light a {
-  color: var(--light-text);
-}
-
 ::-webkit-scrollbar {
   width: 20px;
 }
@@ -256,6 +249,10 @@ dd {
 input[type="submit"]:disabled, input[type="button"]:disabled {
   filter: saturate(0) brightness(0.5);
   cursor: not-allowed;
+}
+
+.light input[type="submit"]:disabled, .light input[type="button"]:disabled {
+  filter: saturate(0) brightness(1.25);
 }
 
 input[type="checkbox"] + label {
@@ -314,4 +311,17 @@ div.monaco-editor, .monaco-editor-background, .monaco-editor .inputarea.ime-inpu
 
 button:active:hover, input[type="submit"]:active:hover, input[type="button"]:active:hover {
   transform: scale(0.97);
+}
+
+.avatar-preview {
+  height: 100px;
+  width: 100px;
+  border-radius: 100%;
+  display: block;
+}
+
+.optional {
+  font-weight: 300;
+  color: var(--night-text);
+  margin-left: 7px;
 }

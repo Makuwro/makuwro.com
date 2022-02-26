@@ -4,7 +4,6 @@ import Checkbox from "../input/Checkbox";
 import Dropdown from "../input/Dropdown";
 import SettingsDropdown from "./SettingsDropdown";
 import PropTypes from "prop-types";
-const themeRegex = /(^|;)\s*theme\s*=\s*([^;]+)/gm;
 
 export default function AppearanceSettings({currentUser, menu, toggleMenu}) {
 
@@ -18,6 +17,15 @@ export default function AppearanceSettings({currentUser, menu, toggleMenu}) {
     if (themeCookie && theme !== themeCookie) {
       
       setTheme(themeCookie);
+      if (themeCookie !== "0") {
+
+        document.body.classList.add("light");
+  
+      } else {
+  
+        document.body.classList.remove("light");
+  
+      }
 
     }
 

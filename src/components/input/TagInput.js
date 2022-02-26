@@ -10,12 +10,6 @@ export default function TagInput({children, onChange}) {
 
   useEffect(() => {
 
-    inputRef.current.focus();
-
-  }, [phrase]);
-
-  useEffect(() => {
-
     setChildrenComponents(React.Children.map(children, (child) => {
 
       return <span onClick={() => {
@@ -35,6 +29,7 @@ export default function TagInput({children, onChange}) {
     // Check if it was a tab or an enter
     if ((event.keyCode === 9 || event.keyCode === 13) && phrase) {
 
+      event.preventDefault();
       onChange(tags => {
 
         // Check if the tag already exists
@@ -74,7 +69,7 @@ export default function TagInput({children, onChange}) {
         onKeyDown={checkSelection} 
         value={phrase} 
         ref={inputRef}
-        className={!children[0] ? styles.none : ""}
+        className={!children || !children[0] ? styles.none : ""}
         onInput={(event) => setPhrase(event.target.value)} 
       />
     </section>

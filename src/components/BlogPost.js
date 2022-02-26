@@ -584,7 +584,7 @@ export default function BlogPost({currentUser, addNotification, shownLocation, s
                 <span>Christian Toney</span>
               </Link>
               <section id={styles.actions}>
-                {currentUser && currentUser.id === post.owner ? (
+                {currentUser && currentUser.id === post.owner.id ? (
                   <>
                     <button onClick={async () => editing ? await save() : navigate("?mode=edit")}>{editing ? "Save" : "Edit"}</button>
                     <button className={post.published ? "destructive" : styles.unpublished}>Publish</button>

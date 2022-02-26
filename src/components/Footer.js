@@ -36,7 +36,7 @@ export default function Footer() {
           <h1>Resources</h1>
           <ul>
             <li><a href="https://help.makuwro.com">Help center</a></li>
-            <li><a href="https://help.makuwro.com/policies/terms">Terms</a></li>
+            <li><a href="https://help.makuwro.com/policies/terms">Terms of service</a></li>
             <li><a href="https://help.makuwro.com/policies/community-guidelines">Community guidelines</a></li>
             <li><a href="https://help.makuwro.com/policies/privacy">Privacy</a></li>
             <li><a href="https://help.makuwro.com/contact">Contact us</a></li>
@@ -51,9 +51,9 @@ export default function Footer() {
           </ul>
         </section>
       </section>
-      <section id={styles["footer-copyright"]}>
+      <p id={styles["footer-copyright"]}>
         © 2022 Makuwro, LLC
-      </section>
+      </p>
     </footer>
   );
 

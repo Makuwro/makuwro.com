@@ -6,11 +6,11 @@ import Dropdown from "../input/Dropdown";
 import SettingsDropdown from "./SettingsDropdown";
 import Editor from "@monaco-editor/react";
 
-export default function ProfileSettings({currentUser, menu, toggleMenu, submitting, updateAccount}) {
+export default function ProfileSettings({currentUser, menu, toggleMenu, submitting, updateAccount, character}) {
 
-  const [terms, setTerms] = useState(currentUser.terms || "");
-  const [css, setCSS] = useState(currentUser.css || "");
-  const [about, setAbout] = useState(currentUser.about || "");
+  const [terms, setTerms] = useState((character ? (character.terms) : currentUser.terms) || "");
+  const [css, setCSS] = useState((character ? character.css : currentUser.css) || "");
+  const [about, setAbout] = useState((character ? character.about : currentUser.about) || "");
   const bannerImage = useRef();
 
   function resetFields() {
@@ -46,20 +46,22 @@ export default function ProfileSettings({currentUser, menu, toggleMenu, submitti
             <input type="button" value="Change banner image" disabled={submitting} onClick={() => bannerImage.current.click()} />
           </form>
         </SettingsDropdown>
-        <SettingsDropdown
-          title="Badges"
-          description="We might give you some cool badges you can hang up on your profile. You can choose which badge you want to show here."
-          open={menu === 2}
-          onClick={() => toggleMenu(2)}
-        >
-          <form>
-            <label>Shown badge</label>
-            <Dropdown>
+        {!character && (
+          <SettingsDropdown
+            title="Badges"
+            description="We might give you some cool badges you can hang up on your profile. You can choose which badge you want to show here."
+            open={menu === 2}
+            onClick={() => toggleMenu(2)}
+          >
+            <form>
+              <label>Shown badge</label>
+              <Dropdown>
 
-            </Dropdown>
-            <input type="submit" value="Save" />
-          </form>
-        </SettingsDropdown>
+              </Dropdown>
+              <input type="submit" value="Save" />
+            </form>
+          </SettingsDropdown>
+        )}
         <SettingsDropdown
           title="About"
           description="Manage the about section of your profile."
@@ -93,6 +95,7 @@ export default function ProfileSettings({currentUser, menu, toggleMenu, submitti
           onClick={() => toggleMenu(4)}
         >
           <p>Need to find class and ID names? Use inspect element by pressing F12 or CTRL+SHIFT+I! There isn't a really easy way to do this on mobile, but I won't stop you.</p>
+          {character && <p>Your profile CSS already applies to this character.</p>}
           <p className="info">If you hide the report and block buttons, you must provide an alternative.</p>
           <form onSubmit={(event) => updateAccountWrapper(event, "css", css)}>
             <Editor

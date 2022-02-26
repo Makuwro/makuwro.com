@@ -63,7 +63,7 @@
 }
 
 .content {
-  overflow: auto;
+  overflow-y: auto;
   transition: 0.3s;
   height: 17.5rem;
 }
