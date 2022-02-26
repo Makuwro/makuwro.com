@@ -30,13 +30,8 @@ const creators = {
 };
 
 export default function App() {
-
-  const [searchParams] = useSearchParams();
-  const value = `; ${document.cookie}`;
-  const themeParts = value.split("; theme=");
   
   // States
-  const [theme, setTheme] = useState((themeParts.length === 2 && themeParts.pop().split(";")[0]) || 1);
   const [systemDark, setSystemDark] = useState(window.matchMedia("(prefers-color-scheme: dark)").matches);
   const [popupChildren, setPopupChildren] = useState(null);
   const [popupTitle, setPopupTitle] = useState();
@@ -45,12 +40,13 @@ export default function App() {
   const [updated, setUpdated] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
   const [shownLocation, setLocation] = useState(location);
   const [notifications, setNotifications] = useState([]);
   const [ready, setReady] = useState(false);
   const [contentWarning, setContentWarning] = useState(null);
+  const [searchParams] = useSearchParams();
   let [currentUser, setCurrentUser] = useState({});
+  const navigate = useNavigate();
   let matchedPath;
   let action;
   let pathname;
@@ -221,6 +217,20 @@ export default function App() {
   }, [action, pathname, document.cookie, art]);
 
   // Listen for theme changes
+  useEffect(() => {
+
+    const themeCookie = document.cookie.match("(^|;)\\s*theme\\s*=\\s*([^;]+)")?.pop() || null;
+    if (themeCookie && themeCookie !== "0") {
+
+      document.body.classList.add("light");
+
+    } else {
+
+      document.body.classList.remove("light");
+
+    }
+
+  }, [document.cookie]);
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => setSystemDark(event.matches));
 
   return ready ? (
@@ -249,16 +259,16 @@ export default function App() {
 
         }} 
       />
-      <Header notify={addNotification} currentUser={currentUser} theme={theme} systemDark={systemDark} setLocation={setLocation} />
+      <Header notify={addNotification} currentUser={currentUser} systemDark={systemDark} setLocation={setLocation} />
       <section id="live-notifications">
         {notifications}
       </section>
       <Routes location={shownLocation}>
-        <Route path={"/"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
-        <Route path={"/register"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
-        <Route path={"/signin"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
-        <Route path={"/library"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
-        <Route path={"/library/:category"} element={<Home theme={theme} shownLocation={shownLocation} setLocation={setLocation} />} />
+        <Route path={"/"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
+        <Route path={"/register"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
+        <Route path={"/signin"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
+        <Route path={"/library"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
+        <Route path={"/library/:category"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
         {["/:username", "/:username/:tab/:id", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id/chapters", "/:username/:tab/:id/characters", "/:username/literature/:id/chapters/:chapter"].map((path, index) => {
           
           return <Route key={index} path={path} element={(
@@ -266,7 +276,7 @@ export default function App() {
           )} />;
 
         })}
-        <Route path={"/:username/blog/:slug"} element={<BlogPost theme={theme} shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} addNotification={addNotification} />} />
+        <Route path={"/:username/blog/:slug"} element={<BlogPost shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} addNotification={addNotification} />} />
         <Route path={"/settings"} element={<Settings currentUser={currentUser} shownLocation={shownLocation} setLocation={setLocation} />} />
         <Route path={"/settings/:tab"} element={<Settings currentUser={currentUser} shownLocation={shownLocation} setLocation={setLocation} setCurrentUser={setCurrentUser} />} />
       </Routes>

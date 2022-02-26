@@ -33,6 +33,8 @@ export default function BlogPost({currentUser, addNotification, shownLocation, s
 
     }
 
+    console.log(post);
+
   }, [post]);
 
   useEffect(() => {

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import styles from "../../styles/Profile.module.css";
-import BlogPost from "../BlogPost";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+import BlogPreview from "../BlogPreview";
 
 export default function ProfileBlog({currentUser, profileInfo, notify}) {
 
@@ -56,6 +56,31 @@ export default function ProfileBlog({currentUser, profileInfo, notify}) {
     }
 
   }
+
+  // Get the blog posts from this user
+  useEffect(async () => {
+
+    try {
+
+      const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/blog/${profileInfo.username}`, {
+        headers: currentUser.token ? {
+          token: currentUser.token
+        } : {}
+      });
+
+      if (response.ok) {
+
+        console.log(await response.json());
+
+      }
+
+    } catch (err) {
+
+      alert(`Couldn't get blog posts: ${err.message}`);
+
+    }
+
+  }, [profileInfo]);
 
   return (
     <section className={styles["profile-card"]} id={styles.blog}>

@@ -38,12 +38,10 @@ footer {
 
 footer a {
   border-bottom: none;
-  color: white;
 }
 
 footer a:hover {
   font-weight: normal;
-  color: #c3d8ff;
   transition: 0.3s;
 }
 

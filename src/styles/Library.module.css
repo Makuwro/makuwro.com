@@ -1,7 +1,3 @@
-#library-creator {
-  overflow-y: auto;
-}
-
 #fileSelectBackground {
   background-color: var(--night-input-background);
   border-radius: 5px;
@@ -28,34 +24,6 @@
 #fileSelectBackground img {
   margin-bottom: 1rem;
   max-height: 200px;
-}
-
-#upload-character > section:first-of-type > section:first-of-type, #create-literature > section:first-of-type > section:first-of-type {
-  display: flex;
-  float: right;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem 0;
-}
-
-label[for="name"] + p + input {
-  width: calc(100% - 13rem);
-}
-
-label + button + button {
-  background: transparent;
-}
-
-#library-creator > form > section:first-of-type > section:nth-of-type(2), #library-creator > form > section > h1:first-of-type, #library-creator > form > section > section:first-of-type, #library-creator > form > section > label:first-of-type {
-  margin-top: 0;
-}
-
-#library-creator > form > section > label, #library-creator > form > section > section {
-  margin-top: 1.5rem;
-}
-
-#library-creator > form input[type="submit"] {
-  margin-top: 2rem;
 }
 
 #avatar, #cover {

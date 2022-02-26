@@ -242,6 +242,9 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 }
 
 Profile.propTypes = {
+  shownLocation: PropTypes.object,
+  notify: PropTypes.func,
+  updated: PropTypes.bool,
   setLocation: PropTypes.func,
   currentUser: PropTypes.object
 };

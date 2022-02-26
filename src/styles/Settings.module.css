@@ -41,6 +41,10 @@
   box-shadow: var(--day-box-shadow);
 }
 
+:global(.light) #options > section {
+  background-color: var(--light-article);
+}
+
 #options > section > section:first-of-type {
   padding: 1rem;
   cursor: pointer;
@@ -53,6 +57,10 @@
 .content {
   padding: 1rem;
   border-top: 1px solid var(--night-background);
+}
+
+:global(.light) .content {
+  border-color: var(--light-background);
 }
 
 .content > p:first-of-type, .content > form > :first-child, .content textarea {
@@ -154,6 +162,10 @@ section#welcome {
 
   #left li a:hover, #left li button:hover, .selected {
     background-color: var(--night-article);
+  }
+
+  :global(.light) #left li a:hover, :global(.light) #left li button:hover, :global(.light) .selected {
+    background-color: var(--light-article);
   }
 
   #viewer {

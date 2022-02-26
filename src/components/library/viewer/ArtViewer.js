@@ -126,8 +126,6 @@ export default function ArtViewer({art, open, currentUser, onClose, notify, artR
 
     if (comments) {
 
-      console.log(comments);
-
       const newComps = [];
       for (let i = comments.length - 1; i >= 0; i--) {
 
@@ -222,100 +220,98 @@ export default function ArtViewer({art, open, currentUser, onClose, notify, artR
 
   }
 
-  return (
+  return ready ? (
     <section id={styles.viewer} className={!open ? styles.closed : null}>
-      {ready && (!art || !art.refresh) && (
-        art ? (
-          <>
-            <section id={styles.content}>
-              <section id={styles["image-background"]} onClick={() => navigate(`/${art.owner.username}/art`)}>
-                <img src={art.imagePath ? `https://cdn.makuwro.com/${art.imagePath}` : "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/YouTube_loading_symbol_3_%28transparent%29.gif/640px-YouTube_loading_symbol_3_%28transparent%29.gif"} onClick={(event) => event.stopPropagation()} />
-              </section>
-              <section id={styles.artist}>
-                <img src={`https://cdn.makuwro.com/${art.owner.avatarPath}`} />
-                <h1>
-                  {art.owner.displayName || `@${art.owner.username}`}
-                </h1>
-                {art.owner.displayName && (
-                  <h2>
-                    @{art.owner.username}
-                  </h2>
-                )}
-                <Link to={`/${art.owner.username}/terms`}>Terms of use</Link>
-                <Link to="?action=report-abuse">Report</Link>
-              </section>
+      {(!art || !art.refresh) && art && (
+        <>
+          <section id={styles.content}>
+            <section id={styles["image-background"]} onClick={() => navigate(`/${art.owner.username}/art`)}>
+              <img src={art.imagePath ? `https://cdn.makuwro.com/${art.imagePath}` : "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/YouTube_loading_symbol_3_%28transparent%29.gif/640px-YouTube_loading_symbol_3_%28transparent%29.gif"} onClick={(event) => event.stopPropagation()} />
             </section>
-            <section id={styles.right}>
-              <section id={styles.details} className={commentsOpen ? styles.closed : null}>
-                <section id={styles.metadata}>
-                  <p>{art.description}</p>
-                  <dl>
-                    {collaborators[0] && (
-                      <>
-                        <dt>Collaborators</dt>
-                        <dd>{collaborators}</dd>
-                      </>
-                    )}
-                    {art.characters && art.characters[0] && (
-                      <>
-                        <dt>Characters</dt>
-                        <dd><Link to="/Christian/characters/Sudobeast">Sudobeast</Link></dd>
-                      </>
-                    )}
-                    {art.folders && art.folders[0] && (
-                      <>
-                        <dt>Folders</dt>
-                        <dd><Link to="/Christian/folders/personas">Personas</Link></dd>
-                      </>
-                    )}
-                    {art.worlds && art.worlds[0] && (
-                      <>
-                        <dt>Folders</dt>
-                        <dd><Link to="/Christian/folders/personas">Personas</Link></dd>
-                      </>
-                    )}
-                    <dt>Uploaded on</dt>
-                    <dd>{formattedDate}</dd>
-                  </dl>
-                </section>
-                <section id={styles.actions}>
-                  <button id={styles.like} className={!commentsEnabled ? styles.disabled : null} onClick={null}>Like</button>
-                  <button id={styles["show-comments"]} className={!commentsEnabled ? styles.disabled : null} onClick={commentsEnabled ? () => toggleComments(true) : null}>{commentsEnabled ? "Comments" : "Comments disabled"}</button>
-                  {currentUser.id === art.owner.id && (
+            <section id={styles.artist}>
+              <img src={`https://cdn.makuwro.com/${art.owner.avatarPath}`} />
+              <h1>
+                {art.owner.displayName || `@${art.owner.username}`}
+              </h1>
+              {art.owner.displayName && (
+                <h2>
+                  @{art.owner.username}
+                </h2>
+              )}
+              <Link to={`/${art.owner.username}/terms`}>Terms of use</Link>
+              <Link to="?action=report-abuse">Report</Link>
+            </section>
+          </section>
+          <section id={styles.right}>
+            <section id={styles.details} className={commentsOpen ? styles.closed : null}>
+              <section id={styles.metadata}>
+                <p>{art.description}</p>
+                <dl>
+                  {collaborators[0] && (
                     <>
-                      <button onClick={() => navigate("?action=edit-art")}>Edit</button>
-                      <button className="destructive" onClick={deleteArt}>Delete</button>
+                      <dt>Collaborators</dt>
+                      <dd>{collaborators}</dd>
                     </>
                   )}
-                </section>
+                  {art.characters && art.characters[0] && (
+                    <>
+                      <dt>Characters</dt>
+                      <dd><Link to="/Christian/characters/Sudobeast">Sudobeast</Link></dd>
+                    </>
+                  )}
+                  {art.folders && art.folders[0] && (
+                    <>
+                      <dt>Folders</dt>
+                      <dd><Link to="/Christian/folders/personas">Personas</Link></dd>
+                    </>
+                  )}
+                  {art.worlds && art.worlds[0] && (
+                    <>
+                      <dt>Folders</dt>
+                      <dd><Link to="/Christian/folders/personas">Personas</Link></dd>
+                    </>
+                  )}
+                  <dt>Uploaded on</dt>
+                  <dd>{formattedDate}</dd>
+                </dl>
               </section>
-              <section id={styles["comment-container"]}>
-                {currentUser.id && (
-                  <form id={styles["comment-creator"]} onSubmit={submitComment}>
-                    <img src={`https://cdn.makuwro.com/${currentUser.avatarPath}`} />
-                    <section>
-                      <section id={styles.commentNames}>
-                        {currentUser.displayName && (
-                          <section>{currentUser.displayName}</section>
-                        )}
-                        <section className={styles.username}>@{currentUser.username}</section>
-                      </section>
-                      <textarea placeholder="This is cool!" required value={commentContent} onInput={(event) => setCommentContent(event.target.value)} />
-                      <input type="submit" value="Post" disabled={submitting} />
-                    </section>
-                  </form>
+              <section id={styles.actions}>
+                <button id={styles.like} className={!commentsEnabled ? styles.disabled : null} onClick={null}>Like</button>
+                <button id={styles["show-comments"]} className={!commentsEnabled ? styles.disabled : null} onClick={commentsEnabled ? () => toggleComments(true) : null}>{commentsEnabled ? "Comments" : "Comments disabled"}</button>
+                {currentUser.id === art.owner.id && (
+                  <>
+                    <button onClick={() => navigate("?action=edit-art")}>Edit</button>
+                    <button className="destructive" onClick={deleteArt}>Delete</button>
+                  </>
                 )}
-                <ul id={styles.comments}>
-                  {commentComps}
-                </ul>
-                <button onClick={() => toggleComments(false)}>Close comments</button>
               </section>
             </section>
-          </>
-        ) : null
+            <section id={styles["comment-container"]}>
+              {currentUser.id && (
+                <form id={styles["comment-creator"]} onSubmit={submitComment}>
+                  <img src={`https://cdn.makuwro.com/${currentUser.avatarPath}`} />
+                  <section>
+                    <section id={styles.commentNames}>
+                      {currentUser.displayName && (
+                        <section>{currentUser.displayName}</section>
+                      )}
+                      <section className={styles.username}>@{currentUser.username}</section>
+                    </section>
+                    <textarea placeholder="This is cool!" required value={commentContent} onInput={(event) => setCommentContent(event.target.value)} />
+                    <input type="submit" value="Post" disabled={submitting} />
+                  </section>
+                </form>
+              )}
+              <ul id={styles.comments}>
+                {commentComps}
+              </ul>
+              <button onClick={() => toggleComments(false)}>Close comments</button>
+            </section>
+          </section>
+        </>
       )}
     </section>
-  );
+  ) : null;
 
 }
 

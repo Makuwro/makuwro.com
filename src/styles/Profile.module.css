@@ -1,8 +1,5 @@
 #profile {
   transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  background-color: var(--night-background);
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
 }
 
 #profile-header {
@@ -45,6 +42,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  user-select: text;
 }
 
 #profile-info h2 {
@@ -120,6 +118,10 @@
   padding: 1rem;
 }
 
+:global(.light) .profile-card {
+  background-color: var(--light-article);
+}
+
 #profile-bio h1:first-of-type {
   font-size: 1.2rem;
   margin: 0;
@@ -182,6 +184,7 @@
   cursor: help;
   background: linear-gradient(90deg, rgba(2,0,36,1) 0%, var(--night-button) 0%, #656dbc 100%);
   display: none;
+  user-select: none;
 }
 
 #profile-terms {
@@ -235,6 +238,11 @@
   border-radius: 5px;
   border: 1px solid #111111;
   box-sizing: border-box;
+}
+
+:global(.light) #blog > form {
+  background-color: var(--light-input-background);
+  border-color: transparent;
 }
 
 #blog > form > section {

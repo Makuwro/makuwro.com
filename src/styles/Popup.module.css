@@ -1,6 +1,5 @@
-#popup-background {
+.background {
   position: fixed;
-  background-color: rgba(0, 0, 0, 0);
   height: 100%;
   width: 100%;
   z-index: -1;
@@ -9,46 +8,70 @@
   align-items: center;
   opacity: 0;
   transition: 0.3s;
+  pointer-events: none;
 }
 
-#popup-background.open {
+.background.open {
   background-color: rgba(0, 0, 0, 0.623);
   opacity: 1;
   z-index: 2;
+  pointer-events: initial;
 }
 
-#popup-container {
+.container {
   background-color: var(--night-article);
   border-radius: 5px;
-  color: #fff;
   padding: 0 20px 25px;
   width: 853px;
   transition: 0.3s;
 }
 
-.open > #popup-container {
+.header button {
+  background: none;
+  color: var(--night-text);
+  padding: 0;
+  font-size: 2rem;
+}
+
+.header button:active:focus {
+  transform: scale(0.9);
+}
+
+:global(.light) .header button {
+  color: var(--light-text);
+}
+
+:global(.light) .container {
+  background-color: var(--light-article);
+}
+
+.open > .container {
   width: 1280px;
 }
 
-#popup-header {
+.header {
   padding: 16px 0;
+  display: flex;
+  justify-content: space-between;
 }
 
-#popup-header > h1 {
+.header > h1 {
   margin: 0;
   font-size: 1.5rem;
+  display: flex;
+  align-items: center;
 }
 
-#popup-content {
+.content {
   overflow: auto;
   transition: 0.3s;
   height: 17.5rem;
 }
 
-.open #popup-content {
+.open .content {
   height: 35rem;
 }
 
-#popup-content > p:first-of-type {
+.content > p:first-of-type {
   margin-top: 0;
 }

@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import sanitize from "sanitize-html";
 import parse from "html-react-parser";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
-export default function ProfileAbout({profileInfo, currentUser}) {
+export default function ProfileAbout({profileInfo}) {
 
   const [ready, setReady] = useState();
   const [comp, setComp] = useState();
@@ -28,7 +29,7 @@ export default function ProfileAbout({profileInfo, currentUser}) {
               // Replace the element with a React Router link so that the page doesn't refresh
               return <Link to=""></Link>;
 
-            };
+            }
 
             return element;
 
@@ -56,3 +57,7 @@ export default function ProfileAbout({profileInfo, currentUser}) {
   ) : null;
 
 }
+
+ProfileAbout.propTypes = {
+  profileInfo: PropTypes.object
+};

@@ -82,6 +82,10 @@
   top: 2.5%;
 }
 
+:global(.light) #right {
+  background-color: var(--light-article);
+}
+
 .closed #right {
   left: 30rem;
 }

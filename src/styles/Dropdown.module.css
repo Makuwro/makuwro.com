@@ -20,8 +20,17 @@
   border: 1px solid #111111;
 }
 
+:global(.light) .list > section {
+  background-color: var(--light-input-background);
+  border-color: transparent;
+}
+
 .list > section:hover, .list li:hover {
   filter: brightness(1.2);
+}
+
+:global(.light) .list > section:hover {
+  filter: brightness(0.9);
 }
 
 .list.closed > section {

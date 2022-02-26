@@ -6,26 +6,12 @@ import Dropdown from "../input/Dropdown";
 import SettingsDropdown from "./SettingsDropdown";
 import Editor from "@monaco-editor/react";
 
-export default function ProfileSettings({currentUser, menu, setMenu, submitting, updateAccount}) {
+export default function ProfileSettings({currentUser, menu, toggleMenu, submitting, updateAccount}) {
 
   const [terms, setTerms] = useState(currentUser.terms || "");
   const [css, setCSS] = useState(currentUser.css || "");
   const [about, setAbout] = useState(currentUser.about || "");
   const bannerImage = useRef();
-
-  function toggleMenu(index) {
-
-    if (index === menu) {
-
-      setMenu();
-
-    } else {
-
-      setMenu(index);
-
-    }
-
-  }
 
   function resetFields() {
 
@@ -106,7 +92,7 @@ export default function ProfileSettings({currentUser, menu, setMenu, submitting,
           open={menu === 4}
           onClick={() => toggleMenu(4)}
         >
-          <p>Need to find class and ID names? Use inspect element (F12 or CTRL+SHIFT+I) and check out our <a href="https://help.makuwro.com/dev/css-reference">CSS reference guide</a>!</p>
+          <p>Need to find class and ID names? Use inspect element by pressing F12 or CTRL+SHIFT+I! There isn't a really easy way to do this on mobile, but I won't stop you.</p>
           <p className="info">If you hide the report and block buttons, you must provide an alternative.</p>
           <form onSubmit={(event) => updateAccountWrapper(event, "css", css)}>
             <Editor

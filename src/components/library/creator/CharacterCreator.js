@@ -46,15 +46,17 @@ export default function CharacterCreator({username, setPopupSettings}) {
   return (
     <form id={styles["upload-character"]}>
       <section>
-        <section>
-          <input type="file" style={{display: "none"}} ref={ref.avatar} onChange={({target}) => updateAvatar(target.files)} accept="image/*" />
-          <img src={state.avatar[0]} onClick={() => ref.avatarUrl.current.click()} id={styles.avatar} />
-        </section>
         <h1>Basics</h1>
         <section>
           <label htmlFor="name">Character name</label>
           <p>This name will be the first thing people see on the page.</p>
           <input type="text" required onChange={(event) => updateInput(event, "name")} value={state.name[0]} />
+        </section>
+        <section>
+          <input type="file" style={{display: "none"}} ref={ref.avatar} onChange={({target}) => updateAvatar(target.files)} accept="image/*" />
+          <label>Character avatar</label>
+          <p>This is the image that people see before clicking on your character. You can add more art later.</p>
+          <img src={state.avatar[0]} onClick={() => ref.avatarUrl.current.click()} id={styles.avatar} />
         </section>
         <section>
           <label>Description</label>
@@ -80,7 +82,7 @@ export default function CharacterCreator({username, setPopupSettings}) {
         <section>
           <label htmlFor="tags">Tags</label>
           <p>You can use tags to sort your characters and easily find them later.</p>
-          <input type="text" name="tags" onChange={(event) => updateInput(event, "tags")} value={state.tags[0]} />
+          
         </section>
         <section>
           <label>Folders</label>

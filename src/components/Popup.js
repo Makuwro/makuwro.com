@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 export default function Popup({title, children, onClose, open, warnUnfinished, notify}) {
 
   const [newChildren, setNewChildren] = useState(null);
+  const [cursorOverBG, setCursorOverBG] = useState(false);
+  const [clickedInside, setClickedInside] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,22 +28,30 @@ export default function Popup({title, children, onClose, open, warnUnfinished, n
 
   }, [children]);
 
+  function close(bypass) {
+
+    if ((bypass || (cursorOverBG && !clickedInside)) && confirm("Are you sure you want to exit? You aren't finished yet!")) {
+
+      navigate(window.location.pathname + (location.hash ? `#${location.hash}` : ""));
+      onClose();
+
+    }
+
+  }
+
   return (
-    <section id={styles["popup-background"]} className={open ? styles.open : null} onClick={() => {
-
-      if (!warnUnfinished || confirm("Are you sure you want to exit? You aren't finished yet!")) {
-
-        navigate(window.location.pathname + (location.hash ? `#${location.hash}` : ""));
-        onClose();
-
-      }
-
-    }}>
-      <section id={styles["popup-container"]} onClick={(event) => event.stopPropagation()}>
-        <section id={styles["popup-header"]}>
+    <section className={`${styles.background} ${open ? styles.open : ""}`} onMouseDown={() => setClickedInside(false)} onClick={() => close()} onMouseOver={() => setCursorOverBG(true)} onMouseOut={() => setCursorOverBG(false)}>
+      <section className={styles.container} onMouseDown={(event) => {
+        
+        setClickedInside(true);
+        event.stopPropagation();
+      
+      }} onClick={(event) => event.stopPropagation()} onMouseOver={(event) => event.stopPropagation()} onMouseOut={(event) => event.stopPropagation()}>
+        <section className={styles.header}>
           <h1>{title}</h1>
+          <button onClick={() => close(true)}>🞫</button>
         </section>
-        <section id={styles["popup-content"]}>{newChildren}</section>
+        <section className={styles.content}>{newChildren}</section>
       </section>
     </section>
   );

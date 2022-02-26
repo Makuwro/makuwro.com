@@ -40,8 +40,7 @@ export default function ProfileTerms({setLocation, profileInfo, currentUser}) {
           <button style={{display: "block", marginTop: "1rem"}} onClick={() => {
             
             navigate("/settings/profile#terms");
-            setLocation(location);
-
+            
           }}>Edit terms</button>
         )}
       </section>

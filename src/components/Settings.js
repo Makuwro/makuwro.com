@@ -6,6 +6,7 @@ import AccountSettings from "./settings/AccountSettings";
 import AppearanceSettings from "./settings/AppearanceSettings";
 import PrivacySettings from "./settings/PrivacySettings";
 import ProfileSettings from "./settings/ProfileSettings";
+import PropTypes from "prop-types";
 
 export default function Settings({currentUser, setLocation, setCurrentUser}) {
 
@@ -24,11 +25,13 @@ export default function Settings({currentUser, setLocation, setCurrentUser}) {
       currentUser={currentUser} 
       setCurrentUser={setCurrentUser} 
       menu={menu} 
-      setMenu={setMenu} 
+      toggleMenu={toggleMenu} 
       submitting={submitting}
       updateAccount={updateAccount} />,
     "appearance": <AppearanceSettings 
-      currentUser={currentUser} />,
+      currentUser={currentUser}
+      menu={menu}
+      toggleMenu={toggleMenu} />,
     "privacy": <PrivacySettings 
       currentUser={currentUser} />
   };
@@ -37,6 +40,20 @@ export default function Settings({currentUser, setLocation, setCurrentUser}) {
   const location = useLocation();
   const menuOptions = ["Account", "Profile", "Appearance", "Privacy"];
   let i;
+
+  function toggleMenu(index) {
+
+    if (index === menu) {
+
+      setMenu();
+
+    } else {
+
+      setMenu(index);
+
+    }
+
+  }
 
   async function updateAccount(event, key, value, resetFields, password, passwordAgain) {
 
@@ -231,3 +248,9 @@ export default function Settings({currentUser, setLocation, setCurrentUser}) {
   ) : null;
 
 }
+
+Settings.propTypes = {
+  currentUser: PropTypes.object,
+  setLocation: PropTypes.func,
+  setCurrentUser: PropTypes.func
+};

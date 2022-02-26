@@ -1,11 +1,8 @@
 :root {
-  --day-background: white;
-  --day-button: #d2ceff;
-  --day-article: #f1f1f1;
-  --day-input-background: #d3d3d3;
-  --day-input-text: #474748;
-  --day-input-placeholder: #7c7c7c;
-  --day-text: #4f5053;
+  --light-background: rgb(242, 242, 242);
+  --light-text: rgb(96, 94, 92);
+  --light-input-background: #e3e5e8;
+  --light-article: white;
   --night-background: #26272b;
   --night-button: #2196f3;
   --night-link: #57bffc;
@@ -39,6 +36,12 @@ body {
   overflow: hidden;
   user-select: none;
   background-color: var(--night-background);
+  color: white;
+}
+
+body.light {
+  background-color: var(--light-background);
+  color: var(--light-text);
 }
 
 a {
@@ -47,9 +50,8 @@ a {
   transition: 0.3s;
 }
 
-a:hover {
+a:hover, .light a:hover {
   color: var(--night-link);
-  transition: 0.3s;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -58,8 +60,12 @@ h1, h2, h3, h4, h5, h6 {
   color: white;
 }
 
+.light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
+  color: var(--light-text);
+}
+
 h1 {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
 }
 
 p {
@@ -72,7 +78,6 @@ main {
   width: 100%;
   height: calc(100% - 4.5rem);
   overflow-y: overlay;
-  color: white;
 }
 
 form p {
@@ -114,6 +119,12 @@ textarea, form input[type="text"], form input[type="password"], form input[type=
   box-sizing: border-box;
   font-weight: 300;
   margin-top: 1rem;
+}
+
+.light textarea, .light form input[type="text"], .light form input[type="password"], .light form input[type="email"], .light .input-with-prefix {
+  background-color: var(--light-input-background);
+  border-color: transparent;
+  color: var(--light-text);
 }
 
 textarea {
@@ -208,8 +219,12 @@ li {
   margin-top: 1rem;
 }
 
-p, li {
+p, li, dd, .info {
   color: var(--night-text);
+}
+
+.light p, .light li, .light dd, .light dt, .light b, .light a {
+  color: var(--light-text);
 }
 
 ::-webkit-scrollbar {
@@ -235,7 +250,6 @@ button.destructive, input.destructive {
 
 dd {
   margin-inline-start: 0;
-  color: var(--night-text);
   font-weight: 300;
 }
 
@@ -281,8 +295,11 @@ input[type="submit"] {
   padding: 1rem;
   border-radius: 5px;
   background-color: #292a34;
-  color: var(--night-text);
   font-weight: 300;
+}
+
+.light .info {
+  background-color: #d3dcff;
 }
 
 div.monaco-editor, .monaco-editor-background, .monaco-editor .inputarea.ime-input {
