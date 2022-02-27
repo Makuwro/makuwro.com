@@ -43,6 +43,7 @@ export default function ArtCreator({currentUser, setPopupSettings, notify, art, 
       setDescription(art.description || description);
       setCollaborators(art.collaborators || collaborators);
       setTags(art.tags || tags);
+      setCharacters(art.characters || characters);
       setFolders(art.folders || folders);
       setWorlds(art.worlds || worlds);
       setSlug(art.slug || slug);
@@ -102,6 +103,7 @@ export default function ArtCreator({currentUser, setPopupSettings, notify, art, 
         formData.append("tags", JSON.stringify(tags));
         formData.append("folders", JSON.stringify(folders));
         formData.append("worlds", JSON.stringify(worlds));
+        formData.append("characters", JSON.stringify(characters));
         formData.append("permissions", JSON.stringify(permissions));
         formData.append("ageRestrictionLevel", ageRestrictionLevel);
         formData.append("contentWarning", contentWarning);
@@ -184,9 +186,7 @@ export default function ArtCreator({currentUser, setPopupSettings, notify, art, 
         {creatorType === 1 && (
           <section>
             <label>Who did you collaborate with?</label>
-            <ContentInput type={0} currentUser={currentUser} onChange={(collaborators) => setCollaborators(collaborators)} notify={notify}>
-              {collaborators}
-            </ContentInput>
+            <ContentInput content={collaborators} type={0} currentUser={currentUser} onChange={(collaborators) => setCollaborators(collaborators)} notify={notify} />
           </section>
         )}
         {creatorType === 2 && (
@@ -211,23 +211,17 @@ export default function ArtCreator({currentUser, setPopupSettings, notify, art, 
         <section>
           <label>Folders<Optional /></label>
           <p>You can add your character to multiple folders.</p>
-          <ContentInput type={1} currentUser={currentUser} onChange={(options) => setFolders(options)}>
-            {folders}
-          </ContentInput>
+          <ContentInput content={folders} type={1} currentUser={currentUser} onChange={(options) => setFolders(options)} />
         </section>
         <section>
           <label>Worlds<Optional /></label>
           <p>You can directly add your art to worlds you manage here. To add your character to a world you don't manage, you have to create this character first, then submit a request to the world admins.</p>
-          <ContentInput type={2} currentUser={currentUser} onChange={(options) => setWorlds(options)}>
-            {worlds}
-          </ContentInput>
+          <ContentInput content={worlds} type={2} currentUser={currentUser} onChange={(options) => setWorlds(options)} />
         </section>
         <section>
           <label>Characters<Optional /></label>
           <p>You can directly tag your characters.</p>
-          <ContentInput type={3} currentUser={currentUser} onChange={(characters) => setCharacters(characters)}>
-            {characters}
-          </ContentInput>
+          <ContentInput content={characters} type={3} currentUser={currentUser} onChange={(characters) => setCharacters(characters)} />
         </section>
       </section>
       <section>

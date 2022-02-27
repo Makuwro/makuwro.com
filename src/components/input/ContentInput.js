@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import styles from "../../styles/TagInput.module.css";
 import ddStyles from "../../styles/Dropdown.module.css";
 
-export default function ContentInput({children = [], onChange, currentUser, type}) {
+export default function ContentInput({content = [], onChange, currentUser, type}) {
 
   const typeList = ["users", "folders", "worlds", "characters"];
   const [phrase, setPhrase] = useState("");
@@ -17,17 +17,16 @@ export default function ContentInput({children = [], onChange, currentUser, type
   useEffect(() => {
 
     const comps = [];
-    
-    for (let i = 0; children.length > i; i++) {
 
-      const content = children[i];
+    for (let i = 0; content.length > i; i++) {
+
       comps[i] = <span onClick={() => {
     
         onChange(contentList => contentList.filter((user2) => user2 !== content));
 
-      }} key={content.id}>
-        <img src={`https://cdn.makuwro.com/${content.avatarPath || content.imagePath}`} />
-        {content.name || content.displayName || `@${content.username}`}
+      }} key={content[i].id}>
+        <img src={`https://cdn.makuwro.com/${content[i].avatarPath || content[i].imagePath}`} />
+        {content[i].name || content[i].displayName || `@${content[i].username}`}
       </span>;
 
     }
@@ -40,7 +39,7 @@ export default function ContentInput({children = [], onChange, currentUser, type
 
     setChildrenComponents(comps);
 
-  }, [children]);
+  }, [content]);
 
   useEffect(() => {
 
@@ -64,6 +63,7 @@ export default function ContentInput({children = [], onChange, currentUser, type
             if (response.ok) {
 
               items = await response.json();
+              if (type === 0) items = [items];
               setCache(items);
 
             }
@@ -87,10 +87,10 @@ export default function ContentInput({children = [], onChange, currentUser, type
                     return contentList;
     
                   } else if (type === 0 && content.id === currentUser.id) {
-    
-                    alert("You can't add yourself");
+
+                    alert("You can't add yourself!");
                     return contentList;
-    
+
                   }
 
                   return [...contentList, content];
@@ -161,7 +161,7 @@ export default function ContentInput({children = [], onChange, currentUser, type
       setSelectedUser();
       setPhrase("");
 
-    } else if (event.keyCode === 8 && inputRef.current.selectionStart === 0 && children[0]) {
+    } else if (event.keyCode === 8 && inputRef.current.selectionStart === 0 && content[0]) {
 
       // Check if there's anything
       onChange(users => {
@@ -180,7 +180,7 @@ export default function ContentInput({children = [], onChange, currentUser, type
     <section className={`${ddStyles.list} ${styles.container} ${searchResults ? styles.open : ""}`} ref={inputContainerRef} >
       <section className={styles.tagInput} onClick={() => inputRef.current.focus()}>
         {childrenComponents}
-        <input tabIndex="0" type="text" onKeyDown={checkSelection} value={phrase} onInput={(event) => setPhrase(event.target.value)} ref={inputRef} className={!children[0] ? styles.none : ""} />
+        <input tabIndex="0" type="text" onKeyDown={checkSelection} value={phrase} onInput={(event) => setPhrase(event.target.value)} ref={inputRef} className={!content[0] ? styles.none : ""} />
       </section>
       <ul>
         {searchResults}
@@ -191,7 +191,8 @@ export default function ContentInput({children = [], onChange, currentUser, type
 }
 
 ContentInput.propTypes = {
-  children: PropTypes.any,
+  content: PropTypes.any,
   onChange: PropTypes.func,
-  currentUser: PropTypes.object.isRequired
+  currentUser: PropTypes.object.isRequired,
+  type: PropTypes.number.isRequired
 };
