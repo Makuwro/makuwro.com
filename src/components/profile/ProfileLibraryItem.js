@@ -20,52 +20,35 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
 
       cache[profileInfo.username] = {};
       
-    } else if (profileInfo.username) {
+    } else if (isCharacter || profileInfo.username) {
 
-      if (!cache[profileInfo.username]) {
+      // Get the stuff from the server.
+      const headers = currentUser.token ? {
+        token: currentUser.token
+      } : {};
+      const response = !isCharacter && await fetch(`${process.env.RAZZLE_API_DEV}contents/${tab}/${profileInfo.username}`, {headers});
 
-        cache[profileInfo.username] = {};
+      // Check if everything's OK.
+      if (mounted) {
 
-      }
+        if (isCharacter || response.ok) {
 
-      if (cache[profileInfo.username][tab]) {
+          let content = isCharacter ? [...profileInfo.references[tab] || []] : await response.json();
 
-        setItems(cache[profileInfo.username][tab]);
+          for (let i = 0; content.length > i; i++) {
 
-      } else {
-
-        // Get the stuff from the server.
-        const headers = currentUser.token ? {
-          token: currentUser.token
-        } : {};
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/${isCharacter ? `characters/${profileInfo.owner.username}/${profileInfo.slug}/${tab}` : `${tab}/${profileInfo.username}`}`, {headers});
-
-        // Check if everything's OK.
-        if (mounted) {
-
-          if (response.ok) {
-
-            // Iterate through the items and turn them into links.
-            const content = await response.json();
-            for (let i = 0; content.length > i; i++) {
-
-              content[i] = <Link className={styles["profile-library-item"]} key={i} to={`/${profileInfo.username}/${tab}/${content[i].slug}`}>
-                <img src={`https://cdn.makuwro.com/${content[i].imagePath || content[i].avatarPath}`} />
-              </Link>;
-
-            }
-
-            // Push the items to render.
-            if (mounted) setItems(content);
-
-            // Cache the content so we don't spam the API.
-            cache[profileInfo.username][tab] = content;
-
-          } else {
-
-            setItems([]);
+            content[i] = <Link className={styles["profile-library-item"]} key={i} to={`/${content[i].owner.username}/${tab}/${content[i].slug}`}>
+              <img src={`https://cdn.makuwro.com/${content[i].imagePath || content[i].avatarPath}`} />
+            </Link>;
 
           }
+
+          // Push the items to render.
+          if (mounted) setItems(content[0] ? content : null);
+
+        } else {
+
+          setItems(null);
 
         }
 
@@ -91,9 +74,9 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
         </Link>
       )}
       {items || (ownProfile ? (
-        isCharacter && (<p>You can attach this character to {tab} by editing them.</p>)
+        isCharacter && (<p>You can attach this character to {tab} by tagging this character.</p>)
       ) : (
-        <p>{profileInfo.owner.username} doesn't have much to share right now, but who knows: they're probably working on the next big thing.</p>
+        <p>{profileInfo.username || profileInfo.owner.username} doesn't have much to share right now, but who knows: they're probably working on the next big thing.</p>
       ))}
     </section>
   );
