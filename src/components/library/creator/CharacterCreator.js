@@ -139,9 +139,7 @@ export default function CharacterCreator({currentUser, setPopupSettings, charact
         {creatorType === 1 && (
           <section>
             <label>Who did you collaborate with?</label>
-            <ContentInput currentUser={currentUser} onChange={(collaborators) => setCollaborators(collaborators)}>
-              {collaborators}
-            </ContentInput>
+            <ContentInput type={0} content={collaborators} currentUser={currentUser} onChange={(collaborators) => setCollaborators(collaborators)} />
           </section>
         )}
         {creatorType === 2 && (
@@ -163,16 +161,12 @@ export default function CharacterCreator({currentUser, setPopupSettings, charact
         <section>
           <label>Folders<Optional /></label>
           <p>You can add your character to multiple folders.</p>
-          <Dropdown>
-
-          </Dropdown>
+          <ContentInput type={1} content={folders} currentUser={currentUser} onChange={(folders) => setFolders(folders)} />
         </section>
         <section>
           <label>Worlds<Optional /></label>
           <p>You can directly add your character to worlds you manage here. To add your character to a world that you don't manage, you have to create this character first, then submit a request to the world admins.</p>
-          <Dropdown>
-
-          </Dropdown>
+          <ContentInput type={2} content={worlds} currentUser={currentUser} onChange={(worlds) => setWorlds(worlds)} />
         </section>
       </section>
       <section>

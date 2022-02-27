@@ -12,6 +12,12 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
   const [ready, setReady] = useState(false);
   const ownProfile = currentUser.id && ((profileInfo.id === currentUser.id) || (profileInfo.owner?.id === currentUser.id));
 
+  useEffect(() => {
+
+    setReady(false);
+
+  }, [tab]);
+
   useEffect(async () => {
 
     let mounted = true;
@@ -59,12 +65,12 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
     setReady(true);
 
     return () => {
-
+      
       mounted = false;
 
     };
 
-  }, [tab, profileInfo, updated]);
+  }, [tab, currentUser, updated]);
 
   return ready && (
     <section className={`${styles["profile-library"]} ${styles["profile-card"]}`} id={styles["profile-" + tab]}>

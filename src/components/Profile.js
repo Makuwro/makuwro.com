@@ -124,7 +124,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
       }
 
-      if ((newProfile && !isCharacter) || (!newProfile && isCharacter) || (!newProfile && !isCharacter && !onProfile)) {
+      if (!matchPath({path: "/:username/art/:id"}, path1) && ((newProfile && !isCharacter) || (!newProfile && isCharacter) || (!newProfile && !isCharacter && !onProfile))) {
 
         setLeaving(true);
 
@@ -155,43 +155,47 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
     let mounted = true;
     const isCharacter = tab === "characters" && id;
 
-    // Get the profile info from the server
-    const headers = currentUser.token ? {
-      token: currentUser.token
-    } : {};
-    const response = await fetch(`${process.env.RAZZLE_API_DEV}${isCharacter ? `contents/${tab}/${username}/${id}` : `accounts/users/${username}`}`, {headers});
+    if (!profileInfo || !matchPath({path: "/:username/art/:id"}, location.pathname)) {
+    
+      // Get the profile info from the server
+      const headers = currentUser.token ? {
+        token: currentUser.token
+      } : {};
+      const response = await fetch(`${process.env.RAZZLE_API_DEV}${isCharacter ? `contents/${tab}/${username}/${id}` : `accounts/users/${username}`}`, {headers});
 
-    if (mounted && response.ok) {
+      if (mounted && response.ok) {
 
-      const profileInfo = await response.json();
+        const profileInfo = await response.json();
 
-      if (mounted) {
+        if (mounted) {
 
-        document.title = `${isCharacter ? profileInfo.name : (profileInfo.displayName || profileInfo.username)} on Makuwro`;
+          document.title = `${isCharacter ? profileInfo.name : (profileInfo.displayName || profileInfo.username)} on Makuwro`;
 
-        if (profileInfo.css) {
+          if (profileInfo.css) {
 
-          const style = document.createElement("style");
-          style.textContent = profileInfo.css;
-          document.head.appendChild(style);
-          setStyleElem(style);
+            const style = document.createElement("style");
+            style.textContent = profileInfo.css;
+            document.head.appendChild(style);
+            setStyleElem(style);
+
+          }
+
+          setProfileInfo(profileInfo);
 
         }
 
-        setProfileInfo(profileInfo);
+      } else {
+
+        document.title = `${isCharacter ? "Character" : "Account"} not found / Makuwro`;
 
       }
 
-    } else {
+      if (mounted) {
 
-      document.title = `${isCharacter ? "Character" : "Account"} not found / Makuwro`;
+        setIsCharacter(isCharacter);
+        setReady(true);
 
-    }
-
-    if (mounted) {
-
-      setIsCharacter(isCharacter);
-      setReady(true);
+      }
 
     }
 
