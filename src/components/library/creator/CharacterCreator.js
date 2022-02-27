@@ -4,7 +4,7 @@ import Dropdown from "../../input/Dropdown";
 import Checkbox from "../../input/Checkbox";
 import TagInput from "../../input/TagInput";
 import Optional from "../../Optional";
-import UserInput from "../../input/UserInput";
+import ContentInput from "../../input/ContentInput";
 import { useNavigate } from "react-router-dom";
 
 export default function CharacterCreator({currentUser, setPopupSettings, character}) {
@@ -139,9 +139,9 @@ export default function CharacterCreator({currentUser, setPopupSettings, charact
         {creatorType === 1 && (
           <section>
             <label>Who did you collaborate with?</label>
-            <UserInput currentUser={currentUser} onChange={(collaborators) => setCollaborators(collaborators)}>
+            <ContentInput currentUser={currentUser} onChange={(collaborators) => setCollaborators(collaborators)}>
               {collaborators}
-            </UserInput>
+            </ContentInput>
           </section>
         )}
         {creatorType === 2 && (

@@ -155,6 +155,10 @@
   height: auto;
 }
 
+.profile-library p {
+  margin: 0;
+}
+
 .profile-library-item {
   height: 10rem;
   border-radius: 5px;
@@ -163,6 +167,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  color: white;
+}
+
+:global(.light) .profile-library-item {
+  color: white;
 }
 
 .profile-library-item:hover {
@@ -188,6 +197,11 @@
   background: linear-gradient(90deg, rgba(2,0,36,1) 0%, var(--night-button) 0%, #656dbc 100%);
   display: none;
   user-select: none;
+  font-weight: 300;
+}
+
+:global(.light) .profile-badge {
+  color: white;
 }
 
 #profile-terms {

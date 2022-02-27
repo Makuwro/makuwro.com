@@ -88,7 +88,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
         about: <ProfileAbout profileInfo={profileInfo} currentUser={currentUser} />,
         art: <ProfileLibraryItem updated={updated} tab="art" profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
         literature: <ProfileLibraryItem tab="literature" profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
-        worlds: <ProfileLibraryItem tab="worlds" profileInfo={profileInfo} currentUser={currentUser} />,
+        worlds: <ProfileLibraryItem tab="worlds" profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
         stats: <ProfileStats profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
         characters: <ProfileLibraryItem tab="characters" profileInfo={profileInfo} currentUser={currentUser} />,
         terms: <ProfileTerms profileInfo={profileInfo} currentUser={currentUser} />,
@@ -127,10 +127,6 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
       if ((newProfile && !isCharacter) || (!newProfile && isCharacter) || (!newProfile && !isCharacter && !onProfile)) {
 
         setLeaving(true);
-
-      } else {
-
-        console.log(onProfile);
 
       }
 
@@ -254,11 +250,11 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
         </section>
         {profileInfo && (
           <section id={styles.actions}>
-            {currentUser && (currentUser.id === profileInfo.id || currentUser.id === profileInfo.owner.id) ? (
+            {currentUser && (currentUser.id === profileInfo?.id || currentUser.id === profileInfo?.owner?.id) ? (
               <button onClick={() => navigate(`/${isCharacter ? `${profileInfo.owner.username}/characters/${profileInfo.slug}/` : ""}settings/${isCharacter ? "profile" : "account"}`)}>Settings</button>
             ) : (
               <>
-                <button onClick={() => currentUser.id ? navigate("?action=follow") : navigate("/signin")}>Follow</button>
+                <button onClick={() => currentUser?.id ? navigate("?action=follow") : navigate("/signin")}>Follow</button>
                 <button className="destructive" onClick={() => navigate("?action=block")}>Block</button>
                 <button className="destructive" onClick={() => navigate("?action=report-abuse")}>Report</button>
               </>

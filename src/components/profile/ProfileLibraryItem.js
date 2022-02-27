@@ -10,7 +10,7 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
   const plural = /s$/g;
   const [items, setItems] = useState(null);
   const [ready, setReady] = useState(false);
-  const ownProfile = profileInfo.username === currentUser.username;
+  const ownProfile = currentUser.id && ((profileInfo.id === currentUser.id) || (profileInfo.owner?.id === currentUser.id));
 
   useEffect(async () => {
 
@@ -71,9 +71,9 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
 
       }
       
-      setReady(true);
-
     }
+
+    setReady(true);
 
     return () => {
 
@@ -85,12 +85,16 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
 
   return ready && (
     <section className={`${styles["profile-library"]} ${styles["profile-card"]}`} id={styles["profile-" + tab]}>
-      {ownProfile && (
+      {ownProfile && !isCharacter && (
         <Link className={styles["profile-library-item"]} style={{backgroundColor: "black"}} to={`?action=create-${plural.test(tab) ? tab.substring(0, tab.length - 1) : tab}`}>
           CREATE NEW
         </Link>
       )}
-      {items || (!ownProfile && <p>{profileInfo.owner.username} doesn't have much to share right now, but who knows: they're probably working on the next big thing.</p>)}
+      {items || (ownProfile ? (
+        isCharacter && (<p>You can attach this character to {tab} by editing them.</p>)
+      ) : (
+        <p>{profileInfo.owner.username} doesn't have much to share right now, but who knows: they're probably working on the next big thing.</p>
+      ))}
     </section>
   );
 

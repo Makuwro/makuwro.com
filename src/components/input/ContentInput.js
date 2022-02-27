@@ -3,36 +3,47 @@ import PropTypes from "prop-types";
 import styles from "../../styles/TagInput.module.css";
 import ddStyles from "../../styles/Dropdown.module.css";
 
-const userCache = {};
-export default function UserInput({children, onChange, currentUser}) {
+export default function ContentInput({children = [], onChange, currentUser, type}) {
 
+  const typeList = ["users", "folders", "worlds", "characters"];
   const [phrase, setPhrase] = useState("");
   const [selectedUser, setSelectedUser] = useState();
   const [searchResults, setSearchResults] = useState(null);
   const [childrenComponents, setChildrenComponents] = useState([]);
+  const [cache, setCache] = useState();
   const inputRef = useRef();
   const inputContainerRef = useRef();
 
   useEffect(() => {
 
-    setChildrenComponents(React.Children.map(children, (user) => {
-
-      return <span onClick={() => {
+    const comps = [];
     
-        onChange(users => users.filter((user2) => user2 !== user));
+    for (let i = 0; children.length > i; i++) {
 
-      }} key={user.id}>
-        <img src={`https://cdn.makuwro.com/${user.avatarPath}`} />
-        {user.displayName || `@${user.username}`}
+      const content = children[i];
+      comps[i] = <span onClick={() => {
+    
+        onChange(contentList => contentList.filter((user2) => user2 !== content));
+
+      }} key={content.id}>
+        <img src={`https://cdn.makuwro.com/${content.avatarPath || content.imagePath}`} />
+        {content.name || content.displayName || `@${content.username}`}
       </span>;
 
-    }));
+    }
+
+    if (comps.length !== childrenComponents.length) {
+
+      inputRef.current.focus();
+
+    }
+
+    setChildrenComponents(comps);
 
   }, [children]);
 
   useEffect(() => {
 
-    inputRef.current.focus();
     const timeout = setTimeout(async () => {
 
       // Check if that user exists
@@ -40,11 +51,11 @@ export default function UserInput({children, onChange, currentUser}) {
 
         try {
 
-          let user;
+          let items = cache;
 
-          if (!userCache[phrase]) {
+          if (!cache) {
 
-            const response = await fetch(`${process.env.RAZZLE_API_DEV}accounts/users/${phrase}`, {
+            const response = await fetch(`${process.env.RAZZLE_API_DEV}${type !== 0 ? `contents/${typeList[type]}/${currentUser.username}` : `accounts/users/${phrase}`}`, {
               headers: {
                 token: currentUser.token
               }
@@ -52,50 +63,57 @@ export default function UserInput({children, onChange, currentUser}) {
 
             if (response.ok) {
 
-              userCache[phrase] = await response.json();
+              items = await response.json();
+              setCache(items);
 
             }
 
           }
+          
+          if (items) {
 
-          user = userCache[phrase];
-          if (user) {
+            const results = [];
+            for (let i = 0; items.length > i; i++) {
 
-            setSearchResults(
-              <li onClick={() => {
+              const content = items[i];
+              results[i] = <li key={content.id} onClick={() => {
 
-                onChange(users => {
+                onChange(contentList => {
     
                   // Check if the user already exists
-                  if (users.find((user2) => user2.id === user.id)) {
+                  if (contentList.find((user2) => user2.id === content.id)) {
     
-                    alert("You already added that user!");
-                    return users;
+                    alert("You already added that one!");
+                    return contentList;
     
-                  } else if (user.id === currentUser.id) {
+                  } else if (type === 0 && content.id === currentUser.id) {
     
                     alert("You can't add yourself");
-                    return users;
+                    return contentList;
     
                   }
 
-                  setSearchResults(null);
-                  
-                  return [...users, user];
+                  return [...contentList, content];
     
                 });
+                setSearchResults(null);
+                setPhrase("");
 
               }}>
-                <img src={`https://cdn.makuwro.com/${user.avatarPath}`} />
-                {user.username}
-              </li>
-            );
+                <img src={`https://cdn.makuwro.com/${content.avatarPath || content.imagePath}`} />
+                {content.name || content.displayName || content.username}
+              </li>;
+
+            }
+
+            setSearchResults(results);
 
           }
 
         } catch (err) {
 
-          console.log(`Couldn't search for user: ${err.message}`);
+          alert(`Couldn't search for content: ${err.message}`);
+          console.warn(err.stack);
 
         }
 
@@ -172,8 +190,8 @@ export default function UserInput({children, onChange, currentUser}) {
 
 }
 
-UserInput.propTypes = {
+ContentInput.propTypes = {
   children: PropTypes.any,
   onChange: PropTypes.func,
-  currentUser: PropTypes.object
+  currentUser: PropTypes.object.isRequired
 };

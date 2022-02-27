@@ -27,7 +27,7 @@ export default function ProfileAbout({profileInfo}) {
             "em", "i", "kbd", "mark", "q", "rb", "rp", "rt", "rtc", "ruby", "s", "samp",
             "small", "span", "strong", "sub", "sup", "time", "u", "var", "wbr", "caption",
             "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr",
-            "audio", "source", "video"
+            "audio", "source", "video", "iframe"
           ]
         });
 

@@ -58,7 +58,11 @@ h1, h2, h3, h4, h5, h6 {
   color: white;
 }
 
-.light h1, .light h2, .light h3, .light h4, .light h5, .light h6, .light input[type="checkbox"] + label, .light p, .light li, .light dd, .light dt, .light b, .light a, .light .input-with-prefix span, .light textarea, .light form input[type="text"], .light form input[type="password"], .light form input[type="email"], .light .input-with-prefix, .light input[type="checkbox"] + label, .light .optional, body.light {
+span {
+  transition: 0.3s;
+}
+
+.light h1, .light h2, .light h3, .light h4, .light h5, .light h6, .light input[type="checkbox"] + label, .light p, .light li, .light dd, .light dt, .light b, .light a, .light .input-with-prefix span, .light textarea, .light form input[type="text"], .light form input[type="password"], .light form input[type="email"], .light .input-with-prefix, .light input[type="checkbox"] + label, .light .optional, .light span {
   color: var(--light-text);
 }
 

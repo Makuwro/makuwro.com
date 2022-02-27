@@ -4,7 +4,8 @@ import Dropdown from "../../input/Dropdown";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import TagInput from "../../input/TagInput";
-import UserInput from "../../input/UserInput";
+import ContentInput from "../../input/ContentInput";
+import Optional from "../../Optional";
 
 export default function ArtCreator({currentUser, setPopupSettings, notify, art, refreshArt, updated}) {
 
@@ -20,6 +21,7 @@ export default function ArtCreator({currentUser, setPopupSettings, notify, art, 
   const [tags, setTags] = useState([]);
   const [folders, setFolders] = useState([]);
   const [worlds, setWorlds] = useState([]);
+  const [characters, setCharacters] = useState([]);
   const [slug, setSlug] = useState("");
   const [permissions, setPermissions] = useState({
     view: 0,
@@ -182,9 +184,9 @@ export default function ArtCreator({currentUser, setPopupSettings, notify, art, 
         {creatorType === 1 && (
           <section>
             <label>Who did you collaborate with?</label>
-            <UserInput currentUser={currentUser} onChange={(collaborators) => setCollaborators(collaborators)} notify={notify}>
+            <ContentInput type={0} currentUser={currentUser} onChange={(collaborators) => setCollaborators(collaborators)} notify={notify}>
               {collaborators}
-            </UserInput>
+            </ContentInput>
           </section>
         )}
         {creatorType === 2 && (
@@ -207,24 +209,25 @@ export default function ArtCreator({currentUser, setPopupSettings, notify, art, 
           </TagInput>
         </section>
         <section>
-          <label>Folders<span style={{
-            color: "var(--night-text)",
-            marginLeft: "0.5rem"
-          }}>(optional)</span></label>
+          <label>Folders<Optional /></label>
           <p>You can add your character to multiple folders.</p>
-          <Dropdown options={folders} tabIndex="0" multiple onChange={(options) => setFolders(options)}>
-
-          </Dropdown>
+          <ContentInput type={1} currentUser={currentUser} onChange={(options) => setFolders(options)}>
+            {folders}
+          </ContentInput>
         </section>
         <section>
-          <label>Worlds<span style={{
-            color: "var(--night-text)",
-            marginLeft: "0.5rem"
-          }}>(optional)</span></label>
-          <p>You can directly add your character to worlds you manage here. To add your character to a world you don't manage, you have to create this character first, then submit a request to the world admins.</p>
-          <Dropdown options={worlds} tabIndex="0" multiple onChange={(options) => setWorlds(options)}>
-
-          </Dropdown>
+          <label>Worlds<Optional /></label>
+          <p>You can directly add your art to worlds you manage here. To add your character to a world you don't manage, you have to create this character first, then submit a request to the world admins.</p>
+          <ContentInput type={2} currentUser={currentUser} onChange={(options) => setWorlds(options)}>
+            {worlds}
+          </ContentInput>
+        </section>
+        <section>
+          <label>Characters<Optional /></label>
+          <p>You can directly tag your characters.</p>
+          <ContentInput type={3} currentUser={currentUser} onChange={(characters) => setCharacters(characters)}>
+            {characters}
+          </ContentInput>
         </section>
       </section>
       <section>
