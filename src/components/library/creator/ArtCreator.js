@@ -43,9 +43,9 @@ export default function ArtCreator({currentUser, setPopupSettings, notify, art, 
       setDescription(art.description || description);
       setCollaborators(art.collaborators || collaborators);
       setTags(art.tags || tags);
-      setCharacters(art.characters || characters);
-      setFolders(art.folders || folders);
-      setWorlds(art.worlds || worlds);
+      setCharacters(art.references.characters || characters);
+      setFolders(art.references.folders || folders);
+      setWorlds(art.references.worlds || worlds);
       setSlug(art.slug || slug);
       setAgeRestrictionLevel(art.ageRestrictionLevel || ageRestrictionLevel);
       setContentWarning(art.contentWarning || contentWarning);
@@ -86,6 +86,9 @@ export default function ArtCreator({currentUser, setPopupSettings, notify, art, 
         let response;
         let i;
         let userIds;
+        let worldIds;
+        let characterIds;
+        let folderIds;
 
         // Turn the collaborators array into an array of user IDs
         userIds = [];
@@ -95,17 +98,42 @@ export default function ArtCreator({currentUser, setPopupSettings, notify, art, 
 
         }
 
+        worldIds = [];
+        for (i = 0; worlds.length > i; i++) {
+
+          worldIds[i] = worlds[i].id;
+
+        }
+
+        characterIds = [];
+        for (i = 0; characters.length > i; i++) {
+
+          characterIds[i] = characters[i].id;
+
+        }
+
+        folderIds = [];
+        for (i = 0; folders.length > i; i++) {
+
+          folderIds[i] = folders[i].id;
+
+        }
+
         // Set up form data
         formData = new FormData();
         formData.append("image", image.current.files[0]);
         formData.append("description", description);
         formData.append("collaborators", JSON.stringify(userIds));
         formData.append("tags", JSON.stringify(tags));
-        formData.append("folders", JSON.stringify(folders));
-        formData.append("worlds", JSON.stringify(worlds));
-        formData.append("characters", JSON.stringify(characters));
+        formData.append("folders", JSON.stringify(folderIds));
+        formData.append("worlds", JSON.stringify(worldIds));
+        formData.append("references", JSON.stringify({
+          worlds: worldIds,
+          folders: folderIds,
+          characters: characterIds
+        }));
         formData.append("permissions", JSON.stringify(permissions));
-        formData.append("ageRestrictionLevel", ageRestrictionLevel);
+        formData.append("ageRestrictionBLevel", ageRestrictionLevel);
         formData.append("contentWarning", contentWarning);
         formData.append("slug", slug);
 
@@ -125,22 +153,13 @@ export default function ArtCreator({currentUser, setPopupSettings, notify, art, 
 
         } else {
 
-          const {message} = await response.json();
-
-          notify({
-            title: "Couldn't submit your art",
-            children: message
-          });
-          setSubmitting(false);
+          throw new Error(await response.json());
 
         }
 
       } catch (err) {
 
-        notify({
-          title: "Couldn't upload your art",
-          children: "Unknown error"
-        });
+        alert(`Couldn't upload your art: ${err.message}`);
         setSubmitting(false);
 
       }
