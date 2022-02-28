@@ -78,7 +78,7 @@ p {
 
 main {
   width: 100%;
-  height: calc(100% - 4.5rem);
+  height: calc(100% - 3.5rem);
   overflow-y: overlay;
 }
 
@@ -225,7 +225,11 @@ p, li, dd, .info {
 }
 
 ::-webkit-scrollbar {
-  width: 20px;
+  width: 15px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  border-width: 2px;
 }
 
 ::-webkit-scrollbar-track {
@@ -239,6 +243,7 @@ p, li, dd, .info {
   background-color: #878792;
   border: 5px solid transparent;
   background-clip: padding-box;
+  transition: 0.3s;
 }
 
 button.destructive, input.destructive {

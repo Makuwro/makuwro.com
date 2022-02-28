@@ -5,7 +5,7 @@
   top: 0;
   display: flex;
   background-color: #000000da;
-  z-index: 1;
+  z-index: 2;
   opacity: 1;
   transition: 0.3s;
 }

@@ -2,7 +2,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 4.5rem;
+  height: 3.5rem;
   padding: 0 1.2rem;
   width: 100%;
   color: white;
@@ -10,6 +10,8 @@ header {
   filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.2));
   box-sizing: border-box;
   transition: 0.3s;
+  position: relative;
+  z-index: 1;
 }
 
 :global(.light) header {
