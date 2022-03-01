@@ -40,7 +40,7 @@
 
 #profile-info {
   width: 100%;
-  padding: 4rem 5rem 3rem;
+  padding: 4rem 5rem 1rem;
   display: flex;
   filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.2));
   align-items: center;
@@ -110,23 +110,29 @@
   flex-wrap: wrap;
   box-sizing: border-box;
   font-size: 1rem;
-  height: 40px;
+  height: 80px;
   padding: 0 5rem;
   box-shadow: var(--day-box-shadow);
 }
 
 #selection > a {
-  padding-bottom: 1rem;
+  padding: 0.5rem 0;
   flex: 1 1 0;
   display: flex;
   justify-content: center;
   height: 100%;
   box-sizing: border-box;
   border-color: rgba(0, 0, 0, 0);
+  align-items: center;
 }
 
 #selection > a:hover, #selection > a.selected {
   border-bottom: 2px solid var(--night-link);
+}
+
+#selection > a:hover:active {
+  transform: scale(0.9);
+  transition: 0.15s;
 }
 
 #selection + section {

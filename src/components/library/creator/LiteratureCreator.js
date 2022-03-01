@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import TagInput from "../../input/TagInput";
 import ContentInput from "../../input/ContentInput";
 import Optional from "../../Optional";
+import Checkbox from "../../input/Checkbox";
 
 export default function LiteratureCreator({currentUser, setPopupSettings, notify}) {
 
@@ -156,6 +157,16 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
             marginLeft: "0.5rem"
           }}>(optional)</span></label>
           <textarea tabIndex="0" value={description} onInput={(event) => setDescription(event.target.value)}></textarea>
+        </section>
+        <section>
+          <label>Literature type</label>
+          <Dropdown index={0}>
+            <li>One-off</li>
+            <li>Multi-chapter</li>
+          </Dropdown>
+          <Checkbox>
+            This literature is a work-in-progress
+          </Checkbox>
         </section>
       </section>
       <section>
