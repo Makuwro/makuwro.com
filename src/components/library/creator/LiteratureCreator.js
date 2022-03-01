@@ -1,101 +1,189 @@
 import React, { useEffect, useRef, useState } from "react";
-import PropTypes from "prop-types";
-import styles from "../../../styles/Library.module.css";
 import Dropdown from "../../input/Dropdown";
-import Checkbox from "../../input/Checkbox";
+import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
+import TagInput from "../../input/TagInput";
+import ContentInput from "../../input/ContentInput";
+import Optional from "../../Optional";
 
-export default function LiteratureCreator({username, setPopupSettings}) {
+export default function LiteratureCreator({currentUser, setPopupSettings, notify}) {
 
-  const state = {
-    name: useState(""),
-    description: useState(),
-    tags: useState(),
-    url: useState(),
-    bannerURL: useState()
-  };
-  const ref = {
-    banner: useRef(),
-    url: useRef()
-  };
+  // Refs
+  const image = useRef();
+  const url = useRef();
 
-  function updateBanner([file]) {
-
-    // Make sure we have a file
-    if (file) state.bannerURL[1](URL.createObjectURL(file));
-
-  }
-
-  function updateInput({target: {value: value}}, name) {
-
-    //if (name !== "characterURL" || !value || /^(?!\.|-)(\w|[-.])+(?<!\.|-)$/.test(value)) {
-      
-    state[name][1](value);
-
-    //}
-
-  }
+  // States
+  const [name, setName] = useState("");
+  const [imagePath, setImagePath] = useState(null);
+  const [description, setDescription] = useState("");
+  const [collaborators, setCollaborators] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [folders, setFolders] = useState([]);
+  const [worlds, setWorlds] = useState([]);
+  const [characters, setCharacters] = useState([]);
+  const [slug, setSlug] = useState("");
+  const [permissions, setPermissions] = useState({
+    view: 0,
+    viewOriginal: 0,
+    viewComments: 0,
+    postComments: 1
+  });
+  const [ageRestrictionLevel, setAgeRestrictionLevel] = useState(0);
+  const [contentWarning, setContentWarning] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [ready, setReady] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
 
-    setPopupSettings({
-      title: "Create literature",
-      warnUnfinished: true
-    });
+    if (currentUser) {
 
-  }, []);
+      setPopupSettings({
+        title: "Create literature",
+        warnUnfinished: true
+      });
+  
+      document.title = "Create literature on Makuwro";
 
-  return (
-    <form id={styles["create-literature"]}>
+      setReady(true);
+
+    }
+
+  }, [currentUser]);
+
+  async function submitForm(event) {
+
+    event.preventDefault();
+    if (!submitting) {
+      
+      setSubmitting(true);
+      try {
+
+        let formData;
+        let response;
+        let i;
+        let userIds;
+        let worldIds;
+        let characterIds;
+        let folderIds;
+
+        // Turn the collaborators array into an array of user IDs
+        userIds = [];
+        for (i = 0; collaborators.length > i; i++) {
+
+          userIds[i] = collaborators[i].id;
+
+        }
+
+        worldIds = [];
+        for (i = 0; worlds.length > i; i++) {
+
+          worldIds[i] = worlds[i].id;
+
+        }
+
+        characterIds = [];
+        for (i = 0; characters.length > i; i++) {
+
+          characterIds[i] = characters[i].id;
+
+        }
+
+        folderIds = [];
+        for (i = 0; folders.length > i; i++) {
+
+          folderIds[i] = folders[i].id;
+
+        }
+
+        // Set up form data
+        formData = new FormData();
+        formData.append("image", image.current.files[0]);
+        formData.append("description", description);
+        formData.append("collaborators", JSON.stringify(userIds));
+        formData.append("tags", JSON.stringify(tags));
+        formData.append("folders", JSON.stringify(folderIds));
+        formData.append("worlds", JSON.stringify(worldIds));
+        formData.append("references", JSON.stringify({
+          worlds: worldIds,
+          folders: folderIds,
+          characters: characterIds
+        }));
+        formData.append("permissions", JSON.stringify(permissions));
+        formData.append("ageRestrictionBLevel", ageRestrictionLevel);
+        formData.append("contentWarning", contentWarning);
+        formData.append("slug", slug);
+
+        response = await fetch(`${process.env.RAZZLE_API_DEV}contents/literature/${currentUser.username}/${slug}`, {
+          headers: {
+            token: currentUser.token
+          },
+          body: formData,
+          method: "POST"
+        });
+
+        if (response.ok) {
+
+          navigate(`/${currentUser.username}/literature/${slug}`);
+
+        } else {
+
+          throw new Error(await response.json());
+
+        }
+
+      } catch (err) {
+
+        alert(`Couldn't create literature: ${err.message}`);
+        setSubmitting(false);
+
+      }
+
+    }
+
+  }
+
+  return ready && currentUser && (
+    <form onSubmit={submitForm}>
       <section>
-        <h1>Basics</h1>
         <section>
-          <input type="file" style={{display: "none"}} ref={ref.banner} onChange={({target}) => updateBanner(target.files)} accept="image/*" />
-          <img src={state.bannerURL[0]} onClick={() => ref.banner.current.click()} id={styles.banner} />
+          <label>Literature name</label>
+          <input type="text" value={name} onInput={(target) => setName(target.input.value)} />
         </section>
         <section>
-          <label>Banner</label>
-          <button>Change banner</button>
-          <button>Remove banner</button>
+          <label>Description<span style={{
+            color: "var(--night-text)",
+            marginLeft: "0.5rem"
+          }}>(optional)</span></label>
+          <textarea tabIndex="0" value={description} onInput={(event) => setDescription(event.target.value)}></textarea>
         </section>
-        <section>
-          <label htmlFor="name">Title</label>
-          <p>This name will be the first thing people see on the page.</p>
-          <input type="text" required onChange={(event) => updateInput(event, "name")} value={state.name[0]} />
-        </section>
-        <section>
-          <label>Description</label>
-          <p>This description is shown below your literature's name.</p>
-          <textarea onChange={(e) => {
-
-            e.preventDefault();
-            //setDescription(e.target.value);
-
-          }} value={state.description[0]}></textarea>
-        </section>
-        <Checkbox>
-          This literature is a work in progress
-        </Checkbox>
       </section>
       <section>
         <h1>Organization</h1>
         <section>
-          <label htmlFor="tags">Tags</label>
-          <p>You can use tags to sort your literature and easily find them later.</p>
-          <input type="text" name="tags" onChange={(event) => updateInput(event, "tags")} value={state.tags[0]} />
+          <label htmlFor="tags">Tags<span style={{
+            color: "var(--night-text)",
+            marginLeft: "0.5rem"
+          }}>(optional)</span></label>
+          <p>You can use tags to sort your characters and easily find them later.</p>
+          <TagInput onChange={(tags) => setTags(tags)} notify={notify}>
+            {tags}
+          </TagInput>
         </section>
         <section>
-          <label>Folders</label>
-          <p>You can add your literature to multiple folders.</p>
-          <Dropdown>
-
-          </Dropdown>
+          <label>Folders<Optional /></label>
+          <p>You can add your character to multiple folders.</p>
+          <ContentInput content={folders} type={1} currentUser={currentUser} onChange={(options) => setFolders(options)} />
         </section>
         <section>
-          <label>Worlds</label>
-          <p>You can directly add your literature to worlds you manage here. To add your literature to a world you don't manage, you have to create this literature first, then submit a request to the world admins.</p>
-          <Dropdown>
-
-          </Dropdown>
+          <label>Worlds<Optional /></label>
+          <p>You can directly add your literature to worlds you manage here. To add your character to a world you don't manage, you have to create this character first, then submit a request to the world admins.</p>
+          <ContentInput content={worlds} type={2} currentUser={currentUser} onChange={(options) => setWorlds(options)} />
+        </section>
+        <section>
+          <label>Characters<Optional /></label>
+          <p>You can directly tag your characters.</p>
+          <ContentInput content={characters} type={3} currentUser={currentUser} onChange={(characters) => setCharacters(characters)} />
         </section>
       </section>
       <section>
@@ -106,59 +194,69 @@ export default function LiteratureCreator({username, setPopupSettings}) {
           <section className="input-with-prefix">
             <span onClick={() => {
 
-              ref.url.current.focus();
-              ref.url.current.setSelectionRange(0, 0);
+              url.current.focus();
+              url.current.setSelectionRange(0, 0);
 
-            }}>{`makuwro.com/${username}/literature/`}</span>
-            <input type="text" name="url" ref={ref.url} onChange={(event) => updateInput(event, "url")} value={state.url[0]} placeholder={state.name[0].replaceAll(" ", "-")}/>
+            }}>{`makuwro.com/${currentUser.username}/literature/`}</span>
+            <input required tabIndex="0" type="text" name="url" ref={url} onInput={(event) => setSlug(event.target.value)} value={slug} placeholder={name.replaceAll(/[^a-zA-Z0-9_]/gm, "-")} />
           </section>
         </section>
         <section>
           <label>Who can view this literature?</label>
-          <Dropdown index={0}>
+          <Dropdown tabIndex="0" index={permissions.view} onChange={(choice) => setPermissions({...permissions, view: choice})}>
             <li>Everyone, including visitors who aren't logged in</li>
             <li>Registered Makuwro users</li>
             <li>My followers</li>
             <li>My friends</li>
-            <li>Specific people</li>
-            <li>Just me</li>
-          </Dropdown>
-        </section>
-        <section>
-          <label>Who can comment on this literature?</label>
-          <Dropdown index={0}>
-            <li>Registered Makuwro users</li>
-            <li>My followers</li>
-            <li>My friends</li>
-            <li>Specific people</li>
             <li>Just me</li>
           </Dropdown>
         </section>
         <section>
           <label>Who can view comments on this literature?</label>
-          <Dropdown index={0}>
+          <Dropdown tabIndex="0" index={permissions.viewComments} onChange={(choice) => setPermissions({...permissions, viewComments: choice})}>
             <li>Everyone, including visitors who aren't logged in</li>
             <li>Registered Makuwro users</li>
             <li>My followers</li>
             <li>My friends</li>
-            <li>Specific people</li>
             <li>Just me</li>
           </Dropdown>
         </section>
-        <Checkbox>
-          Disable likes
-        </Checkbox>
-        <Checkbox>
-          Disable subscriptions
-        </Checkbox>
+        <section>
+          <label>Who can comment on this literature?</label>
+          <Dropdown tabIndex="0" index={permissions.postComments - 1} onChange={(choice) => setPermissions({...permissions, postComments: choice + 1})}>
+            <li>Registered Makuwro users</li>
+            <li>My followers</li>
+            <li>My friends</li>
+            <li>Just me</li>
+          </Dropdown>
+        </section>
+        <section>
+          <label>Would you like to age-restrict this literature?</label>
+          <p>If so, users must sign in to view this literature. If you inappropriately age-gate your literature, Makuwro staff might enforce this setting.</p>
+          <Dropdown tabIndex="0" index={ageRestrictionLevel} onChange={(choice) => setAgeRestrictionLevel(choice)}>
+            <li>No</li>
+            <li>Yes, restrict users under 13 from viewing this</li>
+            <li>Yes, restrict users under 17 from viewing this</li>
+            <li>Yes, restrict users under 18 from viewing this</li>
+          </Dropdown>
+        </section>
+        <section>
+          <label>Content warning<span style={{
+            color: "var(--night-text)",
+            marginLeft: "0.5rem"
+          }}>(optional)</span></label>
+          <p>This text will be shown to viewers before they view this literature.</p>
+          <textarea tabIndex="0" value={contentWarning} onInput={(event) => setContentWarning(event.target.value)}></textarea>
+        </section>
       </section>
-      <input type="submit" value="Create literature" />
+      <input disabled={submitting} tabIndex="0" type="submit" value="Create literature" />
     </form>
   );
 
 }
 
 LiteratureCreator.propTypes = {
-  username: PropTypes.string,
-  setPopupSettings: PropTypes.func
+  setPopupSettings: PropTypes.func,
+  currentUser: PropTypes.object,
+  notify: PropTypes.func
 };

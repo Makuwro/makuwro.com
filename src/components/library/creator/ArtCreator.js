@@ -323,10 +323,10 @@ export default function ArtCreator({currentUser, setPopupSettings, notify, art, 
 }
 
 ArtCreator.propTypes = {
-  username: PropTypes.string,
   setPopupSettings: PropTypes.func,
   currentUser: PropTypes.object,
   notify: PropTypes.func,
-  setLocation: PropTypes.func,
-  art: PropTypes.any
+  art: PropTypes.any,
+  refreshArt: PropTypes.func,
+  updated: PropTypes.func
 };

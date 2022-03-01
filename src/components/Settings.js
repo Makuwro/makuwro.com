@@ -37,7 +37,9 @@ export default function Settings({currentUser, setLocation, setCurrentUser}) {
       menu={menu}
       toggleMenu={toggleMenu} />,
     "privacy": <PrivacySettings 
-      currentUser={currentUser} />
+      currentUser={currentUser} 
+      menu={menu}
+      toggleMenu={toggleMenu} />
   };
   const {tab} = useParams();
   const navigate = useNavigate();

@@ -248,9 +248,16 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
             <p style={{margin: 0}}>This {isCharacter ? "character" : "account"} doesn't exist. {!currentUser.id ? <Link to="/register">But it doesn't have to be that way ;)</Link> : ""}</p>
           ) : (profileInfo.isBanned ? (
             <p style={{margin: 0}}>This account has been banned for violating the <a href="https://about.makuwro.com/policies/terms">terms of service</a></p>
-          ) : (profileInfo.isDisabled && 
+          ) : (profileInfo.isDisabled ? 
             <p style={{margin: 0}}>This account is currently disabled. Try again later!</p>
-          ))}
+            : (isCharacter && (
+              <Link to={`/${profileInfo.owner.username}`} id={styles.owner}>
+                <span>
+                  <img src={`https://cdn.makuwro.com/${profileInfo.owner.avatarPath}`} />
+                </span>
+                {profileInfo.owner.displayName || `@${profileInfo.owner.username}`}
+              </Link>
+            ))))}
         </section>
         {profileInfo && (
           <section id={styles.actions}>

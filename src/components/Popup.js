@@ -30,7 +30,7 @@ export default function Popup({title, children, onClose, open, warnUnfinished, n
 
   function close(bypass) {
 
-    if ((bypass || (cursorOverBG && !clickedInside)) && confirm("Are you sure you want to exit? You aren't finished yet!")) {
+    if (!warnUnfinished || ((bypass || (cursorOverBG && !clickedInside)) && confirm("Are you sure you want to exit? You aren't finished yet!"))) {
 
       navigate(window.location.pathname + (location.hash ? `#${location.hash}` : ""));
       onClose();
