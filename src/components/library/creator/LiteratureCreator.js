@@ -17,7 +17,8 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
   const [name, setName] = useState("");
   const [imagePath, setImagePath] = useState(null);
   const [description, setDescription] = useState("");
-  const [collaborators, setCollaborators] = useState([]);
+  const [editors, setEditors] = useState([]);
+  const [reviewers, setReviewers] = useState([]);
   const [tags, setTags] = useState([]);
   const [folders, setFolders] = useState([]);
   const [worlds, setWorlds] = useState([]);
@@ -63,16 +64,16 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
         let formData;
         let response;
         let i;
-        let userIds;
+        let editorIds;
         let worldIds;
         let characterIds;
         let folderIds;
 
         // Turn the collaborators array into an array of user IDs
-        userIds = [];
-        for (i = 0; collaborators.length > i; i++) {
+        editorIds = [];
+        for (i = 0; editors.length > i; i++) {
 
-          userIds[i] = collaborators[i].id;
+          editorIds[i] = editors[i].id;
 
         }
 
@@ -101,7 +102,7 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
         formData = new FormData();
         formData.append("image", image.current.files[0]);
         formData.append("description", description);
-        formData.append("collaborators", JSON.stringify(userIds));
+        formData.append("editors", JSON.stringify(editorIds));
         formData.append("tags", JSON.stringify(tags));
         formData.append("folders", JSON.stringify(folderIds));
         formData.append("worlds", JSON.stringify(worldIds));
@@ -213,13 +214,30 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
           </section>
         </section>
         <section>
+          <label>Editors</label>
+          <p>These people will have access to view reviewer comments and edit your work. They are not able to publish, unpublish, or delete this literature.</p>
+          {currentUser.isTeam && <p>Admins of {currentUser.displayName} are already able to edit and <i>can</i> delete this literature.</p>}
+          <ContentInput
+            currentUser={currentUser}
+            content={editors}
+            onChange={(editors) => setEditors(editors)} />
+        </section>
+        <section>
+          <label>Reviewers</label>
+          <p>These people will have to read your unpublished work and make private comments.</p>
+          <ContentInput
+            currentUser={currentUser}
+            content={reviewers}
+            onChange={(reviewers) => setReviewers(reviewers)} />
+        </section>
+        <section>
           <label>Who can view this literature?</label>
           <Dropdown tabIndex="0" index={permissions.view} onChange={(choice) => setPermissions({...permissions, view: choice})}>
             <li>Everyone, including visitors who aren't logged in</li>
             <li>Registered Makuwro users</li>
-            <li>My followers</li>
-            <li>My friends</li>
-            <li>Just me</li>
+            <li>My followers, editors, and reviewers</li>
+            <li>My friends, editors, and reviewers</li>
+            <li>Editors and reviewers</li>
           </Dropdown>
         </section>
         <section>
@@ -227,9 +245,9 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
           <Dropdown tabIndex="0" index={permissions.viewComments} onChange={(choice) => setPermissions({...permissions, viewComments: choice})}>
             <li>Everyone, including visitors who aren't logged in</li>
             <li>Registered Makuwro users</li>
-            <li>My followers</li>
-            <li>My friends</li>
-            <li>Just me</li>
+            <li>My followers, editors, and reviewers</li>
+            <li>My friends, editors, and reviewers</li>
+            <li>Editors and reviewers</li>
           </Dropdown>
         </section>
         <section>

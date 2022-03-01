@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from "../../styles/Dropdown.module.css";
 import PropTypes from "prop-types";
 
-export default function Dropdown({index, children, onChange, width, inPopup, tabIndex, text}) {
+export default function Dropdown({index, children, onChange, width, inPopup, tabIndex, text, placeholder = "Choose from a list..."}) {
 
   const dropdownRef = useRef();
   const [open, setOpen] = useState(false);
@@ -81,10 +81,16 @@ export default function Dropdown({index, children, onChange, width, inPopup, tab
 
   return (
     <section className={`${styles.list} ${!open ? styles.closed : ""} ${above ? styles.above : ""} ${!childrenComponents ? styles.none : ""}`} ref={dropdownRef}>
-      <section tabIndex={tabIndex || null} style={{
-        width: width || "auto"
-      }} onClick={() => children && checkIfFlipNeeded()}>
-        {text || (childrenComponents ? ((childrenComponents[index] && childrenComponents[index].props.children) || "Choose from a list...") : "No options available")}
+      <section 
+        tabIndex={tabIndex || null} 
+        style={{
+          width: width || "auto",
+        }}
+        className={index === undefined ? styles.noSelection : ""}
+        onClick={() => children && checkIfFlipNeeded()}
+      >
+        {text || (childrenComponents ? ((childrenComponents[index] && childrenComponents[index].props.children) || placeholder) : "No options available")}
+        <span>▼</span>
       </section>
       <ul>{childrenComponents}</ul>
     </section>

@@ -7,7 +7,7 @@
 }
 
 #profileBannerContainer {
-  height: 260px;
+  aspect-ratio: 6;
   width: 100%;
   background-color: #5e6065;
 }
@@ -132,7 +132,7 @@
 
 #selection > a:hover:active {
   transform: scale(0.9);
-  transition: 0.15s;
+  transition: 0.1s;
 }
 
 #selection + section {
@@ -181,6 +181,7 @@
   flex-wrap: wrap;
   gap: 1rem;
   height: auto;
+  justify-content: center;
 }
 
 .profile-library p {
@@ -188,7 +189,6 @@
 }
 
 .profile-library-item {
-  height: 10rem;
   border-radius: 5px;
   flex: 1 0 10rem;
   max-width: 10rem;
@@ -196,6 +196,7 @@
   justify-content: center;
   align-items: center;
   color: white;
+  height: 10rem;
 }
 
 :global(.light) .profile-library-item {
@@ -208,6 +209,7 @@
 
 .profile-library-item:active:hover {
   transform: scale(0.97);
+  transition: 0.1s;
 }
 
 .profile-library-item > img {
@@ -242,6 +244,10 @@
 
 #profile-literature > a {
   max-width: none;
+  width: 100%;
+  aspect-ratio: 6;
+  flex: initial;
+  height: initial;
 }
 
 #blog {

@@ -15,17 +15,13 @@ export default function Home({shownLocation, setLocation}) {
 
   useEffect(() => {
 
-    if (location.pathname !== "/signin" && location.pathname !== "/register") {
+    if (location.pathname !== "/signin" && location.pathname !== "/register" && location.pathname !== "/") {
 
-      if (location.pathname !== shownLocation.pathname) {
+      setLeaving(true);
 
-        setLeaving(true);
+    } else {
 
-      } else {
-
-        setLeaving(false);
-
-      }
+      setLeaving(false);
 
     }
 

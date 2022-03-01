@@ -31,7 +31,6 @@ body {
   line-height: 1.5;
   user-select: none;
   background-color: var(--night-background);
-  color: white;
   transition: 0.3s;
 }
 
@@ -156,6 +155,10 @@ textarea {
 input[type="checkbox"] {
   width: 25px;
   height: 25px;
+}
+
+label, section {
+  color: white;
 }
 
 label {

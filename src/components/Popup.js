@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import styles from "../styles/Popup.module.css";
 import { useNavigate } from "react-router-dom";
 
-export default function Popup({title, children, onClose, open, warnUnfinished, notify}) {
+export default function Popup({title, children, onClose, open, warnUnfinished, notify, width}) {
 
   const [newChildren, setNewChildren] = useState(null);
   const [cursorOverBG, setCursorOverBG] = useState(false);
@@ -41,12 +41,18 @@ export default function Popup({title, children, onClose, open, warnUnfinished, n
 
   return (
     <section className={`${styles.background} ${open ? styles.open : ""}`} onMouseDown={() => setClickedInside(false)} onClick={() => close()} onMouseOver={() => setCursorOverBG(true)} onMouseOut={() => setCursorOverBG(false)}>
-      <section className={styles.container} onMouseDown={(event) => {
+      <section className={styles.container} 
+        style={width ? {width} : null}
+        onMouseDown={(event) => {
         
-        setClickedInside(true);
-        event.stopPropagation();
+          setClickedInside(true);
+          event.stopPropagation();
       
-      }} onClick={(event) => event.stopPropagation()} onMouseOver={(event) => event.stopPropagation()} onMouseOut={(event) => event.stopPropagation()}>
+        }} 
+        onClick={(event) => event.stopPropagation()} 
+        onMouseOver={(event) => event.stopPropagation()} 
+        onMouseOut={(event) => event.stopPropagation()}
+      >
         <section className={styles.header}>
           <h1>{title}</h1>
           <button onClick={() => close(true)}>🞫</button>

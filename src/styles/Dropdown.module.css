@@ -18,6 +18,8 @@
   box-sizing: border-box;
   transition: 0.3s;
   border: 1px solid #111111;
+  display: flex;
+  justify-content: space-between;
 }
 
 :global(.light) .list > section, :global(.light) .list li, :global(.light) .list > ul {
@@ -77,6 +79,14 @@
   gap: 1rem;
 }
 
+.noSelection {
+  color: var(--night-text);
+}
+
+:global(.light) .noSelection {
+  color: var(--light-text);
+}
+
 .list li img {
   height: 2rem;
   width: 2rem;
@@ -111,4 +121,13 @@ li.selected {
 
 :global(.light) li.selected {
   background-color: rgb(194, 194, 194);
+}
+
+.date {
+  display: flex;
+  gap: 5px;
+}
+
+.date .list {
+  flex: 1 1 0;
 }

@@ -203,7 +203,7 @@ export default function App() {
       }
 
       // Check if we need to sign in
-      if (pathname === "/signin") {
+      if (pathname === "/signin" || pathname === "/register") {
 
         setSignInOpen(true);
 
@@ -246,7 +246,7 @@ export default function App() {
 
   return ready ? (
     <>
-      <Authenticator onSuccess={() => navigate(shownLocation.pathname, {replace: true})} open={signInOpen} addNotification={addNotification} />
+      <Authenticator onSuccess={() => navigate(shownLocation.pathname, {replace: true})} open={signInOpen} addNotification={addNotification} shownLocation={shownLocation} />
       <Popup notify={addNotification} title={popupTitle} open={popupChildren !== null} onClose={() => setPopupChildren(null)} warnUnfinished={popupWarnUnfinished}>
         {popupChildren}
       </Popup>
@@ -275,9 +275,11 @@ export default function App() {
         {notifications}
       </section>
       <Routes location={shownLocation}>
-        <Route path={"/"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
-        <Route path={"/register"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
-        <Route path={"/signin"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
+        {["/", "/register", "/signin"].map((path, index) => {
+
+          return <Route path={path} key={index} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
+
+        })}
         <Route path={"/library"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
         <Route path={"/library/:category"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
         {[
