@@ -4,7 +4,7 @@ import Dropdown from "./input/Dropdown";
 import CountryDropdown from "./input/CountryDropdown";
 import Checkbox from "./input/Checkbox";
 
-export default function AbuseReporter({setPopupSettings, currentUser, addNotification, onClose}) {
+export default function AbuseReporter({setPopupSettings, currentUser, addNotification}) {
 
   const [menu, setMenu] = useState([]);
   const [escalate, setEscalate] = useState(false);

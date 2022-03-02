@@ -14,16 +14,18 @@
 .background.open {
   background-color: rgba(0, 0, 0, 0.623);
   opacity: 1;
-  z-index: 2;
+  z-index: 3;
   pointer-events: initial;
 }
 
 .container {
   background-color: var(--night-article);
-  border-radius: 5px;
   padding: 0 20px 25px;
   transform: scale(0.5);
   transition: 0.3s;
+  width: 100%;
+  box-sizing: border-box;
+  border-color: transparent;
 }
 
 .header button {
@@ -50,7 +52,7 @@
 }
 
 .header {
-  padding: 10px 0;
+  height: 63px;
   display: flex;
   justify-content: space-between;
 }
@@ -65,13 +67,40 @@
 .content {
   overflow-y: auto;
   transition: 0.3s;
-  height: 17.5rem;
+  height: calc(100% - 63px);
 }
 
-.open .content {
-  height: 35rem;
+.open .container {
+  height: 100%;
 }
 
 .content > p:first-of-type {
   margin-top: 0;
+}
+
+@media screen and (min-width: 768px) {
+  
+  .container {
+    width: 728px;
+    border: 1px solid #232325;
+    border-radius: 5px;
+  }
+
+  .open .container {
+    height: 648px;
+  }
+
+  .content {
+    height: 35rem;
+  }
+
+}
+
+@supports (backdrop-filter: blur(10px)) {
+
+  .container {
+    backdrop-filter: blur(35px);
+    background-color: #313237b8;
+  }
+
 }

@@ -6,9 +6,6 @@ import Footer from "./Footer";
 
 export default function Home({shownLocation, setLocation}) {
 
-  // Set the title
-  document.title = "Makuwro, the cool worldbuilding platform";
-
   const navigate = useNavigate();
   const location = useLocation();
   const [leaving, setLeaving] = useState(true);
@@ -19,8 +16,9 @@ export default function Home({shownLocation, setLocation}) {
 
       setLeaving(true);
 
-    } else {
+    } else if (location.pathname === "/") {
 
+      document.title = "Makuwro, the cool worldbuilding platform";
       setLeaving(false);
 
     }

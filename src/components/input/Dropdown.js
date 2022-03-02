@@ -80,7 +80,7 @@ export default function Dropdown({index, children, onChange, width, inPopup, tab
   }, [index]);
 
   return (
-    <section className={`${styles.list} ${!open ? styles.closed : ""} ${above ? styles.above : ""} ${!childrenComponents ? styles.none : ""}`} ref={dropdownRef}>
+    <section className={`${styles.list} ${open ? styles.open : ""} ${above ? styles.above : ""} ${!childrenComponents ? styles.none : ""}`} ref={dropdownRef}>
       <section 
         tabIndex={tabIndex || null} 
         style={{

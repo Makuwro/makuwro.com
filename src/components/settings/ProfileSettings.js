@@ -1,22 +1,24 @@
 import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "../../styles/Settings.module.css";
-import Checkbox from "../input/Checkbox";
+import PropTypes from "prop-types";
 import Dropdown from "../input/Dropdown";
 import SettingsDropdown from "./SettingsDropdown";
 import Editor from "@monaco-editor/react";
 
 export default function ProfileSettings({currentUser, menu, toggleMenu, submitting, updateAccount, character}) {
 
-  const [terms, setTerms] = useState((character ? (character.terms) : currentUser.terms) || "");
-  const [css, setCSS] = useState((character ? character.css : currentUser.css) || "");
-  const [about, setAbout] = useState((character ? character.about : currentUser.about) || "");
+  const [terms, setTerms] = useState((character || currentUser).terms || "");
+  const [css, setCSS] = useState((character || currentUser).css || "");
+  const [about, setAbout] = useState((character ? character.description : currentUser.about) || "");
   const bannerImage = useRef();
+  const avatarImage = useRef();
 
   function resetFields() {
 
-    setTerms(currentUser.terms || "");
-    setCSS(currentUser.css || "");
+    setAbout((character ? character.description : currentUser.about) || "")
+    setTerms((character || currentUser).terms || "");
+    setCSS((character || currentUser).css || "");
 
   }
 
@@ -31,6 +33,22 @@ export default function ProfileSettings({currentUser, menu, toggleMenu, submitti
   return (
     <>
       <section id={styles.options}>
+        <SettingsDropdown
+          title="Avatar"
+          description="This image will be shown on your profile and on all of your published content."
+          open={menu === 0}
+          onClick={() => toggleMenu(0)}
+        >
+          <img className="avatar-preview" src={`${currentUser.avatarUrl || `https://cdn.makuwro.com/${(character || currentUser).avatarPath}`}`} />
+          <form>
+            <input required={true} type="file" accept="image/*" style={{display: "none"}} ref={avatarImage} onChange={(event) => {
+              
+              updateAccountWrapper(event, "avatar", event.target.files[0]);
+            
+            }} />
+            <input style={{marginTop: "1rem"}} type="button" value="Change avatar" onClick={() => avatarImage.current.click()} disabled={submitting} />
+          </form>
+        </SettingsDropdown>
         <SettingsDropdown
           title="Banner image"
           description="This image will be shown at the top of your profile."
@@ -63,12 +81,12 @@ export default function ProfileSettings({currentUser, menu, toggleMenu, submitti
           </SettingsDropdown>
         )}
         <SettingsDropdown
-          title="About"
-          description="Manage the about section of your profile."
+          title={character ? "Description" : "About"}
+          description="Now, just who are you?"
           open={menu === 3}
           onClick={() => toggleMenu(3)}
         >
-          <form onSubmit={(event) => updateAccountWrapper(event, "about", about)}>
+          <form onSubmit={(event) => updateAccountWrapper(event, character ? "description" : "about", about)}>
             <Editor
               height="150px"
               defaultLanguage="html"
@@ -132,3 +150,12 @@ export default function ProfileSettings({currentUser, menu, toggleMenu, submitti
   );
 
 }
+
+ProfileSettings.propTypes = {
+  currentUser: PropTypes.object.isRequired, 
+  menu: PropTypes.number, 
+  toggleMenu: PropTypes.func.isRequired, 
+  submitting: PropTypes.bool.isRequired,
+  updateAccount: PropTypes.func.isRequired, 
+  character: PropTypes.object
+};

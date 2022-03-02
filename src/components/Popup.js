@@ -10,24 +10,6 @@ export default function Popup({title, children, onClose, open, warnUnfinished, n
   const [clickedInside, setClickedInside] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-
-    const fixedChildren = React.Children.map(children, (child) => {
-
-      if (React.isValidElement(child)) {
-
-        return React.cloneElement(child, {notify});
-
-      }
-
-      return child;
-
-    });
-
-    setNewChildren(fixedChildren);
-
-  }, [children]);
-
   function close(bypass) {
 
     if (!warnUnfinished || ((bypass || (cursorOverBG && !clickedInside)) && confirm("Are you sure you want to exit? You aren't finished yet!"))) {
@@ -38,6 +20,46 @@ export default function Popup({title, children, onClose, open, warnUnfinished, n
     }
 
   }
+
+  useEffect(() => {
+
+    if (open) {
+
+      const fixedChildren = React.Children.map(children, (child) => {
+
+        if (React.isValidElement(child)) {
+
+          return React.cloneElement(child, {notify});
+
+        }
+
+        return child;
+
+      });
+
+      const checkForEscape = ({keyCode}) => {
+
+        if (keyCode === 27) {
+
+          close();
+
+        }
+
+      };
+
+      setNewChildren(fixedChildren);
+
+      document.addEventListener("keydown", checkForEscape);
+
+      return () => {
+
+        document.removeEventListener("keydown", checkForEscape);
+
+      };
+
+    }
+
+  }, [children]);
 
   return (
     <section className={`${styles.background} ${open ? styles.open : ""}`} onMouseDown={() => setClickedInside(false)} onClick={() => close()} onMouseOver={() => setCursorOverBG(true)} onMouseOut={() => setCursorOverBG(false)}>

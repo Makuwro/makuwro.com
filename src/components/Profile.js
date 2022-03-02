@@ -75,7 +75,8 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
           className: itemLC === tab || itemLC === subtab || ((isCharacter ? !subtab : !tab) && itemLC === "about") ? styles.selected : null,
           onClick: itemLC !== tab && itemLC !== subtab && (tab || itemLC !== "about") ? onClick : null,
           onTransitionEnd: (event) => event.stopPropagation(),
-          key: itemLC
+          key: itemLC,
+          draggable: false
         }, item);
 
         // Push it for use later
@@ -85,7 +86,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
       setNavComponents(navChildren);
 
       const components = {
-        about: <ProfileAbout profileInfo={profileInfo} currentUser={currentUser} />,
+        about: <ProfileAbout profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
         art: <ProfileLibraryItem updated={updated} tab="art" profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
         literature: <ProfileLibraryItem tab="literature" profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
         worlds: <ProfileLibraryItem tab="worlds" profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
@@ -230,7 +231,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
           {profileInfo && profileInfo.bannerPath && <img src={`https://cdn.makuwro.com/${profileInfo.bannerPath}`} />}
         </section>
       </section>
-      <section id={styles["profile-info"]}>
+      <section id={styles["profile-info"]} style={isCharacter && !profileInfo ? {marginBottom: "48px"} : null}>
         {!isLiterature && (
           <img alt={`${username}'s avatar`} src={`https://cdn.makuwro.com/${profileInfo ? profileInfo.avatarPath : "global/pfp.png"}`} />
         )}
@@ -245,7 +246,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
             {isLiterature ? state.displayName[0] : (profileInfo && !profileInfo.isBanned && !profileInfo.isDisabled && profileInfo.displayName ? `@${profileInfo.username}` : null)}
           </h2>
           {!profileInfo ? (
-            <p style={{margin: 0}}>This {isCharacter ? "character" : "account"} doesn't exist. {!currentUser.id ? <Link to="/register">But it doesn't have to be that way ;)</Link> : ""}</p>
+            <p style={{margin: 0}}>This {isCharacter ? "character" : "account"} doesn't exist. {!isCharacter && !currentUser.id ? <Link to="/register">But it doesn't have to be that way ;)</Link> : ""}</p>
           ) : (profileInfo.isBanned ? (
             <p style={{margin: 0}}>This account has been banned for violating the <a href="https://about.makuwro.com/policies/terms">terms of service</a></p>
           ) : (profileInfo.isDisabled ? 

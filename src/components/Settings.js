@@ -72,7 +72,7 @@ export default function Settings({currentUser, setLocation, setCurrentUser}) {
     }
 
 
-    if (!submitting && value !== currentUser[key]) {
+    if (!submitting && value !== (character || currentUser)[key]) {
 
       // Prevent multiple requests while we do this.
       setSubmitting(true);
@@ -89,7 +89,7 @@ export default function Settings({currentUser, setLocation, setCurrentUser}) {
         }
 
         // Send the request to change the value.
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}accounts/user`, {
+        const response = await fetch(`${process.env.RAZZLE_API_DEV}${character ? `contents/characters/${character.owner.username}/${character.slug}` : "accounts/user"}`, {
           method: "PATCH",
           headers: {
             token: currentUser.token
@@ -102,11 +102,11 @@ export default function Settings({currentUser, setLocation, setCurrentUser}) {
           // Save the new username to the state.
           if (key !== "newPassword") {
 
-            setCurrentUser({...currentUser, [key + (key === "avatar" || key === "banner" ? "Url" : "")]: key === "avatar" || key === "banner" ? URL.createObjectURL(value) : value});
+            (character ? setCharacter : setCurrentUser)({...(character || currentUser), [key + (key === "avatar" || key === "banner" ? "Url" : "")]: key === "avatar" || key === "banner" ? URL.createObjectURL(value) : value});
 
           }
           
-          if (key !== "isDsiabled") {
+          if (key !== "isDisabled") {
 
             alert("Saved!");
 
@@ -185,7 +185,15 @@ export default function Settings({currentUser, setLocation, setCurrentUser}) {
     
     if (!tabs[tab]) {
 
-      navigate(`/settings/account${location.search}`, {replace: true});
+      if (character) {
+
+        navigate(`/${character.owner.username}/characters/${character.slug}/settings/profile`, {replace: true});
+
+      } else {
+
+        navigate(`/settings/account${location.search}`, {replace: true});
+
+      }
 
     } else {
 
@@ -216,7 +224,7 @@ export default function Settings({currentUser, setLocation, setCurrentUser}) {
     for (i = 0; menuOptions.length > i; i++) {
 
       const name = menuOptions[i];
-      const path = `/settings/${name.toLowerCase().replaceAll(" ", "-")}`;
+      const path = `${character ? `/${character.owner.username}/characters/${character.slug}` : ""}/settings/${name.toLowerCase().replaceAll(" ", "-")}`;
   
       menuOptions[i] = (
         <li key={i}>
@@ -271,6 +279,37 @@ export default function Settings({currentUser, setLocation, setCurrentUser}) {
     while (characterName !== null && (!characterName || characterName.toLowerCase() !== character.name.toLowerCase())) {
 
       characterName = prompt(`Are you sure you want to delete this character? We'll remove their stats, their avatar, their about page, and their tags. \n\nNo takesies-backsies! Type ${character.name}'s name to confirm.`);
+
+    }
+
+    if (characterName) {
+    
+      try {
+
+        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/characters/${character.owner.username}/${character.slug}`, {
+          method: "DELETE",
+          headers: {
+            token: currentUser.token
+          }
+        });
+
+        if (response.ok) {
+
+          alert("And they're outta here!");
+          navigate(`/${character.owner.username}`);
+
+        } else {
+
+          const {message} = await response.json();
+          throw new Error(message);
+
+        }
+
+      } catch (err) {
+
+        alert(`Couldn't delete your character: ${err.message}`);
+
+      }
 
     }
 

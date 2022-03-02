@@ -11,7 +11,7 @@ export default function BirthdateDropdown({ onChange }) {
     "July", "August", "September", "October", "November", "December"
   ];
   const monthComps = [];
-  const dayComps = [];
+  const dateComps = [];
   const yearComps = [];
   let year;
   let i;
@@ -24,7 +24,7 @@ export default function BirthdateDropdown({ onChange }) {
 
   for (i = 0; 31 > i; i++) {
 
-    dayComps.push(<li key={i}>{i + 1}</li>);
+    dateComps.push(<li key={i}>{i + 1}</li>);
 
   }
 
@@ -37,7 +37,7 @@ export default function BirthdateDropdown({ onChange }) {
 
   useEffect(() => {
 
-
+    onChange(new Date(`${monthList[dateIndex[0]]}/${dateComps[dateIndex[1]]?.props.children}/${yearComps[dateIndex[2]]?.props.children}`));
 
   }, [dateIndex]);
 
@@ -59,7 +59,7 @@ export default function BirthdateDropdown({ onChange }) {
         {monthComps}
       </Dropdown>
       <Dropdown index={dateIndex[1]} onChange={(index) => setIndex(1, index)} placeholder="Day" inPopup>
-        {dayComps}
+        {dateComps}
       </Dropdown>
       <Dropdown index={dateIndex[2]} onChange={(index) => setIndex(2, index)} placeholder="Year" inPopup>
         {yearComps}

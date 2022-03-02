@@ -15,7 +15,6 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
 
   // States
   const [name, setName] = useState("");
-  const [imagePath, setImagePath] = useState(null);
   const [description, setDescription] = useState("");
   const [editors, setEditors] = useState([]);
   const [reviewers, setReviewers] = useState([]);
@@ -32,6 +31,8 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
   });
   const [ageRestrictionLevel, setAgeRestrictionLevel] = useState(0);
   const [contentWarning, setContentWarning] = useState("");
+  const [literatureType, setLiteratureType] = useState(0);
+  const [wip, setWIP] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [ready, setReady] = useState(false);
   const navigate = useNavigate();
@@ -68,6 +69,7 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
         let worldIds;
         let characterIds;
         let folderIds;
+        const slug = slug || name.toLowerCase().replaceAll(/[^a-zA-Z0-9_]/gm, "-");
 
         // Turn the collaborators array into an array of user IDs
         editorIds = [];
@@ -100,7 +102,7 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
 
         // Set up form data
         formData = new FormData();
-        formData.append("image", image.current.files[0]);
+        formData.append("banner", image.current.files[0]);
         formData.append("description", description);
         formData.append("editors", JSON.stringify(editorIds));
         formData.append("tags", JSON.stringify(tags));
@@ -114,6 +116,8 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
         formData.append("permissions", JSON.stringify(permissions));
         formData.append("ageRestrictionBLevel", ageRestrictionLevel);
         formData.append("contentWarning", contentWarning);
+        formData.append("type", literatureType);
+        formData.append("wip", wip);
         formData.append("slug", slug);
 
         response = await fetch(`${process.env.RAZZLE_API_DEV}contents/literature/${currentUser.username}/${slug}`, {
@@ -161,11 +165,11 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
         </section>
         <section>
           <label>Literature type</label>
-          <Dropdown index={0}>
+          <Dropdown index={literatureType} onChange={(type) => setLiteratureType(type)}>
             <li>One-off</li>
             <li>Multi-chapter</li>
           </Dropdown>
-          <Checkbox>
+          <Checkbox checked={wip} onClick={(checked) => setWIP(checked)}>
             This literature is a work-in-progress
           </Checkbox>
         </section>
@@ -224,7 +228,7 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
         </section>
         <section>
           <label>Reviewers</label>
-          <p>These people will have to read your unpublished work and make private comments.</p>
+          <p>These people will have access to read your unpublished work and make private comments.</p>
           <ContentInput
             currentUser={currentUser}
             content={reviewers}

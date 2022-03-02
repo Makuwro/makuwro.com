@@ -161,6 +161,10 @@ label, section {
   color: white;
 }
 
+.light label, .light section {
+  color: var(--light-text);
+}
+
 label {
   margin-top: 1rem;
   display: block;

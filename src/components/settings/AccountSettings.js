@@ -12,7 +12,6 @@ export default function AccountSettings({currentUser, menu, setMenu, submitting,
   const [newPassword, setNewPassword] = useState("");
   const [password, setPassword] = useState("");
   const [passwordAgain, setPasswordAgain] = useState("");
-  const avatarImage = useRef();
   
   function resetFields() {
 
@@ -117,22 +116,6 @@ export default function AccountSettings({currentUser, menu, setMenu, submitting,
             <label>Password</label>
             <input type="password" value={password} onInput={(event) => setPassword(event.target.value)} required />
             <input type="submit" value="Save" disabled={submitting} />
-          </form>
-        </SettingsDropdown>
-        <SettingsDropdown
-          title="Avatar"
-          description="This image will be shown on your profile and on all of your published content."
-          open={menu === 2}
-          onClick={() => toggleMenu(2)}
-        >
-          <img className="avatar-preview" src={`${currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`}`} />
-          <form>
-            <input required={true} type="file" accept="image/*" style={{display: "none"}} ref={avatarImage} onChange={(event) => {
-              
-              updateAccountWrapper(event, "avatar", event.target.files[0]);
-            
-            }} />
-            <input style={{marginTop: "1rem"}} type="button" value="Change avatar" onClick={() => avatarImage.current.click()} disabled={submitting} />
           </form>
         </SettingsDropdown>
         <SettingsDropdown

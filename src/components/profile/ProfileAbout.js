@@ -4,7 +4,7 @@ import parse from "html-react-parser";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 
-export default function ProfileAbout({profileInfo}) {
+export default function ProfileAbout({profileInfo, isCharacter}) {
 
   const [ready, setReady] = useState();
   const [comp, setComp] = useState();
@@ -13,10 +13,11 @@ export default function ProfileAbout({profileInfo}) {
 
     if (profileInfo) {
 
-      if (profileInfo.about) {
+      const content = profileInfo[isCharacter ? "description" : "about"];
+      if (content) {
 
         // Protect us from bad HTML, please!
-        const sanitizedHtml = sanitize(profileInfo.about, {
+        const sanitizedHtml = sanitize(content, {
           allowedAttributes: false, 
           allowedClasses: false,
           allowedTags: [

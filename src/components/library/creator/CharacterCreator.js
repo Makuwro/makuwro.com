@@ -52,7 +52,7 @@ export default function CharacterCreator({currentUser, setPopupSettings, charact
 
       setSubmitting(true);
       
-      const slug = slug || name.toLowerCase().replaceAll(name.replaceAll(/[^a-zA-Z0-9_]/gm, "-"));
+      const slug = slug || name.toLowerCase().replaceAll(/[^a-zA-Z0-9_]/gm, "-");
 
       try {
 
@@ -82,6 +82,17 @@ export default function CharacterCreator({currentUser, setPopupSettings, charact
 
         if (response.ok) {
 
+          setName("");
+          setAvatar();
+          setDescription("");
+          setTags([]);
+          setFolders([]);
+          setWorlds([]);
+          setPermissions({});
+          setAgeRestrictionLevel();
+          setContentWarning("");
+          setSlug("");
+          setSubmitting(false);
           navigate(`/${currentUser.username}/characters/${slug}`);
 
         } else {
@@ -181,7 +192,7 @@ export default function CharacterCreator({currentUser, setPopupSettings, charact
               slugRef.current.setSelectionRange(0, 0);
 
             }}>{`makuwro.com/${currentUser.username}/characters/`}</span>
-            <input type="text" name="url" ref={slugRef} onChange={(event) => setSlug(event.target.value)} value={slug} placeholder={name.replaceAll(/[^a-zA-Z0-9_]/gm, "-")}/>
+            <input type="text" name="url" ref={slugRef} onChange={(event) => setSlug(event.target.value)} value={slug} placeholder={name.replaceAll(/[^a-zA-Z0-9_-]/gm, "-")}/>
           </section>
         </section>
         <section>

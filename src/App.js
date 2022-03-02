@@ -246,7 +246,7 @@ export default function App() {
 
   return ready ? (
     <>
-      <Authenticator onSuccess={() => navigate(shownLocation.pathname, {replace: true})} open={signInOpen} addNotification={addNotification} shownLocation={shownLocation} />
+      <Authenticator open={signInOpen} addNotification={addNotification} shownLocation={shownLocation} currentUser={currentUser} />
       <Popup notify={addNotification} title={popupTitle} open={popupChildren !== null} onClose={() => setPopupChildren(null)} warnUnfinished={popupWarnUnfinished}>
         {popupChildren}
       </Popup>
@@ -277,7 +277,7 @@ export default function App() {
       <Routes location={shownLocation}>
         {["/", "/register", "/signin"].map((path, index) => {
 
-          return <Route path={path} key={index} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
+          return <Route path={path} key={index} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />;
 
         })}
         <Route path={"/library"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
