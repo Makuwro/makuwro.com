@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import styles from "../../../styles/LibraryViewer.module.css";
 import PropTypes from "prop-types";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Comment from "../../Comment";
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-export default function ArtViewer({art, open, currentUser, onClose, notify, artRegex, confirmContentWarning, contentWarningStatus, artDeleted}) {
+export default function ArtViewer({art, open, currentUser, onClose, notify, artRegex, confirmContentWarning, contentWarningStatus, artDeleted, shownLocation}) {
 
   let [comments, setComments] = useState();
   const [commentComps, setCommentComps] = useState([]);
@@ -18,6 +18,7 @@ export default function ArtViewer({art, open, currentUser, onClose, notify, artR
   const [formattedDate, setFormattedDate] = useState(null);
   const [collaborators, setCollaborators] = useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
 
@@ -58,12 +59,18 @@ export default function ArtViewer({art, open, currentUser, onClose, notify, artR
       for (i = 0; (characters?.length || 0) > i; i++) {
 
         const character = characters[i];
-        comps[i] = <>{i !== 0 && i + 1 === characters.length ? " and " : ""}<Link 
-          to={`/${character.owner.username}/characters/${character.slug}`} 
-          key={character.id}
-        >
-          {character.name}
-        </Link></>;
+        comps[i] = (
+          <React.Fragment 
+            key={character.id}
+          >
+            {i !== 0 ? (i + 1 === characters.length ? `${characters.length > 2 ? "," : ""} and ` : ", ") : ""}
+            <Link 
+              to={`/${character.owner.username}/characters/${character.slug}`} 
+            >
+              {character.name}
+            </Link>
+          </React.Fragment>
+        );
 
       }
       setCharacterComps(comps);
@@ -159,7 +166,7 @@ export default function ArtViewer({art, open, currentUser, onClose, notify, artR
             children: "Buh-bye!"
           });
           artDeleted();
-          navigate(`/${art.owner.username}/art`);
+          navigate(shownLocation.pathname === location.pathname ? `/${art.owner.username}/art` : shownLocation);
 
         }
 
@@ -226,7 +233,7 @@ export default function ArtViewer({art, open, currentUser, onClose, notify, artR
 
       if (!open) {
 
-        onClose(art.owner.username);
+        onClose(art?.owner.username);
 
       }
 
@@ -234,7 +241,7 @@ export default function ArtViewer({art, open, currentUser, onClose, notify, artR
       {(!art || !art.refresh) && art && (
         <>
           <section id={styles.content}>
-            <section id={styles["image-background"]} onClick={() => navigate(`/${art.owner.username}/art`)}>
+            <section id={styles["image-background"]} onClick={() => navigate(shownLocation.pathname === location.pathname ? `/${art.owner.username}/art` : shownLocation)}>
               <img src={art.imagePath ? `https://cdn.makuwro.com/${art.imagePath}` : "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/YouTube_loading_symbol_3_%28transparent%29.gif/640px-YouTube_loading_symbol_3_%28transparent%29.gif"} onClick={(event) => event.stopPropagation()} />
             </section>
             <section id={styles.artist}>

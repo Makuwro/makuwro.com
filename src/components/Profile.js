@@ -33,74 +33,78 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
   // Set the current view
   useEffect(() => {
 
-    if (profileInfo) {
+    if (!matchPath({path: "/:username/art/:id"}, location.pathname)) {
 
-      // Add links to the profile navigator
-      const navChildren = [];
-      const navItems = isCharacter ? [
-        "About",
-        "Art",
-        "Literature",
-        "Stats",
-        "Worlds"
-      ] : [
-        "About",
-        "Art", 
-        "Blog", 
-        "Characters",
-        "Literature", 
-        "Stats",
-        "Terms", 
-        "Worlds"
-      ];
-      for (let i = 0; navItems.length > i; i++) {
+      if (profileInfo) {
 
-        // First, let's work on the onClick function
-        const item = navItems[i];
-        const itemLC = item.toLowerCase();
-        const href = `/${username}${isCharacter ? `/characters/${id}` : ""}${itemLC !== "about" ? `/${itemLC}` : ""}`;
-        const onClick = (event) => {
+        // Add links to the profile navigator
+        const navChildren = [];
+        const navItems = isCharacter ? [
+          "About",
+          "Art",
+          "Literature",
+          "Stats",
+          "Worlds"
+        ] : [
+          "About",
+          "Art", 
+          "Blog", 
+          "Characters",
+          "Literature", 
+          "Stats",
+          "Terms", 
+          "Worlds"
+        ];
+        for (let i = 0; navItems.length > i; i++) {
 
-          // Don't go to the link quite yet, let's animate this first
-          event.preventDefault();
+          // First, let's work on the onClick function
+          const item = navItems[i];
+          const itemLC = item.toLowerCase();
+          const href = `/${username}${isCharacter ? `/characters/${id}` : ""}${itemLC !== "about" ? `/${itemLC}` : ""}`;
+          const onClick = (event) => {
 
-          setShifting(true);
+            // Don't go to the link quite yet, let's animate this first
+            event.preventDefault();
 
-          // Now it's time to go to the next page
-          navigate(href);
+            setShifting(true);
 
-        };
-        const element = React.createElement(Link, {
-          to: href,
-          className: itemLC === tab || itemLC === subtab || ((isCharacter ? !subtab : !tab) && itemLC === "about") ? styles.selected : null,
-          onClick: itemLC !== tab && itemLC !== subtab && (tab || itemLC !== "about") ? onClick : null,
-          onTransitionEnd: (event) => event.stopPropagation(),
-          key: itemLC,
-          draggable: false
-        }, item);
+            // Now it's time to go to the next page
+            navigate(href);
 
-        // Push it for use later
-        navChildren.push(element);
+          };
+          const element = React.createElement(Link, {
+            to: href,
+            className: itemLC === tab || itemLC === subtab || ((isCharacter ? !subtab : !tab) && itemLC === "about") ? styles.selected : null,
+            onClick: itemLC !== tab && itemLC !== subtab && (tab || itemLC !== "about") ? onClick : null,
+            onTransitionEnd: (event) => event.stopPropagation(),
+            key: itemLC,
+            draggable: false
+          }, item);
+
+          // Push it for use later
+          navChildren.push(element);
+
+        }
+        setNavComponents(navChildren);
+
+        const components = {
+          about: <ProfileAbout profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
+          art: <ProfileLibraryItem updated={updated} tab="art" profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
+          literature: <ProfileLibraryItem tab="literature" profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
+          worlds: <ProfileLibraryItem tab="worlds" profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
+          stats: <ProfileStats profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
+          characters: <ProfileLibraryItem tab="characters" profileInfo={profileInfo} currentUser={currentUser} />,
+          terms: <ProfileTerms profileInfo={profileInfo} currentUser={currentUser} />,
+          blog: <ProfileBlog profileInfo={profileInfo} currentUser={currentUser} notify={notify} />
+        };  
+
+        setTabComponent(components[(isCharacter ? subtab : tab) || "about"]);
+
+      } else {
+
+        setTabComponent(null);
 
       }
-      setNavComponents(navChildren);
-
-      const components = {
-        about: <ProfileAbout profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
-        art: <ProfileLibraryItem updated={updated} tab="art" profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
-        literature: <ProfileLibraryItem tab="literature" profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
-        worlds: <ProfileLibraryItem tab="worlds" profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
-        stats: <ProfileStats profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
-        characters: <ProfileLibraryItem tab="characters" profileInfo={profileInfo} currentUser={currentUser} />,
-        terms: <ProfileTerms profileInfo={profileInfo} currentUser={currentUser} />,
-        blog: <ProfileBlog profileInfo={profileInfo} currentUser={currentUser} notify={notify} />
-      };  
-
-      setTabComponent(components[(isCharacter ? subtab : tab) || "about"]);
-
-    } else {
-
-      setTabComponent(null);
 
     }
 

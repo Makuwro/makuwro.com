@@ -274,6 +274,7 @@ export default function App() {
           artRegex={artRegex}
           artDeleted={() => setUpdated(true)}
           confirmContentWarning={(warningText) => setContentWarning(warningText)}
+          shownLocation={shownLocation}
           onClose={() => {
 
             setLocation(location);
@@ -299,7 +300,7 @@ export default function App() {
         ].map((path, index) => {
           
           return <Route key={index} path={path} element={(
-            <Profile updated={updated} shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} notify={addNotification} />
+            <Profile updated={updated} shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} notify={addNotification} artViewerOpen={artViewerOpen} />
           )} />;
 
         })}

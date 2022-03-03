@@ -22,7 +22,7 @@ export default function ContentInput({content = [], onChange, currentUser, type}
 
       comps[i] = <span onClick={() => {
     
-        onChange(contentList => contentList.filter((user2) => user2 !== content));
+        onChange(() => content.filter((item2) => item2 !== content[i]));
 
       }} key={content[i].id}>
         <img src={`https://cdn.makuwro.com/${content[i].avatarPath || content[i].imagePath}`} />
