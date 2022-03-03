@@ -8,14 +8,14 @@ export default function Popup({title, children, onClose, open, warnUnfinished, n
   const [newChildren, setNewChildren] = useState(null);
   const [cursorOverBG, setCursorOverBG] = useState(false);
   const [clickedInside, setClickedInside] = useState(false);
+  const [closing, setClosing] = useState(true);
   const navigate = useNavigate();
 
   function close(bypass) {
 
     if (!warnUnfinished || ((bypass || (cursorOverBG && !clickedInside)) && confirm("Are you sure you want to exit? You aren't finished yet!"))) {
 
-      navigate(window.location.pathname + (location.hash ? `#${location.hash}` : ""));
-      onClose();
+      setClosing(true);
 
     }
 
@@ -61,8 +61,30 @@ export default function Popup({title, children, onClose, open, warnUnfinished, n
 
   }, [children]);
 
+  useEffect(() => {
+
+    setTimeout(() => setClosing(!open), 0);
+
+  }, [open]);
+
   return (
-    <section className={`${styles.background} ${open ? styles.open : ""}`} onMouseDown={() => setClickedInside(false)} onClick={() => close()} onMouseOver={() => setCursorOverBG(true)} onMouseOut={() => setCursorOverBG(false)}>
+    <section 
+      className={`${styles.background} ${!closing ? styles.open : ""}`} 
+      onMouseDown={() => setClickedInside(false)} 
+      onClick={() => close()} 
+      onMouseOver={() => setCursorOverBG(true)} 
+      onMouseOut={() => setCursorOverBG(false)}
+      onTransitionEnd={() => {
+
+        if (closing) {
+
+          navigate(window.location.pathname + (location.hash ? `#${location.hash}` : ""));
+          onClose();
+
+        }
+
+      }}
+    >
       <section className={styles.container} 
         style={width ? {width} : null}
         onMouseDown={(event) => {
@@ -74,6 +96,11 @@ export default function Popup({title, children, onClose, open, warnUnfinished, n
         onClick={(event) => event.stopPropagation()} 
         onMouseOver={(event) => event.stopPropagation()} 
         onMouseOut={(event) => event.stopPropagation()}
+        onTransitionEnd={(event) => {
+
+          event.stopPropagation();
+
+        }}
       >
         <section className={styles.header}>
           <h1>{title}</h1>

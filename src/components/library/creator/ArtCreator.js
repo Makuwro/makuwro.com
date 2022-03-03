@@ -37,32 +37,21 @@ export default function ArtCreator({currentUser, setPopupSettings, notify, art, 
 
   useEffect(() => {
 
-    if (art) {
+    setImagePath(art ? `https://cdn.makuwro.com/${art.imagePath}` : null);
+    setDescription(art?.description || description);
+    setCollaborators(art?.collaborators || collaborators);
+    setTags(art?.tags || tags);
+    setCharacters(art?.characters || characters);
+    setFolders(art?.folders || folders);
+    setWorlds(art?.worlds || worlds);
+    setSlug(art?.slug || slug);
+    setAgeRestrictionLevel(art?.ageRestrictionLevel || ageRestrictionLevel);
+    setContentWarning(art?.contentWarning || contentWarning);
 
-      setImagePath(`https://cdn.makuwro.com/${art.imagePath}`);
-      setDescription(art.description || description);
-      setCollaborators(art.collaborators || collaborators);
-      setTags(art.tags || tags);
-      setCharacters(art.references.characters || characters);
-      setFolders(art.references.folders || folders);
-      setWorlds(art.references.worlds || worlds);
-      setSlug(art.slug || slug);
-      setAgeRestrictionLevel(art.ageRestrictionLevel || ageRestrictionLevel);
-      setContentWarning(art.contentWarning || contentWarning);
-
-      setPopupSettings({
-        title: "Update art",
-        warnUnfinished: true
-      });
-
-    } else {
-
-      setPopupSettings({
-        title: "Upload art",
-        warnUnfinished: true
-      });
-
-    }
+    setPopupSettings({
+      title: `Up${art ? "date" : "load"} art`,
+      warnUnfinished: true
+    });
 
     document.title = "Upload art to Makuwro";
 
@@ -127,11 +116,9 @@ export default function ArtCreator({currentUser, setPopupSettings, notify, art, 
         formData.append("tags", JSON.stringify(tags));
         formData.append("folders", JSON.stringify(folderIds));
         formData.append("worlds", JSON.stringify(worldIds));
-        formData.append("references", JSON.stringify({
-          worlds: worldIds,
-          folders: folderIds,
-          characters: characterIds
-        }));
+        formData.append("characters", JSON.stringify(characterIds));
+        formData.append("worlds", JSON.stringify(worldIds));
+        formData.append("folders", JSON.stringify(folderIds));
         formData.append("permissions", JSON.stringify(permissions));
         formData.append("ageRestrictionBLevel", ageRestrictionLevel);
         formData.append("contentWarning", contentWarning);
@@ -153,7 +140,7 @@ export default function ArtCreator({currentUser, setPopupSettings, notify, art, 
 
         } else {
 
-          throw new Error(await response.json());
+          throw new Error((await response.json()).message);
 
         }
 

@@ -33,13 +33,11 @@ export default function Header({currentUser, theme, systemDark, query, history, 
       </form>
       <section>
         {currentUser && currentUser.id ? (
-          <>
-            <button title={`@${currentUser.username}`} onClick={() => navigate(`/${currentUser.username}`)} id={styles["account-button"]} style={{
-              backgroundImage: `url(${currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`})`,
-              backgroundSize: "cover",
-              backgroundColor: "gray"
-            }}></button>
-          </>
+          <button title={`${`${currentUser.displayName} (` || ""}@${currentUser.username}${currentUser.displayName ? ")" : ""}`} onClick={() => navigate(`/${currentUser.username}`)} id={styles["account-button"]} style={{
+            backgroundImage: `url(${currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`})`,
+            backgroundSize: "cover",
+            backgroundColor: "gray"
+          }} />
         ) : (
           <Link to="/signin" id={styles["login-button"]}>
             Sign in

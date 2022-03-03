@@ -108,11 +108,8 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
         formData.append("tags", JSON.stringify(tags));
         formData.append("folders", JSON.stringify(folderIds));
         formData.append("worlds", JSON.stringify(worldIds));
-        formData.append("references", JSON.stringify({
-          worlds: worldIds,
-          folders: folderIds,
-          characters: characterIds
-        }));
+        formData.append("folders", JSON.stringify(folderIds));
+        formData.append("characters", JSON.stringify(characterIds));
         formData.append("permissions", JSON.stringify(permissions));
         formData.append("ageRestrictionBLevel", ageRestrictionLevel);
         formData.append("contentWarning", contentWarning);
@@ -154,7 +151,7 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
       <section>
         <section>
           <label>Literature name</label>
-          <input type="text" value={name} onInput={(target) => setName(target.input.value)} />
+          <input type="text" value={name} onInput={(event) => setName(event.target.value)} />
         </section>
         <section>
           <label>Description<span style={{
@@ -222,6 +219,7 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
           <p>These people will have access to view reviewer comments and edit your work. They are not able to publish, unpublish, or delete this literature.</p>
           {currentUser.isTeam && <p>Admins of {currentUser.displayName} are already able to edit and <i>can</i> delete this literature.</p>}
           <ContentInput
+            type={0}
             currentUser={currentUser}
             content={editors}
             onChange={(editors) => setEditors(editors)} />
@@ -230,6 +228,7 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
           <label>Reviewers</label>
           <p>These people will have access to read your unpublished work and make private comments.</p>
           <ContentInput
+            type={0}
             currentUser={currentUser}
             content={reviewers}
             onChange={(reviewers) => setReviewers(reviewers)} />

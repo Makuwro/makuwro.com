@@ -44,6 +44,7 @@ export default function App() {
   const [notifications, setNotifications] = useState([]);
   const [ready, setReady] = useState(false);
   const [contentWarning, setContentWarning] = useState(null);
+  const [artViewerOpen, setArtViewerOpen] = useState(false);
   const [searchParams] = useSearchParams();
   let [currentUser, setCurrentUser] = useState({});
   const navigate = useNavigate();
@@ -125,6 +126,7 @@ export default function App() {
 
           if (artResponse.ok) {
 
+            setArtViewerOpen(true);
             setArt(art);
 
           } else {
@@ -177,7 +179,7 @@ export default function App() {
 
           },
           refreshArt: () => setArt({refresh: true}),
-          setPopupSettings: ({title, warnUnfinished}) => {
+          setPopupSettings: ({title, warnUnfinished, onClose}) => {
 
             if (title) {
 
@@ -247,29 +249,39 @@ export default function App() {
   return ready ? (
     <>
       <Authenticator open={signInOpen} addNotification={addNotification} shownLocation={shownLocation} currentUser={currentUser} />
-      <Popup notify={addNotification} title={popupTitle} open={popupChildren !== null} onClose={() => setPopupChildren(null)} warnUnfinished={popupWarnUnfinished}>
-        {popupChildren}
-      </Popup>
-      <Popup title="Content warning" open={contentWarning !== null} onClose={() => setContentWarning(null)}>
-        <ContentWarning>
-          {contentWarning}
-        </ContentWarning>
-      </Popup>
-      <ArtViewer 
-        notify={addNotification} 
-        currentUser={currentUser} 
-        open={art ? true : false} 
-        art={art}
-        artRegex={artRegex}
-        artDeleted={() => setUpdated(true)}
-        confirmContentWarning={(warningText) => setContentWarning(warningText)}
-        onClose={() => {
+      {popupChildren && (
+        <Popup notify={addNotification} title={popupTitle} open={popupChildren !== null} onClose={() => {
+          
+          setPopupChildren(null);
+        
+        }} warnUnfinished={popupWarnUnfinished}>
+          {popupChildren}
+        </Popup>
+      )}
+      {contentWarning && (
+        <Popup title="Content warning" open={contentWarning !== null} onClose={() => setContentWarning(null)}>
+          <ContentWarning>
+            {contentWarning}
+          </ContentWarning>
+        </Popup>
+      )}
+      {artViewerOpen && (
+        <ArtViewer 
+          notify={addNotification} 
+          currentUser={currentUser} 
+          open={art ? true : false} 
+          art={art}
+          artRegex={artRegex}
+          artDeleted={() => setUpdated(true)}
+          confirmContentWarning={(warningText) => setContentWarning(warningText)}
+          onClose={() => {
 
-          setLocation(location);
-          setArt();
+            setLocation(location);
+            setArtViewerOpen(false);
 
-        }} 
-      />
+          }} 
+        />
+      )}
       <Header notify={addNotification} currentUser={currentUser} systemDark={systemDark} setLocation={setLocation} />
       <section id="live-notifications">
         {notifications}

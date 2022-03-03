@@ -39,12 +39,12 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
 
         if (isCharacter || response.ok) {
 
-          let content = isCharacter ? [...profileInfo.references[tab] || []] : await response.json();
+          let content = isCharacter ? [...profileInfo[tab] || []] : await response.json();
 
           for (let i = 0; content.length > i; i++) {
 
             content[i] = <Link className={styles["profile-library-item"]} key={i} to={`/${content[i].owner.username}/${tab}/${content[i].slug}`}>
-              <img src={`https://cdn.makuwro.com/${content[i].imagePath || content[i].avatarPath}`} />
+              <img src={`https://cdn.makuwro.com/${content[i].imagePath || content[i].avatarPath}`} alt={content[i].name || content[i].description} title={content[i].name || content[i].description} />
             </Link>;
 
           }

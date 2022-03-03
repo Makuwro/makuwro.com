@@ -9,6 +9,7 @@ section.tagInput {
   min-height: 47.2px;
   cursor: text;
   padding: 0;
+  justify-content: initial;
 }
 
 :global(.light) section.tagInput {
@@ -73,4 +74,8 @@ section.tagInput > input {
 
 section.tagInput > .none {
   padding: 10.6px;
+}
+
+.message {
+  cursor: initial;
 }

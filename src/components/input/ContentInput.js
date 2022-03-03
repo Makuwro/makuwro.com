@@ -10,7 +10,7 @@ export default function ContentInput({content = [], onChange, currentUser, type}
   const [selectedUser, setSelectedUser] = useState();
   const [searchResults, setSearchResults] = useState(null);
   const [childrenComponents, setChildrenComponents] = useState([]);
-  const [cache, setCache] = useState();
+  const [cache, setCache] = useState({});
   const inputRef = useRef();
   const inputContainerRef = useRef();
 
@@ -43,87 +43,125 @@ export default function ContentInput({content = [], onChange, currentUser, type}
 
   useEffect(() => {
 
-    const timeout = setTimeout(async () => {
+    let mounted = true;
+    if (phrase) {
 
-      // Check if that user exists
-      if (phrase) {
+      const checkForItems = (callback) => {
 
-        try {
+        let items = cache[phrase];
+        if (items) {
 
-          let items = cache;
+          // It's in the cache, so let's use that!
+          callback(items);
 
-          if (!cache) {
+        } else {
 
-            const response = await fetch(`${process.env.RAZZLE_API_DEV}${type !== 0 ? `contents/${typeList[type]}/${currentUser.username}` : `accounts/users/${phrase}`}`, {
-              headers: {
-                token: currentUser.token
-              }
-            });
+          // Set a timeout just in case we're still typing!
+          // Take your time :)
+          setTimeout(async () => {
+      
+            // If the component is gone, no need to query the API and get rate-limited.
+            if (!mounted) {
 
-            if (response.ok) {
-
-              items = await response.json();
-              if (type === 0) items = [items];
-              setCache(items);
+              return;
 
             }
 
-          }
-          
-          if (items) {
+            try {
 
-            const results = [];
-            for (let i = 0; items.length > i; i++) {
+              // Search for this content.
+              const response = await fetch(`${process.env.RAZZLE_API_DEV}${type !== 0 ? `contents/search?type=${typeList[type]}&username=${currentUser.username}&name=${encodeURIComponent(phrase)}` : `accounts/users/${phrase}`}`, {
+                headers: {
+                  token: currentUser.token
+                }
+              });
 
-              const content = items[i];
-              results[i] = <li key={content.id} onClick={() => {
+              if (response.ok) {
 
-                onChange(contentList => {
-    
+                // Add the content to the cache so that we don't have to ask the server again.
+                items = await response.json();
+                if (type === 0) items = [items];
+                setCache((oldCache) => {
+
+                  const newCache = {...oldCache};
+                  newCache[phrase] = items;
+                  return newCache;
+
+                });
+
+              }
+              
+              // And now, back to our regularly scheduled function.
+              callback(items);
+
+            } catch (err) {
+
+              alert(`Couldn't search for content: ${err.message}`);
+              console.warn(err.stack);
+
+            }
+      
+          }, 1000);
+
+        }
+
+      };
+
+      checkForItems((items) => {
+
+        const results = [];
+        for (let i = 0; items.length > i; i++) {
+
+          const item = items[i];
+          console.log(item);
+          results[i] = (
+            <li 
+              key={item.id} 
+              onClick={() => {
+
+                onChange(() => {
+
                   // Check if the user already exists
-                  if (contentList.find((user2) => user2.id === content.id)) {
-    
+                  if (content.find((item2) => item2.id === item.id)) {
+
                     alert("You already added that one!");
-                    return contentList;
-    
-                  } else if (type === 0 && content.id === currentUser.id) {
+                    return content;
+
+                  } else if (type === 0 && item.id === currentUser.id) {
 
                     alert("You can't add yourself!");
-                    return contentList;
+                    return content;
 
                   }
 
-                  return [...contentList, content];
-    
+                  return [...content, item];
+
                 });
                 setSearchResults(null);
                 setPhrase("");
 
-              }}>
-                <img src={`https://cdn.makuwro.com/${content.avatarPath || content.imagePath}`} />
-                {content.name || content.displayName || content.username}
-              </li>;
-
-            }
-
-            setSearchResults(results);
-
-          }
-
-        } catch (err) {
-
-          alert(`Couldn't search for content: ${err.message}`);
-          console.warn(err.stack);
+              }}
+            >
+              <img src={`https://cdn.makuwro.com/${item.avatarPath || item.imagePath}`} />
+              {item.name || item.displayName || item.username}
+            </li>
+          );
 
         }
 
-      }
+        setSearchResults(results);
 
-    }, 1000);
+      });
+
+    } else {
+
+      setSearchResults(null);
+
+    }
 
     return () => {
 
-      clearTimeout(timeout);
+      mounted = false;
 
     };
 
@@ -183,6 +221,7 @@ export default function ContentInput({content = [], onChange, currentUser, type}
         <input tabIndex="0" type="text" onKeyDown={checkSelection} value={phrase} onInput={(event) => setPhrase(event.target.value)} ref={inputRef} className={!content[0] ? styles.none : ""} />
       </section>
       <ul>
+        {searchResults && !searchResults[0] && <li className={styles.message}>No results found :(</li>}
         {searchResults}
       </ul>
     </section>

@@ -12,6 +12,7 @@ export default function Authenticator({currentUser, open, shownLocation}) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+  const [popupOpen, setPopupOpen] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [birthDate, setBirthDate] = useState();
   const [register, setRegister] = useState(false);
@@ -30,6 +31,7 @@ export default function Authenticator({currentUser, open, shownLocation}) {
 
     }
     
+    setPopupOpen(false);
     setBirthDate();
     setUsername("");
     setPassword("");
@@ -151,7 +153,7 @@ export default function Authenticator({currentUser, open, shownLocation}) {
 
   }, [pathname, open]);
 
-  return (
+  return popupOpen ? (
     <Popup title={`Welcome${!register ? " back" : ""} to Makuwro!`} open={open} onClose={onClose}>
       <section id={styles.authenticator}>
         <form onSubmit={authenticate}>
@@ -181,6 +183,6 @@ export default function Authenticator({currentUser, open, shownLocation}) {
         </form>
       </section>
     </Popup>
-  );
+  ) : null;
 
 }

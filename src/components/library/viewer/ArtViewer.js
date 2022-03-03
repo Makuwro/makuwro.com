@@ -12,11 +12,11 @@ export default function ArtViewer({art, open, currentUser, onClose, notify, artR
   const [commentsOpen, toggleComments] = useState(false);
   const [commentsEnabled, toggleCommentsEnabled] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [characterComps, setCharacterComps] = useState([]);
   const [commentContent, setCommentContent] = useState("");
   const [ready, setReady] = useState(false);
   const [formattedDate, setFormattedDate] = useState(null);
   const [collaborators, setCollaborators] = useState([]);
-  const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,35 +29,21 @@ export default function ArtViewer({art, open, currentUser, onClose, notify, artR
 
   }, [open]);
 
-  useEffect(() => {
-
-    if (art) {
-
-      const matchedPath = [...location.pathname.matchAll(artRegex)];
-      if (!matchedPath[0]) {
-
-        onClose(art.owner.username);
-
-      }
-
-    }
-
-  }, [art, location]);
-
   useEffect(async () => {
 
     if (art && !art.refresh) {
 
       const date = new Date(art.uploadedOn);
-      let collaborators;
+      const {characters, collaborators} = art;
+      let comps;
       let i;
 
       // Fix the collaborators
-      collaborators = [];
-      for (i = 0; art.collaborators.length > i; i++) {
+      comps = [];
+      for (i = 0; collaborators.length > i; i++) {
 
-        const collaborator = art.collaborators[i];
-        collaborators[i] = <Link 
+        const collaborator = collaborators[i];
+        comps[i] = <Link 
           to={`/${collaborator.username}`} 
           key={collaborator.id}
         >
@@ -65,14 +51,29 @@ export default function ArtViewer({art, open, currentUser, onClose, notify, artR
         </Link>;
 
       }
+      setCollaborators(comps);
+
+      // Fix the characters.
+      comps = [];
+      for (i = 0; (characters?.length || 0) > i; i++) {
+
+        const character = characters[i];
+        comps[i] = <>{i !== 0 && i + 1 === characters.length ? " and " : ""}<Link 
+          to={`/${character.owner.username}/characters/${character.slug}`} 
+          key={character.id}
+        >
+          {character.name}
+        </Link></>;
+
+      }
+      setCharacterComps(comps);
 
       if (art.contentWarning) {
 
         confirmContentWarning(art.contentWarning);
 
       }
-
-      setCollaborators(collaborators);
+      
       setFormattedDate(`${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`);
       setReady(true);
 
@@ -221,7 +222,15 @@ export default function ArtViewer({art, open, currentUser, onClose, notify, artR
   }
 
   return ready ? (
-    <section id={styles.viewer} className={!open ? styles.closed : null}>
+    <section id={styles.viewer} className={!open ? styles.closed : null} onTransitionEnd={() => {
+
+      if (!open) {
+
+        onClose(art.owner.username);
+
+      }
+
+    }}>
       {(!art || !art.refresh) && art && (
         <>
           <section id={styles.content}>
@@ -253,10 +262,10 @@ export default function ArtViewer({art, open, currentUser, onClose, notify, artR
                       <dd>{collaborators}</dd>
                     </>
                   )}
-                  {art.characters && art.characters[0] && (
+                  {characterComps[0] && (
                     <>
                       <dt>Characters</dt>
-                      <dd><Link to="/Christian/characters/Sudobeast">Sudobeast</Link></dd>
+                      <dd>{characterComps}</dd>
                     </>
                   )}
                   {art.folders && art.folders[0] && (

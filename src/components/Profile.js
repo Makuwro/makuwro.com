@@ -156,7 +156,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
     let mounted = true;
     const isCharacter = tab === "characters" && id;
 
-    if (!profileInfo || !matchPath({path: "/:username/art/:id"}, location.pathname)) {
+    if (!profileInfo && !matchPath({path: "/:username/art/:id"}, location.pathname)) {
     
       // Get the profile info from the server
       const headers = currentUser.token ? {
@@ -206,7 +206,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
     };
 
-  }, [username, tab, id]);
+  }, [profileInfo, tab, id]);
 
   return ready && (
     <main id={styles.profile} className={leaving ? "leaving" : ""} onTransitionEnd={() => {
@@ -220,6 +220,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
         }
         setReady(false);
+        console.warn("resetting");
         setProfileInfo();
         setLocation(location);
 
