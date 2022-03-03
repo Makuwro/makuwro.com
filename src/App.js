@@ -28,6 +28,11 @@ const creators = {
   "create-character": CharacterCreator,
   "create-world": WorldCreator
 };
+const mode = "dev";
+const api = {
+  dev: "http://localhost:3001/",
+  prod: "https://api.makuwro.com/"
+}[mode];
 
 export default function App() {
   
@@ -95,7 +100,7 @@ export default function App() {
 
     if (token && !currentUser.id) {
 
-      const response = await fetch(`${process.env.RAZZLE_API_DEV}accounts/user`, {
+      const response = await fetch(`${api}accounts/user`, {
         headers: {
           token
         }
@@ -119,7 +124,7 @@ export default function App() {
 
       try {
 
-        const artResponse = await fetch(`${process.env.RAZZLE_API_DEV}contents/art/${username}/${slug}`, {headers: token ? {token} : {}});
+        const artResponse = await fetch(`${api}contents/art/${username}/${slug}`, {headers: token ? {token} : {}});
         const art = await artResponse.json();
 
         if (mounted) {

@@ -5,7 +5,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import Comment from "../../Comment";
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-export default function ArtViewer({art, open, currentUser, onClose, notify, artRegex, confirmContentWarning, contentWarningStatus, artDeleted, shownLocation}) {
+export default function ArtViewer({art, open, currentUser, onClose, notify, confirmContentWarning, artDeleted, shownLocation}) {
 
   let [comments, setComments] = useState();
   const [commentComps, setCommentComps] = useState([]);
@@ -336,6 +336,5 @@ ArtViewer.propTypes = {
   currentUser: PropTypes.object,
   art: PropTypes.object,
   onClose: PropTypes.func,
-  notify: PropTypes.func,
-  artRegex: PropTypes.object
+  notify: PropTypes.func
 };

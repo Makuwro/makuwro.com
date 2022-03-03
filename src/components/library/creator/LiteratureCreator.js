@@ -25,7 +25,6 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
   const [slug, setSlug] = useState("");
   const [permissions, setPermissions] = useState({
     view: 0,
-    viewOriginal: 0,
     viewComments: 0,
     postComments: 1
   });
