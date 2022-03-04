@@ -52,6 +52,7 @@ export default function App() {
   const [artViewerOpen, setArtViewerOpen] = useState(false);
   const [searchParams] = useSearchParams();
   let [currentUser, setCurrentUser] = useState({});
+  const [artCache, setArtCache] = useState({});
   const navigate = useNavigate();
   let matchedPath;
   let action;
@@ -124,12 +125,20 @@ export default function App() {
 
       try {
 
-        const artResponse = await fetch(`${api}contents/art/${username}/${slug}`, {headers: token ? {token} : {}});
-        const art = await artResponse.json();
+        const directory = `${username}/${slug}`;
+        let art = artCache[directory];
+        
+        if (!art) {
+
+          const artResponse = await fetch(`${api}contents/art/${directory}`, {headers: token ? {token} : {}});
+          art = await artResponse.json();
+          artCache[directory] = art;
+
+        }
 
         if (mounted) {
 
-          if (artResponse.ok) {
+          if (art) {
 
             setArtViewerOpen(true);
             setArt(art);
@@ -162,7 +171,7 @@ export default function App() {
 
       }
       
-    } else if (!groups) {
+    } else if (!groups && mounted) {
 
       setArt();
 
@@ -273,16 +282,14 @@ export default function App() {
       {artViewerOpen && (
         <ArtViewer 
           notify={addNotification} 
-          currentUser={currentUser} 
-          open={art ? true : false} 
+          currentUser={currentUser}
           art={art}
           artRegex={artRegex}
           artDeleted={() => setUpdated(true)}
           confirmContentWarning={(warningText) => setContentWarning(warningText)}
-          shownLocation={shownLocation}
           onClose={() => {
 
-            setLocation(location);
+            navigate(shownLocation);
             setArtViewerOpen(false);
 
           }} 

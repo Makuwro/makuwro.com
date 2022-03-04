@@ -101,7 +101,8 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
 
         // Set up form data
         formData = new FormData();
-        formData.append("banner", image.current.files[0]);
+        formData.append("banner", image.current?.files[0]);
+        formData.append("name", name);
         formData.append("description", description);
         formData.append("editors", JSON.stringify(editorIds));
         formData.append("tags", JSON.stringify(tags));
@@ -150,7 +151,7 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
       <section>
         <section>
           <label>Literature name</label>
-          <input type="text" value={name} onInput={(event) => setName(event.target.value)} />
+          <input type="text" value={name} onInput={(event) => setName(event.target.value)} required />
         </section>
         <section>
           <label>Description<span style={{
@@ -210,7 +211,14 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
               url.current.setSelectionRange(0, 0);
 
             }}>{`makuwro.com/${currentUser.username}/literature/`}</span>
-            <input required tabIndex="0" type="text" name="url" ref={url} onInput={(event) => setSlug(event.target.value)} value={slug} placeholder={name.replaceAll(/[^a-zA-Z0-9_]/gm, "-")} />
+            <input 
+              tabIndex="0" 
+              type="text" 
+              name="url" 
+              ref={url} 
+              onInput={(event) => setSlug(event.target.value)} 
+              value={slug} 
+              placeholder={name.replaceAll(/[^a-zA-Z0-9_]/gm, "-")} />
           </section>
         </section>
         <section>

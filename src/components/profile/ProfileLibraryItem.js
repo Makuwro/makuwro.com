@@ -73,7 +73,7 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
   }, [tab, currentUser, updated]);
 
   return ready && (
-    <section className={`${styles["profile-library"]} ${styles["profile-card"]}`} id={styles["profile-" + tab]}>
+    <section className={`${styles["profile-library"]} ${styles["profile-card"]}`} id={styles["profile-" + tab]} onTransitionEnd={(event) => event.stopPropagation()}>
       {ownProfile && !isCharacter && (
         <Link className={styles["profile-library-item"]} style={{backgroundColor: "black"}} to={`?action=create-${plural.test(tab) ? tab.substring(0, tab.length - 1) : tab}`}>
           CREATE NEW

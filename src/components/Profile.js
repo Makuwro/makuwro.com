@@ -224,7 +224,6 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
         }
         setReady(false);
-        console.warn("resetting");
         setProfileInfo();
         setLocation(location);
 
