@@ -202,7 +202,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
         if (mounted) {
 
-          document.title = `${isCharacter ? profileInfo.name : (profileInfo.displayName || profileInfo.username)} on Makuwro`;
+          document.title = `${isCharacter || isLiterature ? profileInfo.name : (profileInfo.displayName || profileInfo.username)} on Makuwro`;
 
           if (profileInfo.css) {
 
@@ -285,7 +285,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
             <p style={{margin: 0}}>This account has been banned for violating the <a href="https://about.makuwro.com/policies/terms">terms of service</a></p>
           ) : (profileInfo.isDisabled ? 
             <p style={{margin: 0}}>This account is currently disabled. Try again later!</p>
-            : (isCharacter && (
+            : ((isLiterature || isCharacter) && (
               <Link to={`/${profileInfo.owner.username}`} id={styles.owner}>
                 <span>
                   <img src={`https://cdn.makuwro.com/${profileInfo.owner.avatarPath}`} />
@@ -297,7 +297,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
         {profileInfo && (
           <section id={styles.actions}>
             {currentUser && (currentUser.id === profileInfo?.id || currentUser.id === profileInfo?.owner?.id) ? (
-              <button onClick={() => navigate(`/${isCharacter ? `${profileInfo.owner.username}/characters/${profileInfo.slug}/` : ""}settings/${isCharacter ? "profile" : "account"}`)}>Settings</button>
+              <button onClick={() => navigate(`/${(isLiterature || isCharacter) ? `${profileInfo.owner.username}/${isLiterature ? "literature" : "characters"}/${profileInfo.slug}/` : ""}settings/${isCharacter || isLiterature ? "profile" : "account"}`)}>Settings</button>
             ) : (
               <>
                 <button onClick={() => currentUser?.id ? navigate("?action=follow") : navigate("/signin")}>Follow</button>
