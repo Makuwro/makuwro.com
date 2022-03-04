@@ -26,8 +26,8 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
   const location = useLocation();
   const [tabComponent, setTabComponent] = useState(null);
   const [isCharacter, setIsCharacter] = useState(tab === "characters" && id);
+  const [isLiterature, setIsLiterature] = useState(tab === "literature" && id);
   const [navComponents, setNavComponents] = useState([]);
-  let isLiterature;
   let action;
 
   // Set the current view
@@ -35,26 +35,36 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
     if (!matchPath({path: "/:username/art/:id"}, location.pathname)) {
 
-      if (profileInfo) {
+      if (profileInfo && !isLiterature) {
 
         // Add links to the profile navigator
         const navChildren = [];
-        const navItems = isCharacter ? [
-          "About",
-          "Art",
-          "Literature",
-          "Stats",
-          "Worlds"
-        ] : [
-          "About",
-          "Art", 
-          "Blog", 
-          "Characters",
-          "Literature", 
-          "Stats",
-          "Terms", 
-          "Worlds"
-        ];
+        let navItems;
+        
+        if (isCharacter) {
+          
+          navItems = [
+            "About",
+            "Art",
+            "Literature",
+            "Stats",
+            "Worlds"
+          ];
+
+        } else {
+          
+          navItems = [
+            "About",
+            "Art", 
+            "Blog", 
+            "Characters",
+            "Literature", 
+            "Stats",
+            "Terms", 
+            "Worlds"
+          ];
+
+        }
         for (let i = 0; navItems.length > i; i++) {
 
           // First, let's work on the onClick function
@@ -102,13 +112,18 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
       } else {
 
+        if (isLiterature) {
+
+          setNavComponents(null);
+
+        }
         setTabComponent(null);
 
       }
 
     }
 
-  }, [tab, subtab, profileInfo, isCharacter]);
+  }, [tab, subtab, profileInfo, isCharacter, isLiterature]);
   
   action = searchParams.get("action");
   useEffect(() => {
@@ -121,15 +136,27 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
       let onProfile = false;
       let newProfile = false;
 
-      newProfile = matchPath({path: "/:username/characters/:id"}, path1) || matchPath({path: "/:username/:tab/:id/:subtab"}, path1);
+      newProfile = (
+        matchPath({path: "/:username/:tab/:id"}, path1) || 
+        matchPath({path: "/:username/:tab/:id/:subtab"}, path1)
+      );
       for (let i = 0; paths.length > i; i++) {
-
+ 
+        // Leave the page if we want to go to the settings.
+        // This is why we should block the "settings" username.
         onProfile = (onProfile = matchPath({path: paths[i]}, path1))?.params.username !== "settings" ? onProfile : undefined;
         if (onProfile) break;
 
       }
 
-      if (!matchPath({path: "/:username/art/:id"}, path1) && ((newProfile && !isCharacter) || (!newProfile && isCharacter) || (!newProfile && !isCharacter && !onProfile))) {
+      // Don't actually leave the page if we're just looking at art.
+      if (!matchPath({path: "/:username/art/:id"}, path1) && (
+        (newProfile && !isCharacter) || // Going to an account profile.
+        (!newProfile && isCharacter) || // Going to a character profile.
+        (!newProfile && isLiterature) || // Going to a literature profile.
+        (newProfile && !isLiterature) || // Going to an account profile.
+        (!newProfile && !isCharacter && !onProfile && !isLiterature)) // Leaving the profile component completely.
+      ) {
 
         setLeaving(true);
 
@@ -159,6 +186,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
     let mounted = true;
     const isCharacter = tab === "characters" && id;
+    const isLiterature = tab === "literature" && id;
 
     if (!profileInfo && !matchPath({path: "/:username/art/:id"}, location.pathname)) {
     
@@ -166,7 +194,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
       const headers = currentUser.token ? {
         token: currentUser.token
       } : {};
-      const response = await fetch(`${process.env.RAZZLE_API_DEV}${isCharacter ? `contents/${tab}/${username}/${id}` : `accounts/users/${username}`}`, {headers});
+      const response = await fetch(`${process.env.RAZZLE_API_DEV}${isCharacter || isLiterature ? `contents/${tab}/${username}/${id}` : `accounts/users/${username}`}`, {headers});
 
       if (mounted && response.ok) {
 
@@ -191,13 +219,15 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
       } else {
 
-        document.title = `${isCharacter ? "Character" : "Account"} not found / Makuwro`;
+        document.title = `${isCharacter ? "Character" : (isLiterature ? "Literature" : "Account")} not found / Makuwro`;
+        setProfileInfo();
 
       }
 
       if (mounted) {
 
         setIsCharacter(isCharacter);
+        setIsLiterature(isLiterature);
         setReady(true);
 
       }
@@ -235,22 +265,22 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
           {profileInfo && profileInfo.bannerPath && <img src={`https://cdn.makuwro.com/${profileInfo.bannerPath}`} />}
         </section>
       </section>
-      <section id={styles["profile-info"]} style={isCharacter && !profileInfo ? {marginBottom: "48px"} : null}>
+      <section id={styles["profile-info"]} style={!profileInfo ? {marginBottom: "48px"} : null}>
         {!isLiterature && (
           <img alt={`${username}'s avatar`} src={`https://cdn.makuwro.com/${profileInfo ? profileInfo.avatarPath : "global/pfp.png"}`} />
         )}
         <section>
           <h1>
-            {profileInfo && !profileInfo.isBanned && !profileInfo.isDisabled ? (isCharacter ? profileInfo.name : (profileInfo.displayName || `@${profileInfo.username}`)) : (isCharacter ? id : `@${username}`)}
+            {profileInfo && !profileInfo.isBanned && !profileInfo.isDisabled ? (isCharacter || isLiterature ? profileInfo.name : (profileInfo.displayName || `@${profileInfo.username}`)) : (isCharacter || isLiterature ? id : `@${username}`)}
             {profileInfo && profileInfo.isStaff && (
               <span title="This user is a Makuwro staff member" className={styles["profile-badge"]}>STAFF</span>
             )}
           </h1>
           <h2>
-            {isLiterature ? state.displayName[0] : (profileInfo && !profileInfo.isBanned && !profileInfo.isDisabled && profileInfo.displayName ? `@${profileInfo.username}` : null)}
+            {profileInfo && !profileInfo.isBanned && !profileInfo.isDisabled && profileInfo.displayName ? `@${profileInfo.username}` : null}
           </h2>
           {!profileInfo ? (
-            <p style={{margin: 0}}>This {isCharacter ? "character" : "account"} doesn't exist. {!isCharacter && !currentUser.id ? <Link to="/register">But it doesn't have to be that way ;)</Link> : ""}</p>
+            <p style={{margin: 0}}>This {isCharacter ? "character" : (isLiterature ? "literature" : "account")} doesn't exist. {!isCharacter && !currentUser.id ? <Link to="/register">But it doesn't have to be that way ;)</Link> : ""}</p>
           ) : (profileInfo.isBanned ? (
             <p style={{margin: 0}}>This account has been banned for violating the <a href="https://about.makuwro.com/policies/terms">terms of service</a></p>
           ) : (profileInfo.isDisabled ? 

@@ -131,7 +131,7 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
 
         } else {
 
-          throw new Error(await response.json());
+          throw new Error((await response.json()).message);
 
         }
 

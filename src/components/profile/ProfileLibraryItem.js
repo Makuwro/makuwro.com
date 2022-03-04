@@ -43,9 +43,25 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
 
           for (let i = 0; content.length > i; i++) {
 
-            content[i] = <Link className={styles["profile-library-item"]} key={i} to={`/${content[i].owner.username}/${tab}/${content[i].slug}`}>
-              <img src={`https://cdn.makuwro.com/${content[i].imagePath || content[i].avatarPath}`} alt={content[i].name || content[i].description} title={content[i].name || content[i].description} />
+            content[i] = <Link draggable={false} className={styles["profile-library-item"]} key={i} to={`/${content[i].owner.username}/${tab}/${content[i].slug}`}>
+              {content[i].imagePath || content[i].avatarPath ? (
+                <img 
+                  src={`https://cdn.makuwro.com/${content[i].imagePath || content[i].avatarPath}`} 
+                  alt={content[i].name || content[i].description} 
+                  title={content[i].name || content[i].description} 
+                />
+              ) : content[i].name}
             </Link>;
+
+          }
+
+          if (ownProfile && !isCharacter) {
+
+            content.unshift(
+              <Link key={"new"} draggable={false} className={styles["profile-library-item"]} style={{backgroundColor: "black"}} to={`?action=create-${plural.test(tab) ? tab.substring(0, tab.length - 1) : tab}`}>
+                CREATE NEW
+              </Link>
+            );
 
           }
 
@@ -74,11 +90,6 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
 
   return ready && (
     <section className={`${styles["profile-library"]} ${styles["profile-card"]}`} id={styles["profile-" + tab]} onTransitionEnd={(event) => event.stopPropagation()}>
-      {ownProfile && !isCharacter && (
-        <Link className={styles["profile-library-item"]} style={{backgroundColor: "black"}} to={`?action=create-${plural.test(tab) ? tab.substring(0, tab.length - 1) : tab}`}>
-          CREATE NEW
-        </Link>
-      )}
       {items || (ownProfile ? (
         isCharacter && (<p>You can attach this character to {tab} by tagging this character.</p>)
       ) : (

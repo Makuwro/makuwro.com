@@ -249,6 +249,12 @@
   aspect-ratio: 6;
   flex: initial;
   height: initial;
+  justify-content: left;
+  padding-left: 40px;
+  box-sizing: border-box;
+  font-size: 2.5rem;
+  font-weight: bold;
+  background-color: var(--night-background);
 }
 
 #blog {
