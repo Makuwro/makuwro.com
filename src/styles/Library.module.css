@@ -1,5 +1,5 @@
 #fileSelectBackground {
-  background-color: var(--night-input-background);
+  background-color: var(--background-input);
   border-radius: 5px;
   border: 1px solid #111111;
   height: 350px;

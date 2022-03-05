@@ -1,7 +1,7 @@
 section.tagInput {
   display: flex;
   flex-wrap: wrap;
-  background-color: var(--night-input-background);
+  background-color: var(--background-input);
   border-radius: 5px;
   border: 1px solid #111111;
   font-weight: 300;
@@ -13,7 +13,6 @@ section.tagInput {
 }
 
 :global(.light) section.tagInput {
-  background-color: var(--light-input-background);
   border-color: #b6b6b6;
 }
 
@@ -35,7 +34,7 @@ section.tagInput:hover {
 }
 
 .tagInput span {
-  background-color: var(--night-article);
+  background-color: var(--article);
   margin: 10.6px 0 10.6px 10.6px;
   white-space: nowrap;
   padding: 0 0.5rem;
@@ -45,10 +44,6 @@ section.tagInput:hover {
   cursor: pointer;
   gap: 0.5rem;
   box-sizing: border-box;
-}
-
-:global(.light) .tagInput span {
-  background-color: var(--light-article);
 }
 
 .tagInput span > img {

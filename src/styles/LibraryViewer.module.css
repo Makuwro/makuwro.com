@@ -72,7 +72,7 @@
 #right {
   padding: 1rem 0;
   width: 30rem;
-  background-color: var(--night-article);
+  background-color: var(--article);
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
   transition: 0.3s;
@@ -82,16 +82,12 @@
   top: 2.5%;
 }
 
-:global(.light) #right {
-  background-color: var(--light-article);
-}
-
 .closed #right {
   left: 30rem;
 }
 
 #right dl {
-  border-top: 1px solid var(--night-text);
+  border-top: 1px solid var(--text);
   padding-top: 1rem;
 }
 
@@ -110,8 +106,8 @@
 
 #show-comments.disabled {
   cursor: not-allowed;
-  border: 1px solid var(--night-text);
-  color: var(--night-text);
+  border: 1px solid var(--text);
+  color: var(--text);
   background: transparent;
 }
 
@@ -170,7 +166,7 @@
 }
 
 #comment-creator {
-  background-color: var(--night-input-background);
+  background-color: var(--background-input);
   margin: 0 1rem;
   border-radius: 5px;
   display: flex;
@@ -232,6 +228,6 @@
 }
 
 #commentNames > section:nth-of-type(2) {
-  color: var(--night-text);
+  color: var(--text);
   font-weight: 300;
 }

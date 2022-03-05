@@ -81,11 +81,7 @@
 #profile-info h2 {
   font-size: 1.1rem;
   font-weight: 300;
-  color: var(--night-text);
-}
-
-:global(.light) #profile-info h2 {
-  color: var(--light-text);
+  color: var(--text);
 }
 
 #profile-stats > section {
@@ -141,7 +137,7 @@
 }
 
 #selection > a:hover, #selection > a.selected {
-  border-bottom: 2px solid var(--night-link);
+  border-bottom: 2px solid var(--link);
 }
 
 #selection > a:hover:active {
@@ -155,12 +151,8 @@
 }
 
 .profile-card {
-  background-color: var(--night-article);
+  background-color: var(--article);
   padding: 1rem;
-}
-
-:global(.light) .profile-card {
-  background-color: var(--light-article);
 }
 
 #profile-bio h1:first-of-type {
@@ -242,7 +234,7 @@
   font-size: 0.9rem;
   color: white;
   cursor: help;
-  background: linear-gradient(90deg, rgba(2,0,36,1) 0%, var(--night-button) 0%, #656dbc 100%);
+  background: linear-gradient(90deg, rgba(2,0,36,1) 0%, var(--button) 0%, #656dbc 100%);
   display: none;
   user-select: none;
   font-weight: 300;
@@ -253,7 +245,7 @@
 }
 
 #profile-terms {
-  color: var(--night-text);
+  color: var(--text);
 }
 
 #profile-literature {
@@ -271,7 +263,7 @@
   box-sizing: border-box;
   font-size: 2.5rem;
   font-weight: bold;
-  background-color: var(--night-background);
+  background-color: var(--background);
 }
 
 #blog {
@@ -303,12 +295,12 @@
 }
 
 .username {
-  color: var(--night-text);
+  color: var(--text);
   font-weight: 300;
 }
 
 #blog > form {
-  background-color: var(--night-input-background);
+  background-color: var(--background-input);
   padding: 1rem;
   border-radius: 5px;
   border: 1px solid #111111;
@@ -316,7 +308,6 @@
 }
 
 :global(.light) #blog > form {
-  background-color: var(--light-input-background);
   border-color: transparent;
 }
 

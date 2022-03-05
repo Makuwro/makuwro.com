@@ -155,7 +155,7 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
         </section>
         <section>
           <label>Description<span style={{
-            color: "var(--night-text)",
+            color: "var(--text)",
             marginLeft: "0.5rem"
           }}>(optional)</span></label>
           <textarea tabIndex="0" value={description} onInput={(event) => setDescription(event.target.value)}></textarea>
@@ -175,7 +175,7 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
         <h1>Organization</h1>
         <section>
           <label htmlFor="tags">Tags<span style={{
-            color: "var(--night-text)",
+            color: "var(--text)",
             marginLeft: "0.5rem"
           }}>(optional)</span></label>
           <p>You can use tags to sort your characters and easily find them later.</p>
@@ -281,7 +281,7 @@ export default function LiteratureCreator({currentUser, setPopupSettings, notify
         </section>
         <section>
           <label>Content warning<span style={{
-            color: "var(--night-text)",
+            color: "var(--text)",
             marginLeft: "0.5rem"
           }}>(optional)</span></label>
           <p>This text will be shown to viewers before they view this literature.</p>

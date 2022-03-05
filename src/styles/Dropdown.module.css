@@ -13,7 +13,7 @@
 .list > section {
   border-radius: 5px;
   padding: 10.6px;
-  background-color: #202021;
+  background-color: var(--background-input);
   box-sizing: border-box;
   transition: 0.3s;
   border: 1px solid #111111;
@@ -22,9 +22,7 @@
 }
 
 :global(.light) .list > section, :global(.light) .list li, :global(.light) .list > ul {
-  background-color: var(--light-input-background);
   border-color: #b6b6b6;
-  color: var(--light-text);
 }
 
 .list > section:hover, .list li:hover {
@@ -48,7 +46,7 @@
   border-top: none;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
-  background-color: var(--night-input-background);
+  background-color: var(--background-input);
   display: none;
 }
 
@@ -63,11 +61,11 @@
 .list li {
   padding: 10.6px;
   width: 100%;
-  color: white;
+  color: var(--text);
   font-size: 1rem;
   box-sizing: border-box;
   list-style: none;
-  background-color: #202021;
+  background-color: var(--background-input);
   transition: 0.3s;
   display: flex;
   align-items: center;
@@ -75,11 +73,7 @@
 }
 
 .noSelection {
-  color: var(--night-text);
-}
-
-:global(.light) .noSelection {
-  color: var(--light-text);
+  color: var(--text);
 }
 
 .list li img {

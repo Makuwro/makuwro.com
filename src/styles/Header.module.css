@@ -148,7 +148,7 @@ input.no-results {
 }
 
 #login-button {
-  background-color: var(--night-button);
+  background-color: var(--button);
   border: none;
   border-radius: 5px;
   padding: 0.1rem 0.75rem;

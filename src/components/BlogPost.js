@@ -567,22 +567,14 @@ export default function BlogPost({currentUser, addNotification, shownLocation, s
       {post.id ? (
         <>
           <section id={styles.metadata}>
-            {(post.coverPath || editing) && (
-              <section id={styles.cover}>
-                {post.coverPath && (
-                  <img src={`https://cdn.makuwro.com/${post.coverPath}`} />
-                )}
-              </section>
-            )}
             <section id={styles.postInfo}>
-              <Link to={`/${post.owner.username}`} id={styles.creator}>
-                <img src={`https://cdn.makuwro.com/${post.owner.avatarPath}`} />
-                <span>Christian Toney</span>
-              </Link>
-              <h1 contentEditable={editing} placeholder={editing ? "Untitled blog" : null}>{post.title || (!editing ? "Untitled blog" : null)}</h1>
-              {(editing || post.tagline) && (
-                <p contentEditable={editing} placeholder={editing ? "No tagline" : null}></p>
-              )}
+              <section id={styles.left}>
+                <h1 contentEditable={editing} placeholder={editing ? "Untitled blog" : null}>{post.title || (!editing ? "Untitled blog" : null)}</h1>
+                <Link to={`/${post.owner.username}`} id={styles.creator}>
+                  <img src={`https://cdn.makuwro.com/${post.owner.avatarPath}`} />
+                  <span>Christian Toney</span>
+                </Link>
+              </section>
               <section id={styles.actions}>
                 {currentUser && currentUser.id === post.owner.id ? (
                   <>
@@ -593,6 +585,13 @@ export default function BlogPost({currentUser, addNotification, shownLocation, s
                 ) : <button className="destructive" onClick={() => navigate("?action=report-abuse")}>Report</button>}
               </section>
             </section>
+            {(post.coverPath || editing) && (
+              <section id={styles.cover}>
+                {post.coverPath && (
+                  <img src={`https://cdn.makuwro.com/${post.coverPath}`} />
+                )}
+              </section>
+            )}
           </section>
           <section id={styles.content} contentEditable={editing} onKeyDown={handleInput} onCut={handleCut} onPaste={handlePaste} suppressContentEditableWarning ref={contentContainer}>
             {content ? content.comps : (

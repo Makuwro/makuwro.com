@@ -7,7 +7,7 @@
 }
 
 #maintenance-main > section {
-  background-color: var(--night-article);
+  background-color: var(--article);
   padding: 2rem;
   border-radius: 100px;
   filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.2));
@@ -18,7 +18,7 @@
 }
 
 #maintenance-main a {
-  color: var(--night-button);
+  color: var(--button);
   margin-top: 0.5rem;
   display: inline-block;
 }
