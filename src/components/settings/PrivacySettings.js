@@ -33,8 +33,8 @@ export default function PrivacySettings({currentUser, menu, toggleMenu}) {
         <Checkbox>Allow users to view my profile and my content without signing in</Checkbox>
       </SettingsDropdown>
       <SettingsDropdown
-        title="Optional data that you can send to Makuwro"
-        description="There is some extra data you can give us so we can make the Makuwro experience better for you and everyone else."
+        title="Data you give Makuwro"
+        description="View and manage what we know about you."
         open={menu === 2}
         onClick={() => toggleMenu(2)}
       >
@@ -53,6 +53,8 @@ export default function PrivacySettings({currentUser, menu, toggleMenu}) {
           Use my data to personalize my experience
         </Checkbox>
         <Checkbox>Use my data to improve Makuwro</Checkbox>
+        <h3>We require some data to make Makuwro work for you</h3>
+        <p>And so, there are some things that you can't toggle unless you delete your account. You can always view what qualifies in the <a href="https://help.makuwro.com/policies/privacy">privacy policy</a>.</p>
       </SettingsDropdown>
       <SettingsDropdown
         title="Request your data"
@@ -62,9 +64,6 @@ export default function PrivacySettings({currentUser, menu, toggleMenu}) {
       >
         <button>Request my data</button>
       </SettingsDropdown>
-      <section className="info">
-        Wondering how we use your data and who we share your data to? Give the <a href="https://help.makuwro.com/policies/privacy">privacy policy</a> a read.
-      </section>
     </section>
   );
 
