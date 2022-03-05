@@ -39,7 +39,7 @@ body.light {
 }
 
 a, b, p {
-  transition: 0.3s;
+  transition: 0.1s;
 }
 
 a {
@@ -279,10 +279,6 @@ input[type="checkbox"] + label {
 
 input[type="submit"] {
   margin-top: 1rem;
-}
-
-#content {
-  overflow-y: overlay;
 }
 
 #live-notifications {

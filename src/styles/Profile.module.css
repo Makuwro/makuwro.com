@@ -40,15 +40,27 @@
 
 #profile-info {
   width: 100%;
-  padding: 4rem 5rem 1rem;
   display: flex;
-  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.2));
-  align-items: center;
-  gap: 1.5rem;
   box-sizing: border-box;
+  flex-direction: column;
+  box-shadow: var(--day-box-shadow);
 }
 
-#profile-info > img {
+#profile-info > section {
+  display: flex;
+  align-items: center;
+  padding-top: 4rem;
+  margin: 0 5rem;
+  justify-content: space-between;
+}
+
+#profile-info > section > section:nth-of-type(1) {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+#avatar {
   border-radius: 100%;
   background-color: gray;
   width: 4rem;
@@ -73,10 +85,6 @@
   color: var(--light-text);
 }
 
-#profile-info > section:nth-of-type(2) {
-  margin-left: auto;
-}
-
 #profile-stats > section {
   display: flex;
   margin-top: 1rem;
@@ -96,7 +104,11 @@
   flex-direction: column;
   gap: 2rem;
   width: 100%;
-  margin-bottom: 2rem;
+  margin: 2rem 0;
+}
+
+#container > section, #selection, #profile-info > section {
+  max-width: 1280px;
 }
 
 #container > section.invisible {
@@ -112,7 +124,6 @@
   font-size: 1rem;
   height: 80px;
   padding: 0 5rem;
-  box-shadow: var(--day-box-shadow);
 }
 
 #selection > a {
@@ -133,10 +144,6 @@
 #selection > a:hover:active {
   transform: scale(0.9);
   transition: 0.1s;
-}
-
-#selection + section {
-  padding: 0 5rem;
 }
 
 #profile-container-center > section {
@@ -313,6 +320,15 @@
   margin-top: 0.15rem;
 }
 
+@media screen and (min-width: 1440px) {
+
+  section#container > section, #profile-info > section {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+}
+
 @media screen and (min-width: 425px) {
   
   .profile-badge {
@@ -323,13 +339,21 @@
 
 @media screen and (min-width: 768px) {
 
-  #profile-info > img {
+  #avatar {
     height: 7rem;
     width: 7rem;
   }
 
   .profile-card {
     border-radius: 5px;
+  }
+
+  #container > section {
+    margin: 0 5rem;
+  }
+
+  #selection {
+    margin: 0 auto;
   }
 
 }

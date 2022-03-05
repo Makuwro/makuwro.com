@@ -575,14 +575,14 @@ export default function BlogPost({currentUser, addNotification, shownLocation, s
               </section>
             )}
             <section id={styles.postInfo}>
+              <Link to={`/${post.owner.username}`} id={styles.creator}>
+                <img src={`https://cdn.makuwro.com/${post.owner.avatarPath}`} />
+                <span>Christian Toney</span>
+              </Link>
               <h1 contentEditable={editing} placeholder={editing ? "Untitled blog" : null}>{post.title || (!editing ? "Untitled blog" : null)}</h1>
               {(editing || post.tagline) && (
                 <p contentEditable={editing} placeholder={editing ? "No tagline" : null}></p>
               )}
-              <Link to={""} id={styles.creator}>
-                <img src="https://media.discordapp.net/attachments/539176248673566760/942512442427203624/kyew18norlh81.png?width=583&height=583" />
-                <span>Christian Toney</span>
-              </Link>
               <section id={styles.actions}>
                 {currentUser && currentUser.id === post.owner.id ? (
                   <>

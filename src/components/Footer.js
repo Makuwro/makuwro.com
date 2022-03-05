@@ -1,60 +1,93 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "../styles/Footer.module.css";
 
 export default function Footer() {
 
-  return (
+  const [columns, setColumns] = useState(null);
+  const [open, setOpen] = useState();
+
+  // Set up the columns. 
+  useEffect(() => {
+
+    const sections = {
+      "About": [
+        ["Company", "https://about.makuwro.com"],
+        ["Team", "https://about.makuwro.com/team"]
+      ],
+      "Contribute": [
+        ["Donate", "https://ko-fi.com/Makuwro"],
+        ["Feedback", "https://github.com/Makuwro/makuwro.com/issues"],
+        ["Code", "https://github.com/Makuwro/makuwro.com"]
+      ],
+      "Library": [
+        ["Art", "/library/art"],
+        ["Characters", "/library/characters"],
+        ["Literature", "/library/literature"],
+        ["Worlds", "/library/worlds"],
+        ["Show me everything!", "/library"]
+      ],
+      "Resources": [
+        ["Help center", "https://help.makuwro.com"],
+        ["Terms of service", "https://help.makuwro.com/policies/terms"],
+        ["Community rules", "https://help.makuwro.com/policies/community-rules"],
+        ["Privacy", "https://help.makuwro.com/policies/privacy"],
+        ["Contact us", "https://help.makuwro.com/contact"]
+      ],
+      "Social": [
+        ["@Makuwro", "https://twitter.com/Makuwro"],
+        ["@DaDragonDen", "https://twitter.com/DaDragonDen"],
+        ["Discord server", "https://den.makuwro.com/join"]
+      ]
+    };
+    const columnKeys = Object.keys(sections);
+    const columnComps = [];
+
+    for (let i = 0; columnKeys.length > i; i++) {
+
+      const key = columnKeys[i];
+      const items = [];
+      for (let x = 0; sections[key].length > x; x++) {
+
+        const item = sections[key][x];
+        items[x] = (
+          <li key={item[1]}>
+            <a href={item[1]}>{item[0]}</a>
+          </li>
+        );
+        
+      }
+      columnComps[i] = (
+        <section key={key} className={open === key ? styles.open : null}>
+          <h1 onClick={() => setOpen(open === key ? null : key)}>
+            {key}
+            <span>▼</span>
+          </h1>
+          <ul>
+            {items}
+          </ul>
+        </section>
+      );
+
+    }
+
+    console.log(columnComps);
+
+    setColumns(columnComps);
+
+  }, [open]);
+
+  return columns ? (
     <footer>
-      <section id={styles["footer-columns"]}>
-        <section>
-          <h1>About</h1>
-          <ul>
-            <li><a href="https://about.makuwro.com">Company</a></li>
-            <li><a href="https://about.makuwro.com/team">Team</a></li>
-          </ul>
+      <section id={styles.content}>
+        <section id={styles.columns}>
+          {columns}
         </section>
-        <section>
-          <h1>Contribute</h1>
-          <ul>
-            <li><a href="https://ko-fi.com/Makuwro">Donate</a></li>
-            <li><a href="https://github.com/Makuwro/makuwro.com/issues">Feedback</a></li>
-            <li><a href="https://github.com/Makuwro/makuwro.com">Code</a></li>
-          </ul>
-        </section>
-        <section>
-          <h1>Library</h1>
-          <ul>
-            <li><Link to="/library/art">Art</Link></li>
-            <li><Link to="/library/characters">Characters</Link></li>
-            <li><Link to="/library/literature">Literature</Link></li>
-            <li><Link to="/library/worlds">Worlds</Link></li>
-            <li><Link to="/library">Show me everything!</Link></li>
-          </ul>
-        </section>
-        <section>
-          <h1>Resources</h1>
-          <ul>
-            <li><a href="https://help.makuwro.com">Help center</a></li>
-            <li><a href="https://help.makuwro.com/policies/terms">Terms of service</a></li>
-            <li><a href="https://help.makuwro.com/policies/community-guidelines">Community guidelines</a></li>
-            <li><a href="https://help.makuwro.com/policies/privacy">Privacy</a></li>
-            <li><a href="https://help.makuwro.com/contact">Contact us</a></li>
-          </ul>
-        </section>
-        <section>
-          <h1>Social</h1>
-          <ul>
-            <li><a href="https://twitter.com/Makuwro">@Makuwro</a></li>
-            <li><a href="https://twitter.com/DaDragonDen">@DaDragonDen</a></li>
-            <li><a href="https://den.makuwro.com/join">Discord server</a></li>
-          </ul>
-        </section>
+        <p id={styles["footer-copyright"]}>
+          © 2022 Makuwro, LLC
+        </p>
       </section>
-      <p id={styles["footer-copyright"]}>
-        © 2022 Makuwro, LLC
-      </p>
     </footer>
-  );
+  ) : null;
 
 }
