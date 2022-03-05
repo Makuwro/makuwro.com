@@ -265,7 +265,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
             {profileInfo && profileInfo.bannerPath && <img src={`https://cdn.makuwro.com/${profileInfo.bannerPath}`} />}
           </section>
         </section>
-        <section id={styles["profile-info"]} style={!profileInfo ? {marginBottom: "48px"} : null}>
+        <section id={styles["profile-info"]} style={!profileInfo || isLiterature ? {paddingBottom: "80px"} : null}>
           <section>
             <section>
               {!isLiterature && (

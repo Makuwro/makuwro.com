@@ -52,6 +52,8 @@
   padding-top: 4rem;
   margin: 0 5rem;
   justify-content: space-between;
+  flex-direction: column;
+  gap: 30px;
 }
 
 #profile-info > section > section:nth-of-type(1) {
@@ -65,6 +67,7 @@
   background-color: gray;
   width: 4rem;
   height: 4rem;
+  transition: 0.3s;
 }
 
 #profile-info h1, #profile-info h2 {
@@ -181,6 +184,13 @@
 #actions {
   display: flex;
   gap: 1rem;
+  width: 100%;
+  justify-content: center;
+}
+
+#actions button {
+  width: 100%;
+  max-width: 265px;
 }
 
 .profile-library {
@@ -354,6 +364,15 @@
 
   #selection {
     margin: 0 auto;
+  }
+
+  #profile-info > section {
+    gap: 0;
+    flex-direction: row;
+  }
+
+  #actions, #actions button {
+    width: initial;
   }
 
 }
