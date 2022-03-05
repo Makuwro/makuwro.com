@@ -30,7 +30,7 @@
 #viewer > section {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 10px;
   margin-top: 1rem;
 }
 
@@ -41,8 +41,16 @@
   transition: 0.3s;
 }
 
-:global(.light) #options > section {
+.header:hover {
+  filter: brightness(1.2);
+}
+
+:global(.light) #options > section, :global(.light) .header {
   background-color: var(--light-article);
+}
+
+:global(.light) .header:hover {
+  filter: brightness(0.97);
 }
 
 #options > section > section:first-of-type {
@@ -72,9 +80,21 @@
   margin: 0;
 }
 
+.header b {
+  font-weight: 100;
+}
+
 .header {
   display: flex;
   align-items: center;
+  background-color: var(--night-article);
+  border-radius: 5px;
+  transition: 0.1s;
+}
+
+.open > .header {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .header > section {
@@ -87,10 +107,6 @@
 
 .open .header > span {
   transform: scaleY(-1);
-}
-
-.header p {
-  margin-top: 5px;
 }
 
 #options > section > section:first-of-type > span {

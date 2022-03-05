@@ -262,7 +262,7 @@ dd {
   font-weight: 300;
 }
 
-input[type="submit"]:disabled, input[type="button"]:disabled {
+input[type="submit"]:disabled, input[type="button"]:disabled, button:disabled {
   filter: saturate(0) brightness(0.5);
   cursor: not-allowed;
 }

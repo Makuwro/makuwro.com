@@ -8,6 +8,7 @@ import ProfileStats from "./profile/ProfileStats";
 import ProfileTerms from "./profile/ProfileTerms";
 import ProfileBlog from "./profile/ProfileBlog";
 import ProfileAbout from "./profile/ProfileAbout";
+import ProfileChapters from "./profile/ProfileChapters";
 
 export default function Profile({shownLocation, setLocation, currentUser, notify, updated}) {
 
@@ -151,10 +152,8 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
       // Don't actually leave the page if we're just looking at art.
       if (!matchPath({path: "/:username/art/:id"}, path1) && (
-        (newProfile && !isCharacter) || // Going to an account profile.
-        (!newProfile && isCharacter) || // Going to a character profile.
-        (!newProfile && isLiterature) || // Going to a literature profile.
-        (newProfile && !isLiterature) || // Going to an account profile.
+        (!newProfile && (isCharacter || isLiterature)) || // Going to a character or literature profile.
+        (newProfile && !isLiterature && !isCharacter) || // Going to an account profile.
         (!newProfile && !isCharacter && !onProfile && !isLiterature)) // Leaving the profile component completely.
       ) {
 
@@ -217,7 +216,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
         }
 
-      } else {
+      } else if (mounted) {
 
         document.title = `${isCharacter ? "Character" : (isLiterature ? "Literature" : "Account")} not found / Makuwro`;
         setProfileInfo();
@@ -310,16 +309,18 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
       </section>
       {profileInfo && !profileInfo.isBanned && !profileInfo.isDisabled && (
         <section id={styles.container}>
-          <nav id={styles.selection}>
-            {navComponents}
-          </nav>
+          {!isLiterature && (
+            <nav id={styles.selection}>
+              {navComponents}
+            </nav>
+          )}
           <section className={shifting ? styles.invisible : null} onTransitionEnd={(event) => {
 
             event.stopPropagation();
             setLocation(location);
 
           }}>
-            {tabComponent}
+            {isLiterature ? <ProfileChapters profileInfo={profileInfo} currentUser={currentUser} /> : tabComponent}
           </section>
         </section>
       )}
