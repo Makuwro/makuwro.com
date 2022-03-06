@@ -216,5 +216,5 @@ ArtSubmitter.propTypes = {
   submitting: PropTypes.bool,
   setData: PropTypes.func,
   setPermissions: PropTypes.func,
-  updating: PropTypes.bool
+  update: PropTypes.bool
 };
