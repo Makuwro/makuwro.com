@@ -58,7 +58,12 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
           if (ownProfile && !isCharacter) {
 
             content.unshift(
-              <Link key={"new"} draggable={false} className={styles["profile-library-item"]} style={{backgroundColor: "black"}} to={`?action=create-${plural.test(tab) ? tab.substring(0, tab.length - 1) : tab}`}>
+              <Link 
+                key={"new"} 
+                draggable={false} 
+                className={styles["profile-library-item"]} 
+                style={{backgroundColor: "black"}} 
+                to={`?action=${tab === "art" ? "upload" : "create"}-${plural.test(tab) ? tab.substring(0, tab.length - 1) : tab}`}>
                 CREATE NEW
               </Link>
             );

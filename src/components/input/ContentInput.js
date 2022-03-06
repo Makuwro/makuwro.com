@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import styles from "../../styles/TagInput.module.css";
 import ddStyles from "../../styles/Dropdown.module.css";
 
-export default function ContentInput({content = [], onChange, currentUser, type}) {
+export default function ContentInput({content, onChange, currentUser, type}) {
 
   const typeList = ["users", "folders", "worlds", "characters"];
   const [phrase, setPhrase] = useState("");
@@ -18,7 +18,7 @@ export default function ContentInput({content = [], onChange, currentUser, type}
 
     const comps = [];
 
-    for (let i = 0; content.length > i; i++) {
+    for (let i = 0; (content?.length || 0) > i; i++) {
 
       comps[i] = <span onClick={() => {
     
@@ -113,7 +113,6 @@ export default function ContentInput({content = [], onChange, currentUser, type}
         for (let i = 0; items.length > i; i++) {
 
           const item = items[i];
-          console.log(item);
           results[i] = (
             <li 
               key={item.id} 
@@ -218,7 +217,7 @@ export default function ContentInput({content = [], onChange, currentUser, type}
     <section className={`${ddStyles.list} ${styles.container} ${searchResults ? styles.open : ""}`} ref={inputContainerRef} >
       <section className={styles.tagInput} onClick={() => inputRef.current.focus()}>
         {childrenComponents}
-        <input tabIndex="0" type="text" onKeyDown={checkSelection} value={phrase} onInput={(event) => setPhrase(event.target.value)} ref={inputRef} className={!content[0] ? styles.none : ""} />
+        <input tabIndex="0" type="text" onKeyDown={checkSelection} value={phrase} onInput={(event) => setPhrase(event.target.value)} ref={inputRef} className={!(content || [])[0] ? styles.none : ""} />
       </section>
       <ul>
         {searchResults && !searchResults[0] && <li className={styles.message}>No results found :(</li>}

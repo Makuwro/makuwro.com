@@ -6,28 +6,18 @@ import PropTypes from "prop-types";
 import Header from "./components/Header";
 import Profile from "./components/Profile";
 import Maintenance from "./components/Maintenance";
-import ArtCreator from "./components/library/creator/ArtCreator";
-import LiteratureCreator from "./components/library/creator/LiteratureCreator";
-import CharacterCreator from "./components/library/creator/CharacterCreator";
-import WorldCreator from "./components/library/creator/WorldCreator";
 import AbuseReporter from "./components/AbuseReporter";
-import ArtViewer from "./components/library/viewer/ArtViewer";
+import Art from "./components/library/Art";
 import Popup from "./components/Popup";
 import Authenticator from "./components/Authenticator";
 import LiveNotification from "./components/LiveNotification";
 import ContentWarning from "./components/ContentWarning";
-import BlogPost from "./components/BlogPost";
+import Literature from "./components/library/Literature";
 import Settings from "./components/Settings";
+import Submitter from "./components/library/Submitter";
 
 const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 const maintenance = false;
-const creators = {
-  "report-abuse": AbuseReporter,
-  "create-art": ArtCreator,
-  "create-literature": LiteratureCreator,
-  "create-character": CharacterCreator,
-  "create-world": WorldCreator
-};
 const mode = "dev";
 const api = {
   dev: "http://localhost:3001/",
@@ -93,8 +83,6 @@ export default function App() {
   useEffect(async () => {
 
     let mounted = true;
-    let component = art ? {...creators, "edit-art": ArtCreator}[action] : creators[action];
-    let element;
     let groups;
     let cUser;
     const token = document.cookie.match("(^|;)\\s*token\\s*=\\s*([^;]+)")?.pop() || null;
@@ -179,45 +167,6 @@ export default function App() {
 
     if (mounted) {
 
-      // Check if we need a popup open
-      if (component) {
-
-        element = React.createElement(component, {
-          currentUser,
-          art,
-          addNotification,
-          updated: () => {
-
-            setArt();
-            setUpdated(true);
-
-          },
-          refreshArt: () => setArt({refresh: true}),
-          setPopupSettings: ({title, warnUnfinished, onClose}) => {
-
-            if (title) {
-
-              setPopupTitle(title);
-
-            }
-
-            if (warnUnfinished) {
-
-              setPopupWarnUnfinished(warnUnfinished);
-
-            }
-          
-          }
-        });
-
-        setPopupChildren(element);
-
-      } else {
-
-        setPopupChildren(null);
-
-      }
-
       // Check if we need to sign in
       if (pathname === "/signin" || pathname === "/register") {
 
@@ -280,7 +229,7 @@ export default function App() {
         </Popup>
       )}
       {artViewerOpen && (
-        <ArtViewer 
+        <Art 
           notify={addNotification} 
           currentUser={currentUser}
           art={art}
@@ -295,6 +244,9 @@ export default function App() {
           }} 
         />
       )}
+      <Submitter 
+        currentUser={currentUser}
+      />
       <Header notify={addNotification} currentUser={currentUser} systemDark={systemDark} setLocation={setLocation} />
       <section id="live-notifications">
         {notifications}
@@ -316,7 +268,7 @@ export default function App() {
           )} />;
 
         })}
-        <Route path={"/:username/blog/:slug"} element={<BlogPost shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} addNotification={addNotification} />} />
+        <Route path={"/:username/blog/:slug"} element={<Literature shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} addNotification={addNotification} />} />
         {["/settings", "/:username/:category/:slug/settings/:tab"].map((path, index) => {
           
           return <Route key={index} path={path} element={<Settings currentUser={currentUser} shownLocation={shownLocation} setLocation={setLocation} />} />;

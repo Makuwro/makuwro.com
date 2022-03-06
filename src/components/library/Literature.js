@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import styles from "../styles/Blog.module.css";
-import Footer from "./Footer";
+import styles from "../../styles/Blog.module.css";
+import Footer from "../Footer";
 
-export default function BlogPost({currentUser, addNotification, shownLocation, setLocation}) {
+export default function Literature({currentUser, addNotification, shownLocation, setLocation}) {
 
   const {username, slug} = useParams();
   const [editing, setEditing] = useState(false);
@@ -11,11 +11,11 @@ export default function BlogPost({currentUser, addNotification, shownLocation, s
   const [leaving, setLeaving] = useState(true);
   const [post, setPost] = useState({});
   const [content, setContent] = useState(null);
-  const selectedParagraph = useRef();
-  const location = useLocation();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const contentContainer = useRef();
+  const selectedParagraph = useRef();
+  const navigate = useNavigate();
 
   useEffect(() => {
 
@@ -32,8 +32,6 @@ export default function BlogPost({currentUser, addNotification, shownLocation, s
       setContent({comps: content});
 
     }
-
-    console.log(post);
 
   }, [post]);
 

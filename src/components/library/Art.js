@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import styles from "../../../styles/LibraryViewer.module.css";
+import styles from "../../styles/LibraryViewer.module.css";
 import PropTypes from "prop-types";
 import { Link, useNavigate } from "react-router-dom";
-import Comment from "../../Comment";
+import Comment from "../Comment";
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-export default function ArtViewer({art, currentUser, onClose, notify, confirmContentWarning, artDeleted}) {
+export default function Art({art, currentUser, onClose, notify, confirmContentWarning, artDeleted}) {
 
   let [comments, setComments] = useState();
   const [commentComps, setCommentComps] = useState([]);
@@ -340,7 +340,7 @@ export default function ArtViewer({art, currentUser, onClose, notify, confirmCon
 
 }
 
-ArtViewer.propTypes = {
+Art.propTypes = {
   currentUser: PropTypes.object,
   art: PropTypes.object,
   onClose: PropTypes.func,
