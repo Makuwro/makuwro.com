@@ -4,18 +4,6 @@ footer {
   border-top: 1px solid #111111;
 }
 
-#content {
-  margin: 0 2rem;
-  max-width: 1280px;
-}
-
-#footer-copyright {
-  border-top: 1px solid #5b5e62;
-  margin: 2rem 0 0 0;
-  padding-top: 2rem;
-  text-align: center;
-}
-
 footer a {
   border-bottom: none;
   font-weight: 300;
@@ -23,6 +11,11 @@ footer a {
 
 footer a:hover {
   transition: 0.3s;
+}
+
+#content {
+  margin: 0 2rem;
+  max-width: 1280px;
 }
 
 #home-features {
@@ -55,7 +48,10 @@ footer a:hover {
   transform: scaleY(-1);
 }
 
-#footer-copyright {
+#copyright {
+  border-top: 1px solid #5b5e62;
+  margin: 2rem 0 0 0;
+  padding-top: 2rem;
   text-align: left;
 }
 

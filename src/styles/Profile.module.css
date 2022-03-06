@@ -255,7 +255,7 @@
 #profile-literature > a {
   max-width: none;
   width: 100%;
-  aspect-ratio: 6;
+  aspect-ratio: 4;
   flex: initial;
   height: initial;
   justify-content: left;

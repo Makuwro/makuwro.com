@@ -71,8 +71,6 @@ export default function Footer() {
 
     }
 
-    console.log(columnComps);
-
     setColumns(columnComps);
 
   }, [open]);
@@ -83,7 +81,7 @@ export default function Footer() {
         <section id={styles.columns}>
           {columns}
         </section>
-        <p id={styles["footer-copyright"]}>
+        <p id={styles.copyright}>
           © 2022 Makuwro, LLC
         </p>
       </section>
