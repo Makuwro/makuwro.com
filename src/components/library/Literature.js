@@ -10,12 +10,26 @@ export default function Literature({currentUser, addNotification, shownLocation,
   const [ready, setReady] = useState(false);
   const [leaving, setLeaving] = useState(true);
   const [post, setPost] = useState({});
+  const [title, setTitle] = useState("");
   const [content, setContent] = useState(null);
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const contentContainer = useRef();
   const selectedParagraph = useRef();
+  const titleRef = useRef();
   const navigate = useNavigate();
+  const [caretInfo, setCaretInfo] = useState();
+
+  function fixCaret(ref, start) {
+
+    const currentSelection = document.getSelection();
+    const range = document.createRange();
+    range.setStart(ref.current.childNodes[0], start);
+    range.collapse(true);
+    currentSelection.removeAllRanges();
+    currentSelection.addRange(range);
+
+  }
 
   useEffect(() => {
 
@@ -39,16 +53,21 @@ export default function Literature({currentUser, addNotification, shownLocation,
 
     if (editing && content && (content.selection || content.newParagraph) && selectedParagraph?.current) {
 
-      const currentSelection = document.getSelection();
-      const range = document.createRange();
-      range.setStart(selectedParagraph.current.childNodes[0], !content.deleteParagraph ? (content.selection?.startOffset || 0) + (content.increment || 0) : selectedParagraph.current.childNodes[0].textContent.length + content.increment);
-      range.collapse(true);
-      currentSelection.removeAllRanges();
-      currentSelection.addRange(range);
+      fixCaret(selectedParagraph, !content.deleteParagraph ? (content.selection?.startOffset || 0) + (content.increment || 0) : selectedParagraph.current.childNodes[0].textContent.length + content.increment);
 
     }
 
   }, [content]);
+
+  useEffect(() => {
+
+    if (editing && caretInfo) {
+
+      fixCaret(caretInfo.ref, caretInfo.offset);
+
+    }
+
+  }, [caretInfo]);
 
   useEffect(() => {
 
@@ -76,9 +95,12 @@ export default function Literature({currentUser, addNotification, shownLocation,
 
   useEffect(async () => {
 
+    let mounted = true;
+
     // Try to get the blog post
     if (!post.id) {
 
+      let json = {};
       try {
 
         const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/blog/${username}/${slug}`, {
@@ -86,30 +108,39 @@ export default function Literature({currentUser, addNotification, shownLocation,
             token: currentUser.token
           } : {}
         });
+        json = await response.json();
   
-        if (response.ok) {
+        if (!response.ok) {
   
-          setPost(await response.json());
-  
-        } else {
-  
-          console.log(await response.json());
-          setPost({});
+          throw new Error(json.message);
   
         }
   
-      } catch (err) {
+      } catch ({message}) {
   
-        console.log(err);
+        console.log(message);
   
       }
-      setReady(true);
+
+      if (mounted) {
+
+        setTitle(post.title);
+        setPost(json);
+        setReady(true);
+
+      }
 
     }
 
+    return () => {
+
+      mounted = false;
+
+    };
+
   }, [username, slug]);
 
-  useEffect(async () => {
+  useEffect(() => {
     
     // Check if we need to toggle edit mode
     if (searchParams.get("mode") === "edit") {
@@ -239,6 +270,7 @@ export default function Literature({currentUser, addNotification, shownLocation,
 
         // Prepare the body
         const formData = new FormData();
+        formData.append("title", title);
         formData.append("content", source);
 
         // Update the post's content
@@ -461,7 +493,6 @@ export default function Literature({currentUser, addNotification, shownLocation,
               }
 
             }
-            console.log(child);
 
           } else if (!sameContainer && i <= endIndex) {
 
@@ -552,6 +583,63 @@ export default function Literature({currentUser, addNotification, shownLocation,
 
   }
 
+  function changeTitle(event) {
+
+    const {ctrlKey, keyCode, key} = event;
+    const backspace = keyCode === 8;
+    const del = keyCode === 46;
+    if ((!ctrlKey || backspace || del) && (keyCode === 32 || backspace || del || (keyCode >= 48 && keyCode <= 90) || (keyCode >= 96 && keyCode <= 111) || (keyCode >= 160 && keyCode <= 165) || (keyCode >= 186 && keyCode <= 223))) {
+
+      // We're gonna handle this, browser. Pinky promise.
+      event.preventDefault();
+
+      // Get the selection data.
+      const selection = document.getSelection();
+      const {startOffset, endOffset} = selection.getRangeAt(0);
+      const highlightOffset = startOffset !== endOffset ? 0 : 1;
+      const currentTitle = selection.anchorNode.textContent;
+      let newTitle;
+      let offset = startOffset;
+      
+      // Now let's get into the processing.
+      if (backspace && (!highlightOffset || startOffset)) {
+
+        // We're deleting a character from the left.
+        newTitle = currentTitle.slice(0, startOffset - highlightOffset) + currentTitle.slice(endOffset);
+        offset = offset - highlightOffset;
+
+      } else if (del && currentTitle.charAt(startOffset + highlightOffset)) {
+
+        // We're deleting a character from the right.
+        newTitle = currentTitle.slice(0, startOffset + highlightOffset) + currentTitle.slice(endOffset);
+
+      } else if (!del && !backspace) {
+
+        // We're just adding a normal character.
+        newTitle = currentTitle.slice(0, startOffset) + key + currentTitle.slice(endOffset);
+        offset++;
+
+      }
+
+      if (newTitle !== undefined && newTitle !== title) {
+
+        selection.removeAllRanges();
+        setTitle(newTitle || <br />);
+        setCaretInfo({
+          ref: titleRef,
+          offset
+        });
+
+      }
+      
+    } else if (keyCode === 13) {
+
+      document.activeElement.blur();
+
+    }
+
+  }
+
   return ready && (
     <main id={styles.post} className={leaving ? "leaving" : ""} onTransitionEnd={() => {
 
@@ -567,10 +655,18 @@ export default function Literature({currentUser, addNotification, shownLocation,
           <section id={styles.metadata}>
             <section id={styles.postInfo}>
               <section id={styles.left}>
-                <h1 contentEditable={editing} placeholder={editing ? "Untitled blog" : null}>{post.title || (!editing ? "Untitled blog" : null)}</h1>
-                <Link to={`/${post.owner.username}`} id={styles.creator}>
+                <h1 
+                  contentEditable={editing} 
+                  placeholder={editing ? "Untitled blog" : null}
+                  onKeyDown={changeTitle}
+                  ref={titleRef}
+                  suppressContentEditableWarning
+                >
+                  {title || (!editing ? "Untitled blog" : null)}
+                </h1>
+                <Link to={`/${post.owner.username}`} className={styles.creator}>
                   <img src={`https://cdn.makuwro.com/${post.owner.avatarPath}`} />
-                  <span>Christian Toney</span>
+                  <span>{post.owner.displayName || `@${post.owner.username}`}</span>
                 </Link>
               </section>
               <section id={styles.actions}>
@@ -591,7 +687,15 @@ export default function Literature({currentUser, addNotification, shownLocation,
               </section>
             )}
           </section>
-          <section id={styles.content} contentEditable={editing} onKeyDown={handleInput} onCut={handleCut} onPaste={handlePaste} suppressContentEditableWarning ref={contentContainer}>
+          <section 
+            id={styles.content} 
+            contentEditable={editing} 
+            onKeyDown={handleInput} 
+            onCut={handleCut} 
+            onPaste={handlePaste} 
+            suppressContentEditableWarning 
+            ref={contentContainer}
+          >
             {content ? content.comps : (
               <p>This blog post doesn't exist...yet ;)</p>
             )}

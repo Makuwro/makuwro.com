@@ -6,6 +6,7 @@ import BlogPreview from "../BlogPreview";
 
 export default function ProfileBlog({currentUser, profileInfo, notify}) {
 
+  const [ready, setReady] = useState(false)
   const [posts, setPosts] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -60,17 +61,44 @@ export default function ProfileBlog({currentUser, profileInfo, notify}) {
   // Get the blog posts from this user
   useEffect(async () => {
 
+    let mounted = true;
+
     try {
 
+      // Get all the blog posts from the server.
       const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/blog/${profileInfo.username}`, {
         headers: currentUser.token ? {
           token: currentUser.token
         } : {}
       });
+      const json = await response.json();
 
-      if (response.ok) {
+      if (!response.ok) {
 
-        console.log(await response.json());
+        throw new Error(json.message);
+
+      }
+
+      if (mounted) {
+
+        const posts = json;
+        for (let i = 0; json.length > i; i++) {
+
+          const {id, owner, title, slug} = posts[i];
+
+          posts[i] = (
+            <BlogPreview
+              key={id}
+              owner={owner}
+              title={title}
+              slug={slug}
+              currentUserIsOwner={currentUser.id === owner.id}
+            />
+          );
+
+        }
+        setPosts(posts);
+        setReady(true);
 
       }
 
@@ -80,19 +108,25 @@ export default function ProfileBlog({currentUser, profileInfo, notify}) {
 
     }
 
+    return () => {
+      
+      mounted = false;
+
+    };
+
   }, [profileInfo]);
 
-  return (
+  return ready ? (
     <section className={styles["profile-card"]} id={styles.blog}>
       {ownProfile && (
         <form onSubmit={createEmptyBlogPost}>
-          <section>Making a blog post is a great way to keep the people interested in your work updated.</section>
+          <section>Making a blog post is a great way to keep the people interested in your work informed.</section>
           <input type="submit" value="Start drafting!" disabled={submitting} />
         </form>
       )}
       {posts || (!ownProfile ? (<p>Huh, looks like they don't have much to say right now. Check back later!</p>) : null)}
     </section>
-  );
+  ) : null;
 
 }
 

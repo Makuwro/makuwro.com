@@ -28,6 +28,7 @@
   margin: 0;
   font-weight: 100;
   user-select: text;
+  white-space: pre-wrap;
 }
 
 #cover {
@@ -46,15 +47,15 @@
   width: 100%;
 }
 
-#creator {
-  display: flex;
+.creator {
+  display: inline-flex;
   align-items: center;
   gap: 0.75rem;
   font-weight: 100;
   user-select: text;
 }
 
-#creator img {
+.creator img {
   border-radius: 100%;
   height: 40px;
   width: 40px;
@@ -90,6 +91,10 @@
 
 @media screen and (min-width: 768px) {
 
+  #left {
+    max-width: calc(100% - 271.75px);
+  }
+
   #content {
     margin: 0 5rem;
   }
@@ -104,7 +109,7 @@
     justify-content: space-between;
   }
 
-  #postInfo h1 {
+  #postInfo h1, #postInfo input {
     font-size: 2.5rem;
     margin: 0;
   }
