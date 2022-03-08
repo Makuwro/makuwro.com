@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import styles from "../../styles/Blog.module.css";
+import ReactDOMServer from "react-dom/server";
+import sanitize from "sanitize-html";
+import parse from "html-react-parser";
 import Footer from "../Footer";
 
-export default function Literature({currentUser, addNotification, shownLocation, setLocation}) {
+export default function Literature({currentUser, addNotification, shownLocation, setLocation, setSettingsCache}) {
 
   const {username, slug} = useParams();
   const [editing, setEditing] = useState(false);
@@ -12,6 +15,7 @@ export default function Literature({currentUser, addNotification, shownLocation,
   const [post, setPost] = useState({});
   const [title, setTitle] = useState("");
   const [content, setContent] = useState(null);
+  const [originalContent, setOriginalContent] = useState();
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const contentContainer = useRef();
@@ -35,15 +39,43 @@ export default function Literature({currentUser, addNotification, shownLocation,
 
     if (post.content) {
 
-      const matches = [...post.content.matchAll(/\n?(.+)/gm)];
-      const content = [];
-      for (let i = 0; matches.length > i; i++) {
+      // Protect us from bad HTML, please!
+      const sanitizedHtml = sanitize(post.content, {
+        allowedAttributes: false, 
+        allowedClasses: false,
+        allowedTags: [
+          "address", "article", "aside", "footer", "header", "h1", "h2", "h3", "h4",
+          "h5", "h6", "hgroup", "main", "nav", "section", "blockquote", "dd", "div",
+          "dl", "dt", "figcaption", "figure", "hr", "li", "main", "ol", "p", "pre",
+          "ul", "a", "abbr", "b", "bdi", "bdo", "br", "cite", "code", "data", "dfn",
+          "em", "i", "kbd", "mark", "q", "rb", "rp", "rt", "rtc", "ruby", "s", "samp",
+          "small", "span", "strong", "sub", "sup", "time", "u", "var", "wbr", "caption",
+          "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr",
+          "audio", "source", "video", "iframe"
+        ]
+      });
 
-        content.push(<p key={i}>{matches[i][1]}</p>);
+      // Now convert the HTML into a React component!
+      let content = Array.isArray(content = parse(sanitizedHtml, {
 
-      }
+        replace: (element) => {
+          
+          // Check if the link is an internal link (makuwro.com)
+          if (element.name === "a" && element.attribs.href === "https://makuwro.com") {
 
+            // Replace the element with a React Router link so that the page doesn't refresh
+            return <Link to=""></Link>;
+
+          }
+
+          return element;
+
+        }
+
+      })) ? content : [content];
+      setOriginalContent(content);
       setContent({comps: content});
+      setReady(true);
 
     }
 
@@ -119,14 +151,15 @@ export default function Literature({currentUser, addNotification, shownLocation,
       } catch ({message}) {
   
         console.log(message);
+        json = {};
+        setReady(true);
   
       }
 
       if (mounted) {
 
-        setTitle(post.title);
+        setTitle(json.title);
         setPost(json);
-        setReady(true);
 
       }
 
@@ -150,6 +183,7 @@ export default function Literature({currentUser, addNotification, shownLocation,
 
     } else {
 
+      if (!post.content && content) setContent(null);
       setEditing(false);
 
     }
@@ -198,80 +232,26 @@ export default function Literature({currentUser, addNotification, shownLocation,
     try {
 
       // Convert the elements to a Markdown string
-      const {current: {children}} = contentContainer;
-      let source = "";
-      for (let i = 0; children.length > i; i++) {
+      let contentString = "";
+      let contentUntouched = true;
+      for (let i = 0; content.comps.length > i; i++) {
 
-        const child = children[i];
-        const nodeName = child.nodeName;
-        switch (nodeName) {
+        if (originalContent && originalContent[i]?.props.children !== content.comps[i].props.children) {
 
-          case "P":
-            for (let x = 0; child.childNodes.length > x; x++) {
-
-              const grandChild = child.childNodes[x];
-              const grandNodeName = grandChild.nodeName;
-              if ((grandChild.nodeValue !== null && grandChild.nodeValue.trim() === "") || grandNodeName === "BR") continue;
-
-              source += (i !== 0 && x === 0 ? "\n" : "");
-
-              switch (grandNodeName) {
-
-                case "A":
-                  source += `[${grandChild.innerText}](${grandChild.href})`;
-                  break;
-
-                case "B":
-                  source += `**${grandChild.innerText}**`;
-                  break;
-
-                case "I":
-                  source += `*${grandChild.innerText}*`;
-                  break;
-                
-                case "U":
-                  source += `__${grandChild.innerText}__`;
-                  break;
-
-                default:
-                  source += grandChild.nodeValue;
-                  break;
-
-              }
-
-            }
-            break;
-
-          case "H1":
-          case "H2":
-          case "H3":
-            source += `${i !== 0 ? "\n" : ""}${(nodeName === "H1" || children[i - 1] && children[i - 1].nodeName !== "H1") && i !== 0 ? "\n" : ""}${"#".repeat(nodeName.substring(1))} ${child.innerText}`;
-            break;
-
-          case "UL":
-            for (let x = 0; child.childNodes.length > x; x++) {
-
-              console.log(child.childNodes[x].nodeName);
-
-            }
-
-            source += `${i !== 0 ? "\n" : ""}* ${child.innerText}`;
-            break;
-
-          default:
-            break;
+          contentUntouched = false;
 
         }
+        contentString += ReactDOMServer.renderToStaticMarkup(content.comps[i]);
 
       }
 
       // Make sure the source was altered
-      if (source !== post.content) {
+      if (!contentUntouched || title !== post.title) {
 
         // Prepare the body
         const formData = new FormData();
         formData.append("title", title);
-        formData.append("content", source);
+        formData.append("content", contentString);
 
         // Update the post's content
         const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/blog/${username}/${slug}`, {
@@ -350,7 +330,7 @@ export default function Literature({currentUser, addNotification, shownLocation,
 
                 // Don't delete the beginning paragraph, please.
                 if (content.comps[i - 1]) {
-                  
+
                   newContent.selection.startOffset = content.comps[i - 1].props.children.length;
                   newContent.comps.splice(i, 1);
                   fixFocus = true;
@@ -417,8 +397,10 @@ export default function Literature({currentUser, addNotification, shownLocation,
 
           } else if (fixFocus && i + 1 === index) {
 
+            let previousChild = typeof((previousChild = content.comps[i].props.children)) === "string" ? previousChild : "";
             const oldChild = content.comps[i + 1].props.children;
-            child = content.comps[i].props.children + (oldChild && oldChild.type !== "br" ? oldChild : "");
+            child = previousChild + (oldChild && oldChild.type !== "br" ? oldChild : "");
+            console.log(child);
 
           } else if (!sameContainer && i <= endIndex && i > index) {
 
@@ -639,6 +621,13 @@ export default function Literature({currentUser, addNotification, shownLocation,
     }
 
   }
+  
+  function navigateToSettings() {
+
+    setSettingsCache({...post, type: 2});
+    navigate(`/${post.owner.username}/blog/${post.slug}/settings`);
+
+  }
 
   return ready && (
     <main id={styles.post} className={leaving ? "leaving" : ""} onTransitionEnd={() => {
@@ -673,8 +662,7 @@ export default function Literature({currentUser, addNotification, shownLocation,
                 {currentUser && currentUser.id === post.owner.id ? (
                   <>
                     <button onClick={async () => editing ? await save() : navigate("?mode=edit")}>{editing ? "Save" : "Edit"}</button>
-                    <button className={post.published ? "destructive" : styles.unpublished}>Publish</button>
-                    <button className="destructive" onClick={deletePost}>Delete</button>
+                    <button onClick={navigateToSettings}>Settings</button>
                   </>
                 ) : <button className="destructive" onClick={() => navigate("?action=report-abuse")}>Report</button>}
               </section>

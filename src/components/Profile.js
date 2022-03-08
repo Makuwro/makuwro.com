@@ -10,7 +10,9 @@ import ProfileBlog from "./profile/ProfileBlog";
 import ProfileAbout from "./profile/ProfileAbout";
 import ProfileChapters from "./profile/ProfileChapters";
 
-export default function Profile({shownLocation, setLocation, currentUser, notify, updated}) {
+export default function Profile({
+  shownLocation, setLocation, currentUser, notify, updated, setSettingsCache
+}) {
 
   const {username, tab, id, subtab} = useParams();
   const [leaving, setLeaving] = useState(true);
@@ -237,6 +239,19 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
   }, [profileInfo, tab, id]);
 
+  function navigateToSettings() {
+
+    const type = isStory ? 1 : 0;
+    const isNotUser = isCharacter || isStory;
+    if (isNotUser) {
+
+      setSettingsCache({...profileInfo, type});
+
+    }
+    navigate(`${isNotUser ? location.pathname : ""}/settings/${isNotUser ? "profile" : "account"}`)
+
+  }
+
   return ready && (
     <main id={styles.profile} className={leaving ? "leaving" : ""} onTransitionEnd={() => {
 
@@ -296,7 +311,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
             {profileInfo && (
               <section id={styles.actions}>
                 {currentUser && (currentUser.id === profileInfo?.id || currentUser.id === profileInfo?.owner?.id) ? (
-                  <button onClick={() => navigate(`/${(isStory || isCharacter) ? `${profileInfo.owner.username}/${isStory ? "stories" : "characters"}/${profileInfo.slug}/` : ""}settings/${isCharacter || isStory ? "profile" : "account"}`)}>Settings</button>
+                  <button onClick={navigateToSettings}>Settings</button>
                 ) : (
                   <>
                     <button onClick={() => currentUser?.id ? navigate("?action=follow") : navigate("/signin")}>Follow</button>

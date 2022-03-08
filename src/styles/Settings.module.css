@@ -34,7 +34,7 @@
   margin-top: 1rem;
 }
 
-#options > section {
+.option {
   background-color: var(--article);
   border-radius: 5px;
   box-shadow: var(--day-box-shadow);
@@ -49,12 +49,12 @@
   filter: brightness(0.97);
 }
 
-#options > section > section:first-of-type {
+.option > section:first-of-type {
   padding: 1rem;
   cursor: pointer;
 }
 
-#options > section.open > .content {
+.option.open > .content {
   display: block;
 }
 
@@ -101,7 +101,7 @@
   transform: scaleY(-1);
 }
 
-#options > section > section:first-of-type > span {
+.option > section:first-of-type > span {
   float: right;
 }
 

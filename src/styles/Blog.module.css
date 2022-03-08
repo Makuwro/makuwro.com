@@ -70,6 +70,10 @@
   user-select: text;
 }
 
+#content :first-child {
+  margin-top: 0;
+}
+
 [placeholder]:empty::before {
   content: attr(placeholder);
   cursor: text;

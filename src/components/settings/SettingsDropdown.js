@@ -33,7 +33,7 @@ export default function SettingsDropdown({title, description, children, open, on
   }, [open]);
 
   return (
-    <section className={`${open ? styles.open : ""} ${highlighted ? styles.highlighted : ""}`} onClick={onClick ? onClick : null} id={hash}>
+    <section className={`${styles.option}${open ? ` ${styles.open}` : ""}${highlighted ? ` ${styles.highlighted}` : ""}` || null} onClick={onClick ? onClick : null} id={hash}>
       <section className={styles.header}>
         <section>
           <b>{title}</b>

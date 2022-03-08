@@ -7,41 +7,21 @@ import AppearanceSettings from "./settings/AppearanceSettings";
 import PrivacySettings from "./settings/PrivacySettings";
 import ProfileSettings from "./settings/ProfileSettings";
 import PropTypes from "prop-types";
+import SharingSettings from "./settings/SharingSettings";
 
-export default function Settings({currentUser, setLocation, setCurrentUser}) {
+export default function Settings({currentUser, setLocation, setCurrentUser, setSettingsCache, settingsCache}) {
 
-  const {username, slug, category} = useParams();
+  const {username, slug, category, tab} = useParams();
   const [menu, setMenu] = useState();
   const [leaving, setLeaving] = useState(true);
   const [ready, setReady] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [story, setStory] = useState();
+  const [blogPost, setBlogPost] = useState();
+  const [article, setArticle] = useState();
   const [character, setCharacter] = useState();
   const [menuComponents, setMenuComponents] = useState(null);
-  const tabs = {
-    "account": <AccountSettings 
-      currentUser={currentUser} 
-      menu={menu} 
-      setMenu={setMenu} 
-      submitting={submitting}
-      updateAccount={updateAccount} />,
-    "profile": <ProfileSettings 
-      currentUser={currentUser} 
-      setCurrentUser={setCurrentUser} 
-      menu={menu} 
-      toggleMenu={toggleMenu} 
-      submitting={submitting}
-      updateAccount={updateAccount}
-      character={character} />,
-    "appearance": <AppearanceSettings 
-      currentUser={currentUser}
-      menu={menu}
-      toggleMenu={toggleMenu} />,
-    "privacy": <PrivacySettings 
-      currentUser={currentUser} 
-      menu={menu}
-      toggleMenu={toggleMenu} />
-  };
-  const {tab} = useParams();
+  const [tabComp, setTabComp] = useState();
   const navigate = useNavigate();
   const location = useLocation();
   let i;
@@ -144,101 +124,6 @@ export default function Settings({currentUser, setLocation, setCurrentUser}) {
 
   }
 
-  useEffect(async () => {
-
-    if (!currentUser.id) {
-
-      // Can't manage settings if there are no settings.
-      navigate(`/signin?redirect=${location.pathname}`, {replace: true});
-
-    } 
-
-    if (category && username && slug) {
-
-      // Get the character info.
-      try {
-
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/${category}/${username}/${slug}`, {
-          headers: {
-            token: currentUser.token
-          }
-        });
-
-        if (response.ok) {
-
-          setCharacter({...await response.json()});
-
-        } else {
-
-          const {message} = await response.json();
-          throw new Error(message);
-
-        }
-
-      } catch (err) {
-
-        alert("Sorry, I couldn't find that character!");
-
-      }
-
-    }
-    
-    if (!tabs[tab]) {
-
-      if (character) {
-
-        navigate(`/${character.owner.username}/characters/${character.slug}/settings/profile`, {replace: true});
-
-      } else {
-
-        navigate(`/settings/account${location.search}`, {replace: true});
-
-      }
-
-    } else {
-
-      setReady(true);
-
-    }
-    
-  }, [tab, username, slug, category]);
-
-  useEffect(() => {
-
-    if (ready && (matchPath({path: "/settings/:tab"}, location.pathname) || matchPath({path: "/:username/:category/:slug/settings/:tab"}, location.pathname))) {
-
-      setLeaving(false);
-      setLocation(location);
-
-    } else {
-
-      setLeaving(true);
-
-    }
-
-  }, [location, ready]);
-
-  useEffect(() => {
-
-    const menuOptions = character ? ["Profile", "Sharing"] : ["Account", "Profile", "Appearance", "Privacy"];
-    for (i = 0; menuOptions.length > i; i++) {
-
-      const name = menuOptions[i];
-      const path = `${character ? `/${character.owner.username}/characters/${character.slug}` : ""}/settings/${name.toLowerCase().replaceAll(" ", "-")}`;
-  
-      menuOptions[i] = (
-        <li key={i}>
-          <Link to={`${path}${location.search}`} className={path === location.pathname ? styles.selected : ""} onClick={() => setMenu()}>
-            {name}
-          </Link>
-        </li>
-      );
-  
-    }
-    setMenuComponents(menuOptions);
-
-  }, [character, location]);
-
   async function signOut() {
 
     if (confirm("Are you sure you want to sign out?")) {
@@ -315,11 +200,230 @@ export default function Settings({currentUser, setLocation, setCurrentUser}) {
 
   }
 
+  useEffect(async () => {
+
+    let mounted = true;
+    let story;
+    let blogPost;
+    let article;
+    let character;
+
+    if (!currentUser.id) {
+
+      // Can't manage settings if there are no settings.
+      navigate(`/signin?redirect=${location.pathname}`, {replace: true});
+
+    } 
+
+    if (settingsCache) {
+
+      switch (settingsCache.type) {
+
+        // Character
+        case 0:
+          character = settingsCache;
+          break;
+
+        // Story
+        case 1: 
+          story = settingsCache;
+          break;
+
+        // Blog post
+        case 2:
+          blogPost = settingsCache;
+          break;
+
+        // Wiki article
+        case 3:
+          article = settingsCache;
+          break;
+        
+        default:
+          break;
+
+      }   
+
+    } else if (category && username && slug) {
+
+      try {
+
+        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/${category}/${username}/${slug}`, {
+          headers: {
+            token: currentUser.token
+          }
+        });
+        const json = await response.json();
+
+        if (response.ok && mounted) {
+
+          const content = {...json};
+
+          switch (category) {
+
+            case "characters":
+              character = content;
+              break;
+            
+            case "blog":
+              blogPost = content;
+              break;
+            
+            default:
+              break;
+
+          }
+
+        } else {
+
+          throw new Error(json.message);
+
+        }
+
+      } catch (err) {
+
+        alert("Sorry, I couldn't find that one!");
+
+      }
+
+    }
+
+    setCharacter(character);
+    setStory(story);
+    setBlogPost(blogPost);
+    setArticle(article);
+    setReady(true);
+
+    return () => {
+
+      mounted = false;
+
+    };
+    
+  }, [username, slug, category]);
+
+  useEffect(() => {
+
+    if (ready && (matchPath({path: "/settings/:tab"}, location.pathname) || matchPath({path: "/:username/:category/:slug/settings/:tab"}, location.pathname))) {
+
+      setLeaving(false);
+      setLocation(location);
+
+    } else {
+
+      setLeaving(true);
+
+    }
+
+  }, [location, ready]);
+
+  useEffect(() => {
+
+    if (ready) {
+
+      const tabs = {
+        "account": <AccountSettings 
+          currentUser={currentUser} 
+          menu={menu} 
+          setMenu={setMenu} 
+          submitting={submitting}
+          updateAccount={updateAccount} />,
+        "profile": <ProfileSettings 
+          currentUser={currentUser} 
+          setCurrentUser={setCurrentUser} 
+          menu={menu} 
+          toggleMenu={toggleMenu} 
+          submitting={submitting}
+          updateAccount={updateAccount}
+          character={character} />,
+        "appearance": <AppearanceSettings 
+          currentUser={currentUser}
+          menu={menu}
+          toggleMenu={toggleMenu} />,
+        "privacy": <PrivacySettings 
+          currentUser={currentUser} 
+          menu={menu}
+          toggleMenu={toggleMenu} />,
+        "sharing": <SharingSettings
+          currentUser={currentUser}
+          menu={menu}
+          blogPost={blogPost}
+          toggleMenu={toggleMenu}
+        />
+      };
+
+      if (!tabs[tab]) {
+
+        if (character) {
+  
+          navigate(`/${character.owner.username}/characters/${character.slug}/settings/profile`, {replace: true});
+  
+        } else if (blogPost) {
+  
+          navigate(`/${blogPost.owner.username}/blog/${blogPost.slug}/settings/sharing`, {replace: true});
+  
+        } else {
+  
+          navigate(`/settings/account${location.search}`, {replace: true});
+  
+        }
+  
+      } else {
+  
+        setTabComp(tabs[tab]);
+  
+      }
+
+    }
+
+  }, [tab, ready, menu]);
+
+  useEffect(() => {
+
+    let menuOptions;
+    let pathPrefix;
+
+    if (character) {
+
+      menuOptions = ["Profile", "Sharing"];
+      pathPrefix = `/${character.owner.username}/characters/${character.slug}/settings/`;
+
+    } else if (blogPost) {
+
+      menuOptions = ["Sharing"];
+      pathPrefix = `/${blogPost.owner.username}/blog/${blogPost.slug}/settings/`;
+      
+    } else {
+      
+      menuOptions = ["Account", "Profile", "Appearance", "Privacy"];
+      pathPrefix = "/settings/";
+
+    }
+
+    for (i = 0; menuOptions.length > i; i++) {
+
+      const name = menuOptions[i];
+      const path = `${pathPrefix}${name.toLowerCase().replaceAll(" ", "-")}`;
+  
+      menuOptions[i] = (
+        <li key={i}>
+          <Link to={`${path}${location.search}`} className={path === location.pathname ? styles.selected : ""} onClick={() => setMenu()}>
+            {name}
+          </Link>
+        </li>
+      );
+  
+    }
+    setMenuComponents(menuOptions);
+
+  }, [character, blogPost, location]);
+
   return ready ? (
     <main id={styles.settings} className={leaving ? "leaving" : ""} onTransitionEnd={() => {
 
       if (leaving) {
 
+        setSettingsCache();
         setLocation(location);
 
       }
@@ -328,12 +432,12 @@ export default function Settings({currentUser, setLocation, setCurrentUser}) {
       <section id={styles.left}>
         <ul>
           {menuComponents}
-          <li><button onClick={character ? deleteCharacter : signOut}>{character ? "Delete character" : "Sign out"}</button></li>
+          <li><button onClick={character ? deleteCharacter : signOut}>{character ? "Delete character" : (blogPost ? "Delete blog post" : "Sign out")}</button></li>
         </ul>
         <p>Makuwro.com v{pjson.version}</p>
       </section>
       <section id={styles.viewer}>
-        {tabs[tab] || null}
+        {tabComp || null}
       </section>
     </main>
   ) : null;

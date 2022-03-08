@@ -43,6 +43,7 @@ export default function App() {
   const [searchParams] = useSearchParams();
   let [currentUser, setCurrentUser] = useState({});
   const [artCache, setArtCache] = useState({});
+  const [settingsCache, setSettingsCache] = useState();
   const navigate = useNavigate();
   let matchedPath;
   let action;
@@ -260,21 +261,53 @@ export default function App() {
         <Route path={"/library"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
         <Route path={"/library/:category"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
         {[
-          "/:username", "/:username/:tab/:id", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id/:subtab"
+          "/:username", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id", "/:username/:tab/:id/:subtab"
         ].map((path, index) => {
           
           return <Route key={index} path={path} element={(
-            <Profile updated={updated} shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} notify={addNotification} artViewerOpen={artViewerOpen} />
+            <Profile 
+              updated={updated} 
+              shownLocation={shownLocation} 
+              setLocation={setLocation}
+              currentUser={currentUser} 
+              notify={addNotification} 
+              artViewerOpen={artViewerOpen}
+              setSettingsCache={setSettingsCache}
+            />
           )} />;
 
         })}
-        <Route path={"/:username/blog/:slug"} element={<Literature shownLocation={shownLocation} setLocation={setLocation} currentUser={currentUser} addNotification={addNotification} />} />
-        {["/settings", "/:username/:category/:slug/settings/:tab"].map((path, index) => {
-          
-          return <Route key={index} path={path} element={<Settings currentUser={currentUser} shownLocation={shownLocation} setLocation={setLocation} />} />;
-
-        })}
-        <Route path={"/settings/:tab"} element={<Settings currentUser={currentUser} shownLocation={shownLocation} setLocation={setLocation} setCurrentUser={setCurrentUser} />} />
+        {["/:username/blog/:slug", "/:username/literature/:literatureSlug/chapters/:chapterSlug", "/:username/worlds/:worldSlug/wiki/:articleSlug"].map((path, index) => (
+          <Route 
+            key={index} 
+            path={path} 
+            element={(
+              <Literature 
+                shownLocation={shownLocation} 
+                setLocation={setLocation} 
+                currentUser={currentUser} 
+                addNotification={addNotification}
+                setSettingsCache={setSettingsCache}
+              />
+            )}
+          />
+        ))}
+        {["/settings", "/settings/:tab", "/:username/:category/:slug/settings", "/:username/:category/:slug/settings/:tab"].map((path, index) => (
+          <Route 
+            key={index} 
+            path={path} 
+            element={(
+              <Settings 
+                currentUser={currentUser} 
+                shownLocation={shownLocation} 
+                setLocation={setLocation} 
+                setCurrentUser={setCurrentUser}
+                settingsCache={settingsCache}
+                setSettingsCache={setSettingsCache}
+              />
+            )}
+          />
+        ))}
       </Routes>
     </>
   ) : null;
