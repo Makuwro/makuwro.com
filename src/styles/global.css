@@ -138,6 +138,7 @@ textarea {
 .input-with-prefix span {
   color: var(--text);
   padding: 10.6px 0 10.6px 10.6px;
+  user-select: text;
 }
 
 .input-with-prefix > input[type="text"] {

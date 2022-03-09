@@ -17,6 +17,16 @@ export default function Literature({currentUser, addNotification, shownLocation,
   const [content, setContent] = useState(null);
   const [originalContent, setOriginalContent] = useState();
   const [searchParams] = useSearchParams();
+  const [clipboardHistory, setClipboardHistory] = useState({
+    title: {
+      position: 0,
+      history: []
+    },
+    content: {
+      position: 0,
+      history: []
+    }
+  });
   const location = useLocation();
   const contentContainer = useRef();
   const selectedParagraph = useRef();
@@ -284,7 +294,7 @@ export default function Literature({currentUser, addNotification, shownLocation,
 
   }
 
-  function handleInput(event) {
+  function handleInput(event, cutting) {
 
     const {keyCode, ctrlKey} = event;
     const selection = document.getSelection();
@@ -297,13 +307,42 @@ export default function Literature({currentUser, addNotification, shownLocation,
     const sameContainer = startContainer === endContainer;
     const highlighted = startOffset !== endOffset || !sameContainer;
     let endIndex = index;
+
+    function fixClipboard() {
+
+
+      
+
+    }
+
+    if (cutting) {
+
+      navigator.clipboard.writeText(document.getSelection().toString());
+
+    }
+
     if (!sameContainer) {
 
       onP = startContainer.nodeName === "P";
       endIndex = (onP ? [...endContainer.parentNode.childNodes] : [...endContainer.parentNode.parentNode.childNodes]).indexOf(onP ? endContainer : endContainer.parentNode);
 
     }
-    if ((!ctrlKey || backspace || del) && (keyCode === 32 || backspace || del || (keyCode >= 48 && keyCode <= 90) || (keyCode >= 96 && keyCode <= 111) || (keyCode >= 160 && keyCode <= 165) || (keyCode >= 186 && keyCode <= 223))) {
+
+    if (cutting || (
+      (
+        !ctrlKey || backspace || del
+      ) && (
+        keyCode === 32 || backspace || del || (
+          keyCode >= 48 && keyCode <= 90
+        ) || (
+          keyCode >= 96 && keyCode <= 111
+        ) || (
+          keyCode >= 160 && keyCode <= 165
+        ) || (
+          keyCode >= 186 && keyCode <= 223
+        )
+      )
+    )) {
       
       // We're handling the content, so prevent the default behavior
       event.preventDefault();
@@ -311,7 +350,7 @@ export default function Literature({currentUser, addNotification, shownLocation,
       // We have to add or remove characters!
       setContent((content) => {
 
-        const newContent = {comps: [...content.comps], selection: {startOffset}, increment: backspace || del ? 0 : 1};
+        const newContent = {comps: [...content.comps], selection: {startOffset}, increment: cutting || backspace || del ? 0 : 1};
         let i = content.comps.length;
         let fixFocus = false;
         while (i--) {
@@ -508,6 +547,37 @@ export default function Literature({currentUser, addNotification, shownLocation,
 
       });
 
+    } else if (ctrlKey && keyCode === 90) {
+
+      // We have to undo something!
+      // First, let's stop the browser from handling this event.
+      event.preventDefault();
+
+    } else if (ctrlKey && keyCode === 89) {
+
+      // We have to redo something!
+      // First, let's stop the browser from handling this event.
+      event.preventDefault();
+
+      // Now, check if there's any history.
+      const { position, history } = clipboardHistory.content;
+      const newContent = history[position + 1];
+      if (newContent) {
+
+        // Set the content.
+        setContent(newContent);
+        
+        // And finally adjust the clipboard history to reflect this.
+        setClipboardHistory((oldHistory) => ({
+          ...oldHistory,
+          content: {
+            ...oldHistory.content,
+            position: position + 1
+          }
+        }));
+
+      }
+
     } else if (!ctrlKey && keyCode !== 37 && keyCode !== 38 && keyCode !== 39 && keyCode !== 40) {
 
       // We're handling the content, so prevent the default behavior
@@ -556,12 +626,6 @@ export default function Literature({currentUser, addNotification, shownLocation,
       return newContent;
 
     });
-
-  }
-
-  function handleCut(event) {
-
-    event.preventDefault();
 
   }
 
@@ -625,7 +689,7 @@ export default function Literature({currentUser, addNotification, shownLocation,
   function navigateToSettings() {
 
     setSettingsCache({...post, type: 2});
-    navigate(`/${post.owner.username}/blog/${post.slug}/settings`);
+    navigate(`/${post.owner.username}/blog/${post.slug}/settings/sharing`);
 
   }
 
@@ -679,7 +743,7 @@ export default function Literature({currentUser, addNotification, shownLocation,
             id={styles.content} 
             contentEditable={editing} 
             onKeyDown={handleInput} 
-            onCut={handleCut} 
+            onCut={(event) => handleInput(event, true)}
             onPaste={handlePaste} 
             suppressContentEditableWarning 
             ref={contentContainer}

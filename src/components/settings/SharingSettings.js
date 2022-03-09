@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import Dropdown from "../input/Dropdown";
 import SettingsDropdown from "./SettingsDropdown";
 import Editor from "@monaco-editor/react";
+import SlugInput from "../input/SlugInput";
 
 export default function SharingSettings({currentUser, menu, toggleMenu, submitting, updateAccount, character, blogPost}) {
 
@@ -39,14 +40,14 @@ export default function SharingSettings({currentUser, menu, toggleMenu, submitti
           open={menu === 0}
           onClick={() => toggleMenu(0)}
         >
-          <img className="avatar-preview" src={`${currentUser.avatarUrl || `https://cdn.makuwro.com/${(character || currentUser).avatarPath}`}`} />
+          <p className="info">Head's up! If you change this, we won't redirect your old URL because we want to allow you to reuse it for something else.</p>
           <form>
-            <input required={true} type="file" accept="image/*" style={{display: "none"}} ref={avatarImage} onChange={(event) => {
-              
-              updateAccountWrapper(event, "avatar", event.target.files[0]);
-            
-            }} />
-            <input style={{marginTop: "1rem"}} type="button" value="Change avatar" onClick={() => avatarImage.current.click()} disabled={submitting} />
+            <SlugInput 
+              username={blogPost.owner.username}
+              slug={blogPost.slug}
+              path="blog"
+            />
+            <input style={{marginTop: "1rem"}} type="submit" value="Change avatar" disabled={submitting} />
           </form>
         </SettingsDropdown>
         <SettingsDropdown
