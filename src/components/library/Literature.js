@@ -93,11 +93,46 @@ export default function Literature({currentUser, addNotification, shownLocation,
 
   useEffect(() => {
 
+    let timeout;
     if (editing && content && (content.selection || content.newParagraph) && selectedParagraph?.current) {
 
       fixCaret(selectedParagraph, !content.deleteParagraph ? (content.selection?.startOffset || 0) + (content.increment || 0) : selectedParagraph.current.childNodes[0].textContent.length + content.increment);
+      
+      // Use a delay for 1.5 seconds just in case we aren't finished typing.
+      if (clipboardHistory.historyAltered) {
+
+        setClipboardHistory({
+          ...clipboardHistory,
+          historyAltered: false
+        });
+
+      } else {
+
+        timeout = setTimeout(() => {
+
+          setClipboardHistory((oldHistory) => ({
+            ...oldHistory,
+            content: {
+              position: oldHistory.content.position + 1,
+              history: [
+                ...oldHistory.content.history.slice(0, oldHistory.content.position), 
+                content
+              ]
+            }
+          }));
+
+        }, 1500);
+
+      }
 
     }
+
+    return () => {
+
+      // If we change the content, don't save the old content to the history.
+      clearTimeout(timeout);
+
+    };
 
   }, [content]);
 
@@ -200,6 +235,7 @@ export default function Literature({currentUser, addNotification, shownLocation,
 
   }, [searchParams]);
 
+  /*
   async function deletePost() {
 
     if (confirm("Are you sure you want to delete this post? If someone reported it, it'll only be hidden until the Makuwro Safety & Security team reviews it.")) {
@@ -236,6 +272,7 @@ export default function Literature({currentUser, addNotification, shownLocation,
     }
 
   }
+  */
 
   async function save() {
 
@@ -308,10 +345,32 @@ export default function Literature({currentUser, addNotification, shownLocation,
     const highlighted = startOffset !== endOffset || !sameContainer;
     let endIndex = index;
 
-    function fixClipboard() {
+    function changeClipboard(increment) {
 
+      // Now, check if there's any history.
+      const { position, history } = clipboardHistory.content;
+      let newPosition = position + increment;
+      let newContent = (newContent = history[newPosition]) || (newPosition === -1 && {comps: originalContent});
+      if (newContent) {
 
+        // Set the content.
+        setContent(newContent);
+        
+        // And finally adjust the clipboard history to reflect this.
+        setClipboardHistory((oldHistory) => ({
+          ...oldHistory,
+          content: {
+            ...oldHistory.content,
+            position: newPosition
+          },
+          historyAltered: true
+        }));
+
+        return true;
+
+      } 
       
+      return false;
 
     }
 
@@ -553,28 +612,23 @@ export default function Literature({currentUser, addNotification, shownLocation,
       // First, let's stop the browser from handling this event.
       event.preventDefault();
 
+      // Keeping it D.R.Y.
+      if (!changeClipboard(-2)) {
+
+        alert("There's nothing to undo");
+
+      }
+
     } else if (ctrlKey && keyCode === 89) {
 
       // We have to redo something!
       // First, let's stop the browser from handling this event.
       event.preventDefault();
 
-      // Now, check if there's any history.
-      const { position, history } = clipboardHistory.content;
-      const newContent = history[position + 1];
-      if (newContent) {
+      // Keeping it D.R.Y.
+      if (!changeClipboard(1)) {
 
-        // Set the content.
-        setContent(newContent);
-        
-        // And finally adjust the clipboard history to reflect this.
-        setClipboardHistory((oldHistory) => ({
-          ...oldHistory,
-          content: {
-            ...oldHistory.content,
-            position: position + 1
-          }
-        }));
+        alert("There's nothing to redo");
 
       }
 
