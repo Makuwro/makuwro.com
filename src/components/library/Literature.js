@@ -267,7 +267,17 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
     } else {
 
-      if (!post.content && content) setContent(null);
+      // Reset the content if it wasn't edited.
+      if (!post.content && content) {
+        
+        setContent(null);
+
+      }
+
+      // Remove the selections.
+      document.getSelection().removeAllRanges();
+
+      // Disable edit mode.
       setEditing(false);
 
     }
@@ -906,8 +916,11 @@ export default function Literature({currentUser, shownLocation, setLocation, set
         // Check if we removed the formatting, and if we did, return the component as-is.
         // Otherwise, add the formatting.
         newParent[i] = elementRemoved || nodeType === 3 ? newElement : React.createElement(elementName, {
-          key: i
+          key: i,
+          ref: selectedParagraph
         }, newElement);
+        
+        console.log(newContent.selection)
 
       };
 
@@ -1021,56 +1034,58 @@ export default function Literature({currentUser, shownLocation, setLocation, set
               <li>Heading 6</li>
             </Dropdown>
           </section>
-          <section id={styles.metadata}>
-            <section id={styles.postInfo}>
-              <section id={styles.left}>
-                <h1 
-                  contentEditable={editing} 
-                  placeholder={editing ? "Untitled blog" : null}
-                  onKeyDown={changeTitle}
-                  ref={titleRef}
-                  suppressContentEditableWarning
-                >
-                  {title || (!editing ? "Untitled blog" : null)}
-                </h1>
-                <Link to={`/${post.owner.username}`} className={styles.creator}>
-                  <img src={`https://cdn.makuwro.com/${post.owner.avatarPath}`} />
-                  <span>{post.owner.displayName || `@${post.owner.username}`}</span>
-                </Link>
+          <section id={styles.belowFormatter}>
+            <section id={styles.metadata}>
+              <section id={styles.postInfo}>
+                <section id={styles.left}>
+                  <h1 
+                    contentEditable={editing} 
+                    placeholder={editing ? "Untitled blog" : null}
+                    onKeyDown={changeTitle}
+                    ref={titleRef}
+                    suppressContentEditableWarning
+                  >
+                    {title || (!editing ? "Untitled blog" : null)}
+                  </h1>
+                  <Link to={`/${post.owner.username}`} className={styles.creator}>
+                    <img src={`https://cdn.makuwro.com/${post.owner.avatarPath}`} />
+                    <span>{post.owner.displayName || `@${post.owner.username}`}</span>
+                  </Link>
+                </section>
+                <section id={styles.actions}>
+                  {currentUser && currentUser.id === post.owner.id ? (
+                    <>
+                      <button onClick={async () => editing ? await save() : navigate("?mode=edit")}>{editing ? "Save" : "Edit"}</button>
+                      <button onClick={navigateToSettings}>Settings</button>
+                    </>
+                  ) : <button className="destructive" onClick={() => navigate("?action=report-abuse")}>Report</button>}
+                </section>
               </section>
-              <section id={styles.actions}>
-                {currentUser && currentUser.id === post.owner.id ? (
-                  <>
-                    <button onClick={async () => editing ? await save() : navigate("?mode=edit")}>{editing ? "Save" : "Edit"}</button>
-                    <button onClick={navigateToSettings}>Settings</button>
-                  </>
-                ) : <button className="destructive" onClick={() => navigate("?action=report-abuse")}>Report</button>}
-              </section>
+              {(post.coverPath || editing) && (
+                <section id={styles.cover}>
+                  {post.coverPath && (
+                    <img src={`https://cdn.makuwro.com/${post.coverPath}`} />
+                  )}
+                </section>
+              )}
             </section>
-            {(post.coverPath || editing) && (
-              <section id={styles.cover}>
-                {post.coverPath && (
-                  <img src={`https://cdn.makuwro.com/${post.coverPath}`} />
-                )}
-              </section>
-            )}
-          </section>
-          <section 
-            id={styles.content} 
-            contentEditable={editing} 
-            onKeyDown={handleInput} 
-            onCut={(event) => handleInput(event, true)}
-            onPaste={handlePaste} 
-            suppressContentEditableWarning 
-            ref={contentContainer}
-          >
-            {content ? content.comps : (
-              <p>This blog post doesn't exist...yet ;)</p>
-            )}
+            <section 
+              id={styles.content} 
+              contentEditable={editing} 
+              onKeyDown={handleInput} 
+              onCut={(event) => handleInput(event, true)}
+              onPaste={handlePaste} 
+              suppressContentEditableWarning 
+              ref={contentContainer}
+            >
+              {content ? content.comps : (
+                <p>This blog post doesn't exist...yet ;)</p>
+              )}
+            </section>
+            <Footer />
           </section>
         </>
       ) : "That one doesn't exist!"}
-      <Footer />
     </main>
   );
 
