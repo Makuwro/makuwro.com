@@ -870,7 +870,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       const {textContent, nodeType} = childNodes[i];
       let currentNode = childNodes[i];
 
-      const fixNodes = () => {
+      const fixNodes = (checkNodes) => {
 
         // Get all of the tags that are selected.
         let newElement = textContent;
@@ -885,7 +885,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
         // Iterate through the tags and remove the formatting, if necessary.
         for (let x = 0; tags.length > x; x++) {
 
-          if (elementName === tags[x]) {
+          if (checkNodes && elementName === tags[x]) {
 
             // Remember that we removed the formatting so that we don't re-add it
             // at the end.
@@ -933,7 +933,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
         } else {
 
-          fixNodes();
+          fixNodes(true);
 
         }
 
