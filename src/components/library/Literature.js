@@ -16,7 +16,6 @@ export default function Literature({currentUser, shownLocation, setLocation, set
   const [post, setPost] = useState({});
   const [title, setTitle] = useState("");
   const [content, setContent] = useState(null);
-  const [originalContent, setOriginalContent] = useState();
   const [searchParams] = useSearchParams();
   const [clipboardHistory, setClipboardHistory] = useState({
     title: {
@@ -37,12 +36,20 @@ export default function Literature({currentUser, shownLocation, setLocation, set
   const isMounted = useRef(true);
   const contentRefs = useRef([]);
 
-  function fixCaret(ref, start) {
+  function fixCaret(ref, start, end) {
 
     const currentSelection = document.getSelection();
     const range = document.createRange();
     range.setStart(ref.current.childNodes[0], start);
-    range.collapse(true);
+    if (end) {
+
+      range.selectNodeContents(ref.current.childNodes[0]);
+
+    } else {
+      
+      range.collapse(true);
+
+    }
     currentSelection.removeAllRanges();
     currentSelection.addRange(range);
 
@@ -99,8 +106,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
       })) ? content : [content];
 
-      // Save the react component to the states.
-      setOriginalContent(content);
+      // Save the react component to the state.
       setContent({comps: content});
 
       // Set up the initial clipboard history state for undoing and redoing.
@@ -126,7 +132,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
     if (editing && content && (content.selection || content.newParagraph) && selectedParagraph?.current) {
 
-      fixCaret(selectedParagraph, !content.deleteParagraph ? (content.selection?.startOffset || 0) + (content.increment || 0) : selectedParagraph.current.childNodes[0].textContent.length + content.increment);
+      fixCaret(selectedParagraph, !content.deleteParagraph ? (content.selection?.startOffset || 0) + (content.increment || 0) : selectedParagraph.current.childNodes[0].textContent.length + content.increment, content.selection?.endOffset);
       
       // Use a delay for 1.5 seconds just in case we aren't finished typing.
       if (clipboardHistory.historyAltered) {
@@ -857,7 +863,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     // Iterate through all of the child nodes in the selected parent.
     childNodes = parent[paragraphIndex].childNodes;
     newParent = [];
-    newContent = {comps: [...content.comps], selection: {startOffset}};
+    newContent = {comps: [...content.comps], selection: {startOffset, endOffset}};
     for (i = 0; childNodes.length > i; i++) {
 
       const tags = [];
@@ -916,9 +922,14 @@ export default function Literature({currentUser, shownLocation, setLocation, set
           // Easy: all we need to do is just splice the text node to include the formatted element.
           newParent[i] = [
             textContent.slice(0, startOffset),
-            React.createElement(elementName, {key: i}, targetText),
+            React.createElement(elementName, {
+              key: i,
+              ref: selectedParagraph
+            }, targetText),
             textContent.slice(endOffset)
           ];
+          newContent.selection.startOffset = 0;
+          newContent.selection.endOffset = targetText.length;
 
         } else {
 
@@ -956,9 +967,6 @@ export default function Literature({currentUser, shownLocation, setLocation, set
         {newParent}
       </p>
     );
-
-    // We'll let the useEffect() function re-select the range.
-    selection.removeAllRanges();
 
     // Finally, change the content.
     setContent(newContent);
