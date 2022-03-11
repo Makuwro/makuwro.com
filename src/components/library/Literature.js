@@ -362,6 +362,15 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
     const {ctrlKey, key} = event;
     const selection = document.getSelection();
+
+    // Hold that thought. Make sure we're selecting something.
+    if (!selection.focusNode) {
+
+      return;
+
+    }
+
+    // Alright, continue.
     const {startOffset, endOffset, startContainer, endContainer} = selection.getRangeAt(0);
     let onP = startContainer.nodeName === "P";
     const index = contentRefs.current.indexOf(onP ? startContainer : startContainer.parentNode);
@@ -638,7 +647,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
         // Underline
         case "u":
           event.preventDefault();
-          formatSelection(1);
+          formatSelection(2);
           break;
 
         // Undo
@@ -786,6 +795,11 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     const selection = document.getSelection();
     const {startOffset, endOffset, startContainer, endContainer} = selection.getRangeAt(0);
     const parent = contentRefs.current;
+    let childNodes;
+    let i;
+    let newParent;
+    let newContent;
+    let elementName;
 
     // Find the index of the paragraph and the selected node.
     let paragraphIndex;
@@ -822,102 +836,132 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     switch (action) {
 
       // Bold
-      case 0: {
-
-        let newContent = {...content};
-        let newParent = [];
-        const {childNodes} = parent[paragraphIndex];
-        let i;
-
-        // Iterate through all of the child nodes in the selected parent.
-        for (i = 0; childNodes.length > i; i++) {
-
-          // Find out if this is the target element by checking the start offset and the container.
-          if (i === selectedNodeIndex) {
-
-            const {nodeName, textContent, innerHTML} = childNodes[i];
-            switch (nodeName) {
-
-              case "#text": {
-
-                const targetText = textContent.slice(startOffset, endOffset);
-                newParent[i] = [
-                  textContent.slice(0, startOffset),
-                  <b key={i}>{targetText}</b>,
-                  textContent.slice(endOffset)
-                ];
-                break;
-
-              }
-
-              default:
-                console.warn(`Unknown node name: ${nodeName}`);
-                newParent[i] = textContent;
-                break;
-
-            }
-
-          } else {
-
-            // We don't need to do anything to this,
-            // so we can just turn it back into a React component.
-            const {nodeName, innerHTML, textContent, nodeType} = childNodes[i];
-            switch (nodeType) {
-
-              case 1:
-                newParent[i] = React.createElement(nodeName.toLowerCase(), {
-                  key: i,
-                  dangerouslySetInnerHTML: {__html: innerHTML}
-                });
-                break;
-
-              case 3:
-                newParent[i] = textContent;
-                break;
-
-              default:
-                break;
-
-            }
-            
-
-          }
-
-        }
-
-        // Iterate through the parent array and merge the text nodes.
-        i = newParent.length;
-        while (i--) {
-
-          // Text nodes are always just strings.
-          if (typeof newParent[i] === "string" && typeof newParent[i + 1] === "string") {
-
-            // Append the text to the current node.
-            newParent[i] += newParent[i + 1];
-
-            // Remove the previous text node.
-            newParent.splice(i + 1, 1);
-
-          }
-
-        }
-        
-        newContent.comps[paragraphIndex] = (
-          <p key={paragraphIndex} ref={(element) => (contentRefs.current[paragraphIndex] === element)}>
-            {newParent}
-          </p>
-        );
-
-        setContent(newContent);
+      case 0: 
+        elementName = "b";
         break;
 
-      }
+      case 1:
+        elementName = "i";
+        break;
+
+      case 2:
+        elementName = "u";
+        break;
 
       default:
         console.warn("Unknown format option selected.");
-        break;
+        return;
 
     }
+
+    // Iterate through all of the child nodes in the selected parent.
+    childNodes = parent[paragraphIndex].childNodes;
+    newParent = [];
+    newContent = {comps: [...content.comps], selection: {startOffset}};
+    for (i = 0; childNodes.length > i; i++) {
+
+      const tags = [];
+      const {textContent, nodeType} = childNodes[i];
+      let currentNode = childNodes[i];
+
+      const fixNodes = () => {
+
+        // Get all of the tags that are selected.
+        let newElement = textContent;
+        let elementRemoved = false;
+        while (currentNode.nodeType !== 3) {
+
+          tags.push(currentNode.nodeName.toLowerCase());
+          currentNode = currentNode.childNodes[0];
+
+        }
+
+        // Iterate through the tags and remove the formatting, if necessary.
+        for (let x = 0; tags.length > x; x++) {
+
+          if (elementName === tags[x]) {
+
+            // Remember that we removed the formatting so that we don't re-add it
+            // at the end.
+            elementRemoved = true;
+
+          } else {
+
+            // We don't need to mess with these tags, so we just re-add them
+            // as React components.
+            newElement = React.createElement(tags[x], {
+              key: x
+            }, newElement);
+
+          }
+
+        }
+
+        // Check if we removed the formatting, and if we did, return the component as-is.
+        // Otherwise, add the formatting.
+        newParent[i] = elementRemoved || nodeType === 3 ? newElement : React.createElement(elementName, {
+          key: i
+        }, newElement);
+
+      };
+
+      // Find out if this is the target element by checking the start offset and the container.
+      if (i === selectedNodeIndex) {
+
+        const targetText = textContent.slice(startOffset, endOffset);
+
+        // Check if it's a text node.
+        if (nodeType === 3) {
+
+          // Easy: all we need to do is just splice the text node to include the formatted element.
+          newParent[i] = [
+            textContent.slice(0, startOffset),
+            React.createElement(elementName, {key: i}, targetText),
+            textContent.slice(endOffset)
+          ];
+
+        } else {
+
+          fixNodes();
+
+        }
+
+      } else {
+
+        fixNodes();
+
+      }
+
+    }
+
+    // Iterate through the parent array and merge the text nodes.
+    i = newParent.length;
+    while (i--) {
+
+      // Text nodes are always just strings.
+      if (typeof newParent[i] === "string" && typeof newParent[i + 1] === "string") {
+
+        // Append the text to the current node.
+        newParent[i] += newParent[i + 1];
+
+        // Remove the previous text node.
+        newParent.splice(i + 1, 1);
+
+      }
+
+    }
+    
+    newContent.comps[paragraphIndex] = (
+      <p key={paragraphIndex} ref={(element) => (contentRefs.current[paragraphIndex] === element)}>
+        {newParent}
+      </p>
+    );
+
+    // We'll let the useEffect() function re-select the range.
+    selection.removeAllRanges();
+
+    // Finally, change the content.
+    setContent(newContent);
 
   }
 
