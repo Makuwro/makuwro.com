@@ -313,20 +313,14 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
       // Convert the elements to a Markdown string
       let contentString = "";
-      let contentUntouched = true;
       for (let i = 0; content.comps.length > i; i++) {
 
-        if (originalContent && originalContent[i]?.props.children !== content.comps[i].props.children) {
-
-          contentUntouched = false;
-
-        }
         contentString += ReactDOMServer.renderToStaticMarkup(content.comps[i]);
 
       }
 
       // Make sure the source was altered
-      if (!contentUntouched || title !== post.title) {
+      if (contentString !== post.content || title !== post.title) {
 
         // Prepare the body
         const formData = new FormData();
@@ -791,9 +785,31 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
     const selection = document.getSelection();
     const {startOffset, endOffset, startContainer, endContainer} = selection.getRangeAt(0);
-    const onP = startContainer.parentNode.nodeName === "P";
     const parent = contentRefs.current;
-    const index = parent.indexOf(startContainer.parentNode);
+
+    // Find the index of the paragraph and the selected node.
+    let paragraphIndex;
+    let selectedNodeIndex;
+    let currentContainer = startContainer;
+    while (paragraphIndex === undefined) {
+
+      // Check if the current container's parent node is a paragraph.
+      const {parentNode} = currentContainer;
+      if (parentNode.nodeName === "P") {
+
+        // Find the index from the paragraph's children.
+        selectedNodeIndex = Array.prototype.indexOf.call(parentNode.childNodes, currentContainer);
+
+        // Find the index from the ref list.
+        paragraphIndex = contentRefs.current.indexOf(parentNode);
+
+      } else {
+
+        currentContainer = parentNode;
+
+      }
+
+    }
 
     // Make sure we're selecting something.
     if (startOffset === endOffset && startContainer === endContainer) {
@@ -810,35 +826,84 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
         let newContent = {...content};
         let newParent = [];
-        const {childNodes} = parent[index];
-        for (let i = 0; childNodes.length > i; i++) {
+        const {childNodes} = parent[paragraphIndex];
+        let i;
 
-          const {nodeName, textContent} = childNodes[i];
-          switch (nodeName) {
+        // Iterate through all of the child nodes in the selected parent.
+        for (i = 0; childNodes.length > i; i++) {
 
-            case "#text": {
+          // Find out if this is the target element by checking the start offset and the container.
+          if (i === selectedNodeIndex) {
 
-              const targetText = textContent.slice(startOffset, endOffset);
-              newParent[i] = [
-                textContent.slice(0, startOffset),
-                <b key={i}>{targetText}</b>,
-                textContent.slice(endOffset)
-              ];
-              break;
+            const {nodeName, textContent, innerHTML} = childNodes[i];
+            switch (nodeName) {
+
+              case "#text": {
+
+                const targetText = textContent.slice(startOffset, endOffset);
+                newParent[i] = [
+                  textContent.slice(0, startOffset),
+                  <b key={i}>{targetText}</b>,
+                  textContent.slice(endOffset)
+                ];
+                break;
+
+              }
+
+              default:
+                console.warn(`Unknown node name: ${nodeName}`);
+                newParent[i] = textContent;
+                break;
 
             }
 
-            default:
-              console.warn(`Unknown node name: ${nodeName}`);
-              newParent[i] = textContent;
-              break;
+          } else {
+
+            // We don't need to do anything to this,
+            // so we can just turn it back into a React component.
+            const {nodeName, innerHTML, textContent, nodeType} = childNodes[i];
+            switch (nodeType) {
+
+              case 1:
+                newParent[i] = React.createElement(nodeName.toLowerCase(), {
+                  key: i,
+                  dangerouslySetInnerHTML: {__html: innerHTML}
+                });
+                break;
+
+              case 3:
+                newParent[i] = textContent;
+                break;
+
+              default:
+                break;
+
+            }
+            
+
+          }
+
+        }
+
+        // Iterate through the parent array and merge the text nodes.
+        i = newParent.length;
+        while (i--) {
+
+          // Text nodes are always just strings.
+          if (typeof newParent[i] === "string" && typeof newParent[i + 1] === "string") {
+
+            // Append the text to the current node.
+            newParent[i] += newParent[i + 1];
+
+            // Remove the previous text node.
+            newParent.splice(i + 1, 1);
 
           }
 
         }
         
-        newContent.comps[index] = (
-          <p key={index} ref={(element) => (contentRefs.current[index] === element)}>
+        newContent.comps[paragraphIndex] = (
+          <p key={paragraphIndex} ref={(element) => (contentRefs.current[paragraphIndex] === element)}>
             {newParent}
           </p>
         );
