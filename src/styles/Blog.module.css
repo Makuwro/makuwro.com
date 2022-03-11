@@ -93,6 +93,39 @@
   flex: 1;
 }
 
+#formatter {
+  position: fixed;
+  background-color: #141519;
+  width: 100%;
+  padding: 5px 10px;
+  box-sizing: border-box;
+  display: flex;
+  height: 50.5px;
+  transition: 0.3s;
+  top: -50.5px;
+}
+
+#formatter.available {
+  top: 55.5px
+}
+
+#formatter section {
+  margin-top: 0;
+  height: 100%;
+}
+
+#formatter button {
+  background-color: transparent;
+  font-weight: 100;
+  height: 40px;
+  width: 40px;
+  padding: 0;
+}
+
+#formatter button:hover {
+  background-color: var(--article);
+}
+
 @media screen and (min-width: 768px) {
 
   #left {

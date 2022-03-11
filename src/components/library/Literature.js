@@ -3,8 +3,9 @@ import { Link, useLocation, useNavigate, useParams, useSearchParams } from "reac
 import styles from "../../styles/Blog.module.css";
 import ReactDOMServer from "react-dom/server";
 import sanitize from "sanitize-html";
-import parse from "html-react-parser";
+import parse, { domToReact } from "html-react-parser";
 import Footer from "../Footer";
+import Dropdown from "../input/Dropdown";
 
 export default function Literature({currentUser, shownLocation, setLocation, setSettingsCache}) {
 
@@ -34,6 +35,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
   const navigate = useNavigate();
   const [caretInfo, setCaretInfo] = useState();
   const isMounted = useRef(true);
+  const contentRefs = useRef([]);
 
   function fixCaret(ref, start) {
 
@@ -85,6 +87,10 @@ export default function Literature({currentUser, shownLocation, setLocation, set
             // Replace the element with a React Router link so that the page doesn't refresh
             return <Link to=""></Link>;
 
+          } else if (element.name === "p") {
+
+            return <p ref={(element) => (contentRefs.current.push(element))}>{domToReact(element.children)}</p>;
+
           }
 
           return element;
@@ -98,6 +104,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       setContent({comps: content});
 
       // Set up the initial clipboard history state for undoing and redoing.
+      console.log("Setting initial clipboard history...");
       setClipboardHistory((oldHistory) => ({
         ...oldHistory,
         content: {
@@ -108,7 +115,6 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
       // And we're done loading!
       setReady(true);
-      console.log("Post content loaded!");
 
     }
 
@@ -196,8 +202,9 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
       setLeaving(true);
     
-    } else if (ready) {
+    } else if (ready && leaving) {
 
+      console.log("Ready!");
       setTimeout(() => setLeaving(false), 0);
 
     }
@@ -228,7 +235,6 @@ export default function Literature({currentUser, shownLocation, setLocation, set
   
       } catch ({message}) {
   
-        console.log(message);
         json = {};
         setReady(true);
   
@@ -360,52 +366,18 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
   function handleInput(event, cutting) {
 
-    const {keyCode, ctrlKey} = event;
+    const {ctrlKey, key} = event;
     const selection = document.getSelection();
     const {startOffset, endOffset, startContainer, endContainer} = selection.getRangeAt(0);
     let onP = startContainer.nodeName === "P";
-    const index = (onP ? [...startContainer.parentNode.childNodes] : [...startContainer.parentNode.parentNode.childNodes]).indexOf(onP ? startContainer : startContainer.parentNode);
+    const index = contentRefs.current.indexOf(onP ? startContainer : startContainer.parentNode);
     const atBeginning = startOffset === 0;
-    const backspace = keyCode === 8;
-    const del = keyCode === 46;
+    const backspace = key === "Backspace";
+    const del = key === "Delete";
     const sameContainer = startContainer === endContainer;
     const highlighted = startOffset !== endOffset || !sameContainer;
     let endIndex = index;
-
-    function changeClipboard(increment) {
-
-      // Now, check if there's any history.
-      const { position, history } = clipboardHistory.content;
-      let newPosition = position + increment;
-      let newContent = newContent = history[newPosition];
-      if (newContent) {
-
-        // Set the content.
-        setContent(newContent);
-        
-        // And finally adjust the clipboard history to reflect this.
-        setClipboardHistory((oldHistory) => ({
-          ...oldHistory,
-          content: {
-            ...oldHistory.content,
-            position: newPosition
-          },
-          historyAltered: true
-        }));
-
-        return true;
-
-      } 
-      
-      return false;
-
-    }
-
-    if (cutting) {
-
-      navigator.clipboard.writeText(document.getSelection().toString());
-
-    }
+    const removing = backspace || del;
 
     if (!sameContainer) {
 
@@ -414,148 +386,141 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
     }
 
-    if (cutting || (
-      (
-        !ctrlKey || backspace || del
-      ) && (
-        keyCode === 32 || backspace || del || (
-          keyCode >= 48 && keyCode <= 90
-        ) || (
-          keyCode >= 96 && keyCode <= 111
-        ) || (
-          keyCode >= 160 && keyCode <= 165
-        ) || (
-          keyCode >= 186 && keyCode <= 223
-        )
-      )
-    )) {
+    if (cutting || (!ctrlKey && (key.length === 1 || removing))) {
       
-      // We're handling the content, so prevent the default behavior
+      // We're adding or removing characters.
+      let newContent;
+      let i;
+      let fixFocus;
+      
+      // We're handling the content, so prevent the default behavior.
       event.preventDefault();
 
-      // We have to add or remove characters!
-      setContent((content) => {
+      // Check if we're cutting the selection.
+      if (cutting) {
 
-        const newContent = {comps: [...content.comps], selection: {startOffset}, increment: cutting || backspace || del ? 0 : 1};
-        let i = content.comps.length;
-        let fixFocus = false;
-        while (i--) {
+        // Save the selected text.
+        navigator.clipboard.writeText(document.getSelection().toString());
+  
+      }
 
-          const isTarget = i === index;
-          let child;
-          if (isTarget) {
+      // Now iterate through the component list from the last to the first.
+      // We're doing last to first because if we need to delete a paragraph
+      // from the list, it won't break the loop.
+      newContent = {comps: [...content.comps], selection: {startOffset}, increment: cutting || backspace || del ? 0 : 1};
+      i = content.comps.length;
+      fixFocus = false;
+      while (i--) {
 
-            child = (child = content.comps[i].props).children || child;
-            const isEmpty = child.type === "br";
-            const removing = backspace || del;
+        const isTarget = i === index;
+        let child = content.comps[i].props.children;
 
-            if (isEmpty || atBeginning) {
+        if (isTarget) {
 
-              if (backspace) {
+          // If a child is empty, it'll should only have a <br /> tag.
+          child = (child = content.comps[i].props).children || child;
+          const isEmpty = child.type === "br";
 
-                // Don't delete the beginning paragraph, please.
-                if (content.comps[i - 1]) {
+          if (isEmpty || atBeginning) {
 
-                  newContent.selection.startOffset = content.comps[i - 1].props.children.length;
-                  newContent.comps.splice(i, 1);
-                  fixFocus = true;
-                  continue;
+            if (backspace) {
 
-                }
+              // Don't delete the beginning paragraph, please.
+              if (content.comps[i - 1]) {
 
-              } else {
-
-                child = event.key;
-
-              }
-            
-            } else if (sameContainer) {
-
-              let backspaceIncrement = 0;
-
-              if (backspace) {
-
-                if (!ctrlKey && !highlighted) {
-
-                  // If the text isn't highlighted, just remove a character.
-                  backspaceIncrement = 1;
-
-                } else if (ctrlKey) {
-
-                  // Control + Backspace = remove a word.
-                  // Look for the closest space near the caret position.
-                  let closestSpace;
-                  let offset = 0;
-                  do { 
-                    
-                    closestSpace = child.lastIndexOf(" ", startOffset - offset);
-                    offset++;
-
-                  } while (closestSpace !== -1 && closestSpace + 1 === startOffset);
-                  backspaceIncrement = startOffset - closestSpace;
-                  
-                  if (closestSpace === -1) {
-
-                    // We want to delete the rest of the paragraph, but there's no space left.
-                    backspaceIncrement = startOffset;
-
-                  } else {
-
-                    // We want to end with a space.
-                    backspaceIncrement--;
-
-                  }
-
-                }
-
-                newContent.increment -= backspaceIncrement;
+                newContent.selection.startOffset = content.comps[i - 1].props.children.length;
+                newContent.comps.splice(i, 1);
+                fixFocus = true;
+                continue;
 
               }
-
-              child = [child.slice(0, startOffset - backspaceIncrement), removing ? "" : event.key, child.slice((highlighted ? endOffset : startOffset) + (del ? 1 : 0))].join("");
 
             } else {
 
-              child = [child.slice(0, startOffset), removing ? "" : event.key, endContainer.textContent.slice(endOffset)].join("");
+              child = event.key;
+
+            }
+          
+          } else if (sameContainer) {
+
+            let backspaceIncrement = 0;
+
+            if (backspace) {
+
+              if (!ctrlKey && !highlighted) {
+
+                // If the text isn't highlighted, just remove a character.
+                backspaceIncrement = 1;
+
+              } else if (ctrlKey) {
+
+                // Control + Backspace = remove a word.
+                // Look for the closest space near the caret position.
+                let closestSpace;
+                let offset = 0;
+                do { 
+                  
+                  closestSpace = child.lastIndexOf(" ", startOffset - offset);
+                  offset++;
+
+                } while (closestSpace !== -1 && closestSpace + 1 === startOffset);
+                backspaceIncrement = startOffset - closestSpace;
+                
+                if (closestSpace === -1) {
+
+                  // We want to delete the rest of the paragraph, but there's no space left.
+                  backspaceIncrement = startOffset;
+
+                } else {
+
+                  // We want to end with a space.
+                  backspaceIncrement--;
+
+                }
+
+              }
+
+              newContent.increment -= backspaceIncrement;
 
             }
 
-          } else if (fixFocus && i + 1 === index) {
+            child = [child.slice(0, startOffset - backspaceIncrement), removing ? "" : event.key, child.slice((highlighted ? endOffset : startOffset) + (del ? 1 : 0))].join("");
 
-            let previousChild = typeof((previousChild = content.comps[i].props.children)) === "string" ? previousChild : "";
-            const oldChild = content.comps[i + 1].props.children;
-            child = previousChild + (oldChild && oldChild.type !== "br" ? oldChild : "");
-            console.log(child);
-
-          } else if (!sameContainer && i <= endIndex && i > index) {
-
-            // This paragraph was completely highlighted, so we should remove it.
-            newContent.comps.splice(i, 1);
-            continue;
-          
           } else {
-            
-            // This content doesn't need to be changed.
-            child = content.comps[i].props.children;
+
+            child = [child.slice(0, startOffset), removing ? "" : event.key, endContainer.textContent.slice(endOffset)].join("");
 
           }
 
-          newContent.comps[i] = <p ref={isTarget || (i + 1 === index && fixFocus) ? selectedParagraph : null} key={i}>
-            {child || <br />}
-          </p>;
+        } else if (fixFocus && i + 1 === index) {
 
+          let previousChild = typeof((previousChild = content.comps[i].props.children)) === "string" ? previousChild : "";
+          const oldChild = content.comps[i + 1].props.children;
+          child = previousChild + (oldChild && oldChild.type !== "br" ? oldChild : "");
+
+        } else if (!sameContainer && i <= endIndex && i > index) {
+
+          // This paragraph was completely highlighted, so we should remove it.
+          newContent.comps.splice(i, 1);
+          continue;
+        
         }
 
-        // React really likes glitching out the caret when the content is updated, so let's do an illusion. 
-        // I think this is way better than the caret resetting to position 0 of the document, and then
-        // speeding back to where it should be.
-        selection.removeAllRanges();
+        newContent.comps[i] = <p ref={isTarget || (i + 1 === index && fixFocus) ? selectedParagraph : null} key={i}>
+          {child || <br />}
+        </p>;
 
-        return newContent;
+      }
 
-      });
+      // React really likes glitching out the caret when the content is updated, so let's do an illusion. 
+      // I think this is way better than the caret resetting to position 0 of the document, and then
+      // speeding back to where it should be.
+      selection.removeAllRanges();
 
-    } else if (keyCode === 13) {
+      // Finally, set the new content.
+      setContent(newContent);
+
+    } else if (key === "Enter") {
 
       // We're handling the content, so prevent the default behavior
       event.preventDefault();
@@ -633,33 +598,86 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
       });
 
-    } else if (ctrlKey && keyCode === 90) {
+    } else if (ctrlKey) {
 
-      // We have to undo something!
-      // First, let's stop the browser from handling this event.
-      event.preventDefault();
+      const changeClipboard = (increment) => {
 
-      // Keeping it D.R.Y.
-      if (!changeClipboard(-1)) {
+        // First, let's stop the browser from handling this event.
+        event.preventDefault();
+  
+        // Now, check if there's any history.
+        const { position, history } = clipboardHistory.content;
+        let newPosition = position + increment;
+        let newContent = newContent = history[newPosition];
+        if (newContent) {
+  
+          // Set the content.
+          setContent(newContent);
+          
+          // And finally adjust the clipboard history to reflect this.
+          setClipboardHistory((oldHistory) => ({
+            ...oldHistory,
+            content: {
+              ...oldHistory.content,
+              position: newPosition
+            },
+            historyAltered: true
+          }));
+  
+          return true;
+  
+        } 
+        
+        return false;
+  
+      };
 
-        alert("There's nothing to undo");
+      switch (key.toLowerCase()) {
+
+        // Bold
+        case "b":
+          event.preventDefault();
+          formatSelection(0);
+          break;
+
+        // Italics
+        case "i":
+          event.preventDefault();
+          formatSelection(1);
+          break;
+
+        // Underline
+        case "u":
+          event.preventDefault();
+          formatSelection(1);
+          break;
+
+        // Undo
+        case "z": 
+          // Keeping it D.R.Y.
+          if (!changeClipboard(-1)) {
+
+            alert("There's nothing to undo");
+
+          }
+          break;
+
+        // Redo
+        case "y":
+          // Keeping it D.R.Y.
+          if (!changeClipboard(1)) {
+
+            alert("There's nothing to redo");
+
+          }
+          break;
+
+        default:
+          break;
 
       }
 
-    } else if (ctrlKey && keyCode === 89) {
-
-      // We have to redo something!
-      // First, let's stop the browser from handling this event.
-      event.preventDefault();
-
-      // Keeping it D.R.Y.
-      if (!changeClipboard(1)) {
-
-        alert("There's nothing to redo");
-
-      }
-
-    } else if (!ctrlKey && keyCode !== 37 && keyCode !== 38 && keyCode !== 39 && keyCode !== 40) {
+    } else if (!ctrlKey && key === "ArrowLeft" && key === "ArrowUp" && key === "ArrowRight" && key === "ArrowDown") {
 
       // We're handling the content, so prevent the default behavior
       event.preventDefault();
@@ -713,8 +731,8 @@ export default function Literature({currentUser, shownLocation, setLocation, set
   function changeTitle(event) {
 
     const {ctrlKey, keyCode, key} = event;
-    const backspace = keyCode === 8;
-    const del = keyCode === 46;
+    const backspace = key === "Backspace";
+    const del = key === "Delete";
     if ((!ctrlKey || backspace || del) && (keyCode === 32 || backspace || del || (keyCode >= 48 && keyCode <= 90) || (keyCode >= 96 && keyCode <= 111) || (keyCode >= 160 && keyCode <= 165) || (keyCode >= 186 && keyCode <= 223))) {
 
       // We're gonna handle this, browser. Pinky promise.
@@ -774,6 +792,75 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
   }
 
+  function formatSelection(action) {
+
+    const selection = document.getSelection();
+    const {startOffset, endOffset, startContainer, endContainer} = selection.getRangeAt(0);
+    const onP = startContainer.parentNode.nodeName === "P";
+    const parent = contentRefs.current;
+    const index = [...parent].indexOf(onP ? startContainer : startContainer.parentNode);
+
+    // Make sure we're selecting something.
+    if (startOffset === endOffset && startContainer === endContainer) {
+
+      return;
+
+    }
+
+    // Now, check which action we want to do.
+    switch (action) {
+
+      // Bold
+      case 0:
+        setContent((oldContent) => {
+          
+          let newContent = {...oldContent};
+          let newParent = [];
+          for (let i = 0; parent.length > i; i++) {
+
+            const node = parent[i];
+            const {nodeName, textContent} = node;
+            switch (nodeName) {
+
+              case "#text": {
+
+                const targetText = textContent.slice(startOffset, endOffset);
+                newParent[i] = (
+                  <p key={i}>
+                    {textContent.slice(0, startOffset)}
+                    <b>{targetText}</b>
+                    {textContent.slice(endOffset)}
+                  </p>
+                );
+                break;
+
+              }
+
+              case "B":
+                break;
+
+              default:
+                console.warn(`Unknown node name: ${nodeName}`);
+                newParent[i] = <p key={i}>{textContent}</p>;
+                break;
+
+            }
+
+          }
+          newContent.comps[index] = newParent;
+          return newContent;
+
+        });
+        break;
+
+      default:
+        console.warn("Unknown format option selected.");
+        break;
+
+    }
+
+  }
+
   return ready && (
     <main id={styles.post} className={leaving ? "leaving" : ""} onTransitionEnd={() => {
 
@@ -786,6 +873,42 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     }}>
       {post.id ? (
         <>
+          <section id={styles.formatter} className={editing ? styles.available : null}>
+            <section>
+              <button 
+                title="Bolden or unbolden text"
+                onClick={() => formatSelection(0)}
+              ><b>B</b></button>
+              <button 
+                title="Italicize or unitalicize text"
+                onClick={() => formatSelection(1)}
+              ><i>I</i></button>
+              <button 
+                title="Underline or un...underline text"
+                onClick={() => formatSelection(2)}
+              ><u>U</u></button>
+              <button 
+                title="Strikethrough or unstrikethrough text"
+                onClick={() => formatSelection(3)}
+              ><strike>S</strike></button>
+              <button title="Change text color">🎨</button>
+              <button title="Highlight text">H</button>
+              <button title="Link to another website">🔗</button>
+              <button 
+                title="Reset text formatting"
+                onClick={() => formatSelection(4)}
+              >❌</button>
+            </section>
+            <Dropdown>
+              <li>Normal text</li>
+              <li>Heading 1</li>
+              <li>Heading 2</li>
+              <li>Heading 3</li>
+              <li>Heading 4</li>
+              <li>Heading 5</li>
+              <li>Heading 6</li>
+            </Dropdown>
+          </section>
           <section id={styles.metadata}>
             <section id={styles.postInfo}>
               <section id={styles.left}>

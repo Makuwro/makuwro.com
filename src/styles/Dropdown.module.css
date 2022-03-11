@@ -19,6 +19,8 @@
   border: 1px solid #111111;
   display: flex;
   justify-content: space-between;
+  height: 100%;
+  align-items: center;
 }
 
 :global(.light) .list > section, :global(.light) .list li, :global(.light) .list > ul {
