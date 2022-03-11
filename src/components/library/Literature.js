@@ -33,6 +33,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
   const titleRef = useRef();
   const navigate = useNavigate();
   const [caretInfo, setCaretInfo] = useState();
+  const isMounted = useRef(true);
 
   function fixCaret(ref, start) {
 
@@ -44,6 +45,14 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     currentSelection.addRange(range);
 
   }
+
+  useEffect(() => {
+
+    // This is for detecting if the component is mounted or not.
+    // Helpful in async actions.
+    return () => (isMounted.current = false);
+
+  }, []);
 
   useEffect(() => {
 
@@ -197,8 +206,6 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
   useEffect(async () => {
 
-    let mounted = true;
-
     // Try to get the blog post
     if (!post.id) {
 
@@ -227,7 +234,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
   
       }
 
-      if (mounted) {
+      if (isMounted.current) {
 
         setTitle(json.title);
         setPost(json);
@@ -235,12 +242,6 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       }
 
     }
-
-    return () => {
-
-      mounted = false;
-
-    };
 
   }, [username, slug]);
 
@@ -639,7 +640,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       event.preventDefault();
 
       // Keeping it D.R.Y.
-      if (!changeClipboard(-2)) {
+      if (!changeClipboard(-1)) {
 
         alert("There's nothing to undo");
 
