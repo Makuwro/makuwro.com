@@ -6,7 +6,7 @@ import sanitize from "sanitize-html";
 import parse from "html-react-parser";
 import Footer from "../Footer";
 
-export default function Literature({currentUser, addNotification, shownLocation, setLocation, setSettingsCache}) {
+export default function Literature({currentUser, shownLocation, setLocation, setSettingsCache}) {
 
   const {username, slug} = useParams();
   const [editing, setEditing] = useState(false);
@@ -83,9 +83,23 @@ export default function Literature({currentUser, addNotification, shownLocation,
         }
 
       })) ? content : [content];
+
+      // Save the react component to the states.
       setOriginalContent(content);
       setContent({comps: content});
+
+      // Set up the initial clipboard history state for undoing and redoing.
+      setClipboardHistory((oldHistory) => ({
+        ...oldHistory,
+        content: {
+          position: 0,
+          history: [{comps: content}]
+        }
+      }));
+
+      // And we're done loading!
       setReady(true);
+      console.log("Post content loaded!");
 
     }
 
@@ -94,6 +108,7 @@ export default function Literature({currentUser, addNotification, shownLocation,
   useEffect(() => {
 
     let timeout;
+
     if (editing && content && (content.selection || content.newParagraph) && selectedParagraph?.current) {
 
       fixCaret(selectedParagraph, !content.deleteParagraph ? (content.selection?.startOffset || 0) + (content.increment || 0) : selectedParagraph.current.childNodes[0].textContent.length + content.increment);
@@ -108,20 +123,40 @@ export default function Literature({currentUser, addNotification, shownLocation,
 
       } else {
 
+        // This is the amount of time in milliseconds before we save the state.
+        // I think it'd be a nice feature for this to be customizable in the future.
+        const timeoutMS = 1500;
+
         timeout = setTimeout(() => {
 
+          // This is the amount of objects allowed in the clipboard history array.
+          const maxHistory = 100;
+          let currentContentHistory = [...clipboardHistory.content.history];
+          let newPosition = clipboardHistory.content.position + 1;
+
+          if (newPosition === maxHistory) {
+            
+            // Push the position back.
+            newPosition--;
+
+            // Remove the first object from the content history.
+            currentContentHistory.shift();
+
+          }
+
+          // Save the new history state.
           setClipboardHistory((oldHistory) => ({
             ...oldHistory,
             content: {
-              position: oldHistory.content.position + 1,
+              position: newPosition, 
               history: [
-                ...oldHistory.content.history.slice(0, oldHistory.content.position), 
+                ...currentContentHistory.slice(0, newPosition),
                 content
               ]
             }
           }));
 
-        }, 1500);
+        }, timeoutMS);
 
       }
 
@@ -158,16 +193,6 @@ export default function Literature({currentUser, addNotification, shownLocation,
 
     }
 
-    return () => {
-
-      if (!leaving) {
-
-        setLeaving(true);
-
-      }
-
-    };
-
   }, [ready, location]);
 
   useEffect(async () => {
@@ -180,6 +205,7 @@ export default function Literature({currentUser, addNotification, shownLocation,
       let json = {};
       try {
 
+        console.log("Getting post from the server...");
         const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/blog/${username}/${slug}`, {
           headers: currentUser.token ? {
             token: currentUser.token
@@ -350,7 +376,7 @@ export default function Literature({currentUser, addNotification, shownLocation,
       // Now, check if there's any history.
       const { position, history } = clipboardHistory.content;
       let newPosition = position + increment;
-      let newContent = (newContent = history[newPosition]) || (newPosition === -1 && {comps: originalContent});
+      let newContent = newContent = history[newPosition];
       if (newContent) {
 
         // Set the content.

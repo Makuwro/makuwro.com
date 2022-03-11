@@ -49,14 +49,23 @@ export default function Footer() {
       const items = [];
       for (let x = 0; sections[key].length > x; x++) {
 
+        // Convert the link into a React Router link, if needed.
         const item = sections[key][x];
+        const linksToSameDomain = item[1].slice(0, 1) === "/";
+        const link = React.createElement(linksToSameDomain ? Link : "a", {
+          [linksToSameDomain ? "to" : "href"]: item[1]
+        }, item[0]);
+        
+        // Add the list item to the array.
         items[x] = (
           <li key={item[1]}>
-            <a href={item[1]}>{item[0]}</a>
+            {link}
           </li>
         );
         
       }
+
+      // All list items were added, so let's add this column to the array.
       columnComps[i] = (
         <section key={key} className={open === key ? styles.open : null}>
           <h1 onClick={() => setOpen(open === key ? null : key)}>
