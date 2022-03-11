@@ -58,7 +58,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
   useEffect(() => {
 
-    if (post.content) {
+    if (!ready && post.content) {
 
       // Protect us from bad HTML, please!
       const sanitizedHtml = sanitize(post.content, {
@@ -525,78 +525,73 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       // We're handling the content, so prevent the default behavior
       event.preventDefault();
 
-      // We have to add a new paragraph!
-      setContent((content) => {
+      const newContent = {comps: [...content.comps], selection: null, newParagraph: true, increment: 0, deleteParagraph: false};
 
-        const newContent = {comps: [...content.comps], selection: null, newParagraph: true, increment: 0, deleteParagraph: false};
-        let i;
+      // We're only adding a paragraph if it's in the same container.
+      // Otherwise, we're just replacing paragraphs.
+      let i = content.comps.length + (sameContainer ? 1 : 0);
+      while (i--) {
+
+        let child;
+        let afterIndex = i - 1 === index;
         
-        // We're only adding a paragraph if it's in the same container.
-        // Otherwise, we're just replacing paragraphs.
-        i = content.comps.length + (sameContainer ? 1 : 0);
-        while (i--) {
+        if (index === i) {
 
-          let child;
-          let afterIndex = i - 1 === index;
-          
-          if (index === i) {
+          if (!atBeginning) {
 
-            if (!atBeginning) {
-
-              // Only cut off the part that we're adding to a new paragraph.
-              child = content.comps[i].props.children.slice(0, startOffset);
-
-            }
-
-          } else if (afterIndex) {
-
-            child = content.comps[i - 1].props.children;
-
-            if (!atBeginning) {
-
-              if (sameContainer) {
-
-                child = child.slice(highlighted ? endOffset : startOffset);
-
-              } else {
-
-                child = endContainer.textContent.slice(endOffset);
-
-              }
-
-            }
-
-          } else if (!sameContainer && i <= endIndex) {
-
-            // This paragraph is completely in the range, so it should be removed.
-            newContent.comps.splice(i, 1);
-            continue;
-
-          } else {
-
-            // This content doesn't need to be changed.
-            child = (content.comps[i] || content.comps[i - 1]).props.children;
+            // Only cut off the part that we're adding to a new paragraph.
+            child = content.comps[i].props.children.slice(0, startOffset);
 
           }
 
-          // Return the paragraph component, and the selectedParagraph ref 
-          // so that the caret position is reset to the correct position.
-          // Also, if the string is empty, we need to add a <br /> because Chromium doesn't like when a paragraph is empty :( 
-          // In other words, it's not selectable.
-          newContent.comps[i] = <p key={i} ref={afterIndex ? selectedParagraph : null}>
-            {child || <br />}
-          </p>;
+        } else if (afterIndex) {
+
+          child = content.comps[i - 1].props.children;
+
+          if (!atBeginning) {
+
+            if (sameContainer) {
+
+              child = child.slice(highlighted ? endOffset : startOffset);
+
+            } else {
+
+              child = endContainer.textContent.slice(endOffset);
+
+            }
+
+          }
+
+        } else if (!sameContainer && i <= endIndex) {
+
+          // This paragraph is completely in the range, so it should be removed.
+          newContent.comps.splice(i, 1);
+          continue;
+
+        } else {
+
+          // This content doesn't need to be changed.
+          child = (content.comps[i] || content.comps[i - 1]).props.children;
 
         }
 
-        // React really likes glitching out the caret when the content is updated, so let's do an illusion. 
-        // I think this is way better than the caret resetting to position 0 of the document, and then
-        // speeding back to where it should be.
-        selection.removeAllRanges();
+        // Return the paragraph component, and the selectedParagraph ref 
+        // so that the caret position is reset to the correct position.
+        // Also, if the string is empty, we need to add a <br /> because Chromium doesn't like when a paragraph is empty :( 
+        // In other words, it's not selectable.
+        newContent.comps[i] = <p key={i} ref={afterIndex ? selectedParagraph : null}>
+          {child || <br />}
+        </p>;
 
-        return newContent;
+      }
 
-      });
+      // React really likes glitching out the caret when the content is updated, so let's do an illusion. 
+      // I think this is way better than the caret resetting to position 0 of the document, and then
+      // speeding back to where it should be.
+      selection.removeAllRanges();
+
+      // We have to add a new paragraph!
+      setContent(newContent);
 
     } else if (ctrlKey) {
 
@@ -798,7 +793,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     const {startOffset, endOffset, startContainer, endContainer} = selection.getRangeAt(0);
     const onP = startContainer.parentNode.nodeName === "P";
     const parent = contentRefs.current;
-    const index = [...parent].indexOf(onP ? startContainer : startContainer.parentNode);
+    const index = parent.indexOf(startContainer.parentNode);
 
     // Make sure we're selecting something.
     if (startOffset === endOffset && startContainer === endContainer) {
@@ -811,47 +806,47 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     switch (action) {
 
       // Bold
-      case 0:
-        setContent((oldContent) => {
-          
-          let newContent = {...oldContent};
-          let newParent = [];
-          for (let i = 0; parent.length > i; i++) {
+      case 0: {
 
-            const node = parent[i];
-            const {nodeName, textContent} = node;
-            switch (nodeName) {
+        let newContent = {...content};
+        let newParent = [];
+        const {childNodes} = parent[index];
+        for (let i = 0; childNodes.length > i; i++) {
 
-              case "#text": {
+          const {nodeName, textContent} = childNodes[i];
+          switch (nodeName) {
 
-                const targetText = textContent.slice(startOffset, endOffset);
-                newParent[i] = (
-                  <p key={i}>
-                    {textContent.slice(0, startOffset)}
-                    <b>{targetText}</b>
-                    {textContent.slice(endOffset)}
-                  </p>
-                );
-                break;
+            case "#text": {
 
-              }
-
-              case "B":
-                break;
-
-              default:
-                console.warn(`Unknown node name: ${nodeName}`);
-                newParent[i] = <p key={i}>{textContent}</p>;
-                break;
+              const targetText = textContent.slice(startOffset, endOffset);
+              newParent[i] = [
+                textContent.slice(0, startOffset),
+                <b key={i}>{targetText}</b>,
+                textContent.slice(endOffset)
+              ];
+              break;
 
             }
 
-          }
-          newContent.comps[index] = newParent;
-          return newContent;
+            default:
+              console.warn(`Unknown node name: ${nodeName}`);
+              newParent[i] = textContent;
+              break;
 
-        });
+          }
+
+        }
+        
+        newContent.comps[index] = (
+          <p key={index} ref={(element) => (contentRefs.current[index] === element)}>
+            {newParent}
+          </p>
+        );
+
+        setContent(newContent);
         break;
+
+      }
 
       default:
         console.warn("Unknown format option selected.");
