@@ -29,7 +29,6 @@ export default function Literature({currentUser, shownLocation, setLocation, set
   });
   const location = useLocation();
   const contentContainer = useRef();
-  const selectedParagraph = useRef();
   const titleRef = useRef();
   const navigate = useNavigate();
   const [caretInfo, setCaretInfo] = useState();
@@ -40,10 +39,10 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
     const currentSelection = document.getSelection();
     const range = document.createRange();
-    range.setStart(ref.current.childNodes[0], start);
+    range.setStart(ref, start);
     if (end) {
 
-      range.selectNodeContents(ref.current.childNodes[0]);
+      range.setEnd(ref, end);
 
     } else {
       
@@ -130,9 +129,19 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
     let timeout;
 
-    if (editing && content && (content.selection || content.newParagraph) && selectedParagraph?.current) {
+    if (editing && content && (content.selection || content.newParagraph) && content.selection.paragraphIndex !== undefined) {
 
-      fixCaret(selectedParagraph, !content.deleteParagraph ? (content.selection?.startOffset || 0) + (content.increment || 0) : selectedParagraph.current.childNodes[0].textContent.length + content.increment, content.selection?.endOffset);
+      // Find the text node.
+      const {childIndex} = content.selection;
+      let ref = (ref = contentRefs.current[content.selection.paragraphIndex]) && childIndex !== undefined ? ref.childNodes[childIndex] : ref;
+      while (ref.nodeType !== 3) {
+
+        ref = ref.childNodes[0];
+
+      }
+
+      // Fix the caret.
+      fixCaret(ref, content.selection.startOffset || 0, content.selection.endOffset || 0);
       
       // Use a delay for 1.5 seconds just in case we aren't finished typing.
       if (clipboardHistory.historyAltered) {
@@ -499,7 +508,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
               }
 
-              newContent.increment -= backspaceIncrement;
+              newContent.selection.startOffset -= backspaceIncrement;
 
             }
 
@@ -525,9 +534,15 @@ export default function Literature({currentUser, shownLocation, setLocation, set
         
         }
 
-        newContent.comps[i] = <p ref={isTarget || (i + 1 === index && fixFocus) ? selectedParagraph : null} key={i}>
+        newContent.comps[i] = <p ref={(element) => (contentRefs.current[i] = element)} key={i}>
           {child || <br />}
         </p>;
+
+        if (isTarget || (i + 1 === index && fixFocus)) {
+
+          newContent.selection.paragraphIndex = i;
+
+        }
 
       }
 
@@ -594,13 +609,19 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
         }
 
-        // Return the paragraph component, and the selectedParagraph ref 
-        // so that the caret position is reset to the correct position.
+        // Return the paragraph component.
         // Also, if the string is empty, we need to add a <br /> because Chromium doesn't like when a paragraph is empty :( 
         // In other words, it's not selectable.
-        newContent.comps[i] = <p key={i} ref={afterIndex ? selectedParagraph : null}>
+        newContent.comps[i] = <p key={i} ref={(element) => (contentRefs.current[i] = element)}>
           {child || <br />}
         </p>;
+        
+        if (afterIndex) {
+
+          // The caret position will reset to the correct position.
+          newContent.selection.paragraphIndex = i;
+          
+        }
 
       }
 
@@ -730,9 +751,15 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
         }
 
-        newContent.comps[i] = <p ref={isTarget ? selectedParagraph : null} key={i}>
+        newContent.comps[i] = <p ref={(element) => (contentRefs.current[i] = element)} key={i}>
           {child}
         </p>;
+
+        if (isTarget) {
+
+          newContent.selection.paragraphIndex = i;
+
+        }
 
       }
 
@@ -809,7 +836,8 @@ export default function Literature({currentUser, shownLocation, setLocation, set
   function formatSelection(action) {
 
     const selection = document.getSelection();
-    const {startOffset, endOffset, startContainer, endContainer} = selection.getRangeAt(0);
+    const range = selection.getRangeAt(0);
+    const {startOffset, endOffset, startContainer, endContainer} = range;
     const parent = contentRefs.current;
     let childNodes;
     let i;
@@ -873,7 +901,8 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     // Iterate through all of the child nodes in the selected parent.
     childNodes = parent[paragraphIndex].childNodes;
     newParent = [];
-    newContent = {comps: [...content.comps], selection: {startOffset, endOffset}};
+    newContent = {comps: [...content.comps], selection: {startOffset, endOffset, paragraphIndex}};
+    let refSet = false;
     for (i = 0; childNodes.length > i; i++) {
 
       const tags = [];
@@ -906,21 +935,36 @@ export default function Literature({currentUser, shownLocation, setLocation, set
             // We don't need to mess with these tags, so we just re-add them
             // as React components.
             newElement = React.createElement(tags[x], {
-              key: x
+              key: x,
             }, newElement);
 
           }
 
         }
 
-        // Check if we removed the formatting, and if we did, return the component as-is.
-        // Otherwise, add the formatting.
-        newParent[i] = elementRemoved || nodeType === 3 ? newElement : React.createElement(elementName, {
-          key: i,
-          ref: selectedParagraph
-        }, newElement);
-        
-        console.log(newContent.selection)
+        if (elementRemoved || nodeType === 3 || i !== selectedNodeIndex) {
+
+          // Return the component as-is.
+          newParent[i] = newElement;
+
+        } else {
+
+          // Add the new formatting.
+          console.log(newElement);
+          newParent[i] = React.createElement(elementName, {
+            key: i
+          }, newElement);
+
+        }
+
+        if (i === selectedNodeIndex && typeof newParent[i] !== "string") {
+
+          newContent.selection.childIndex = i;
+          newContent.selection.startOffset = 0;
+          newContent.selection.endOffset = textContent.length;
+          refSet = true;
+
+        }
 
       };
 
@@ -937,12 +981,13 @@ export default function Literature({currentUser, shownLocation, setLocation, set
             textContent.slice(0, startOffset),
             React.createElement(elementName, {
               key: i,
-              ref: selectedParagraph
             }, targetText),
             textContent.slice(endOffset)
           ];
+          newContent.selection.childIndex = i + 1;
           newContent.selection.startOffset = 0;
           newContent.selection.endOffset = targetText.length;
+          refSet = true;
 
         } else {
 
@@ -976,10 +1021,22 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     }
     
     newContent.comps[paragraphIndex] = (
-      <p key={paragraphIndex} ref={(element) => (contentRefs.current[paragraphIndex] === element)}>
+      <p key={paragraphIndex} ref={(element) => (contentRefs.current[paragraphIndex] = element)}>
         {newParent}
       </p>
     );
+
+    if (!refSet) {
+
+      let rangeClone = range.cloneRange();
+      rangeClone.selectNodeContents(contentRefs.current[paragraphIndex]);
+      rangeClone.setEnd(startContainer, startOffset);
+      newContent.selection.startOffset = rangeClone.toString().length;
+      rangeClone.setEnd(endContainer, endOffset);
+      console.log(newContent.selection.endOffset);
+      newContent.selection.endOffset = rangeClone.toString().length;
+
+    }
 
     // Finally, change the content.
     setContent(newContent);
