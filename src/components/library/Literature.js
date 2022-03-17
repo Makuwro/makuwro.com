@@ -396,7 +396,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       // Now iterate through the component list from the last to the first.
       // We're doing last to first because if we need to delete a paragraph
       // from the list, it won't break the loop.
-      newContent = {comps: [...content.comps], selection: {startOffset}, increment: cutting || backspace || del ? 0 : 1};
+      newContent = {comps: [...content.comps], selection: {startOffset: startOffset + (cutting || backspace || del ? 0 : 1)}};
       i = content.comps.length;
       fixFocus = false;
       while (i--) {
@@ -528,7 +528,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       // We're handling the content, so prevent the default behavior
       event.preventDefault();
 
-      const newContent = {comps: [...content.comps], selection: null, newParagraph: true, increment: 0, deleteParagraph: false};
+      const newContent = {comps: [...content.comps], selection: null, newParagraph: true, deleteParagraph: false};
 
       // We're only adding a paragraph if it's in the same container.
       // Otherwise, we're just replacing paragraphs.

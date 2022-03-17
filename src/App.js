@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import Home from "./components/Home";
-import "./styles/global.css";
 import PropTypes from "prop-types";
 import Header from "./components/Header";
 import Profile from "./components/Profile";
@@ -17,6 +16,7 @@ import Submitter from "./components/library/Submitter";
 import OfflineServer from "./components/errors/OfflineServer";
 import OfflineClient from "./components/errors/OfflineClient";
 import GameOverError from "./components/errors/GameOverError";
+import "./styles/global.css";
 
 const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 const maintenance = false;
@@ -31,8 +31,6 @@ export default function App() {
   // States
   const [systemDark, setSystemDark] = useState(window.matchMedia("(prefers-color-scheme: dark)").matches);
   const [popupChildren, setPopupChildren] = useState(null);
-  const [popupTitle, setPopupTitle] = useState();
-  const [popupWarnUnfinished, setPopupWarnUnfinished] = useState(false);
   const [art, setArt] = useState();
   const [updated, setUpdated] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
@@ -268,11 +266,11 @@ export default function App() {
       <>
         <Authenticator open={signInOpen} addNotification={addNotification} shownLocation={shownLocation} currentUser={currentUser} />
         {popupChildren && (
-          <Popup notify={addNotification} title={popupTitle} open={popupChildren !== null} onClose={() => {
+          <Popup notify={addNotification} open={popupChildren !== null} onClose={() => {
             
             setPopupChildren(null);
           
-          }} warnUnfinished={popupWarnUnfinished}>
+          }}>
             {popupChildren}
           </Popup>
         )}
