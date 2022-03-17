@@ -6,7 +6,6 @@ import PropTypes from "prop-types";
 import Header from "./components/Header";
 import Profile from "./components/Profile";
 import Maintenance from "./components/Maintenance";
-import AbuseReporter from "./components/AbuseReporter";
 import Art from "./components/library/Art";
 import Popup from "./components/Popup";
 import Authenticator from "./components/Authenticator";
@@ -17,6 +16,7 @@ import Settings from "./components/Settings";
 import Submitter from "./components/library/Submitter";
 import OfflineServer from "./components/errors/OfflineServer";
 import OfflineClient from "./components/errors/OfflineClient";
+import GameOverError from "./components/errors/GameOverError";
 
 const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 const maintenance = false;
@@ -362,6 +362,7 @@ export default function App() {
               )}
             />
           ))}
+          <Route path="/gameover" element={<GameOverError />} />
         </Routes>
       </>
     )

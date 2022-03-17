@@ -134,7 +134,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       // Find the text node.
       const {childIndex} = content.selection;
       let ref = (ref = contentRefs.current[content.selection.paragraphIndex]) && childIndex !== undefined ? ref.childNodes[childIndex] : ref;
-      while (ref.nodeType !== 3) {
+      while (ref.nodeType !== 3 && ref.nodeName !== "BR") {
 
         ref = ref.childNodes[0];
 
@@ -293,45 +293,6 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
   }, [searchParams]);
 
-  /*
-  async function deletePost() {
-
-    if (confirm("Are you sure you want to delete this post? If someone reported it, it'll only be hidden until the Makuwro Safety & Security team reviews it.")) {
-
-      try {
-
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/blog/${username}/${slug}`, {
-          headers: {
-            token: currentUser.token
-          },
-          method: "DELETE"
-        });
-
-        if (response.ok) {
-
-          navigate(`/${username}/blog`);
-
-        } else {
-
-          const {message} = await response.json();
-          throw new Error(message);
-
-        }
-
-      } catch ({message}) {
-
-        addNotification({
-          title: "Couldn't delete your post",
-          children: message
-        });
-
-      }
-
-    }
-
-  }
-  */
-
   async function save() {
 
     try {
@@ -456,10 +417,18 @@ export default function Literature({currentUser, shownLocation, setLocation, set
               // Don't delete the beginning paragraph, please.
               if (content.comps[i - 1]) {
 
-                newContent.selection.startOffset = content.comps[i - 1].props.children.length;
-                newContent.comps.splice(i, 1);
-                fixFocus = true;
-                continue;
+                if (highlighted) {
+
+                  child = <br />;
+
+                } else {
+
+                  newContent.selection.startOffset = content.comps[i - 1].props.children.length;
+                  newContent.comps.splice(i, 1);
+                  fixFocus = true;
+                  continue;
+
+                }
 
               }
 
@@ -906,8 +875,8 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     for (i = 0; childNodes.length > i; i++) {
 
       const tags = [];
-      const {textContent, nodeType} = childNodes[i];
       let currentNode = childNodes[i];
+      const {textContent, nodeType} = currentNode;
 
       const fixNodes = (checkNodes) => {
 
@@ -945,24 +914,31 @@ export default function Literature({currentUser, shownLocation, setLocation, set
         if (elementRemoved || nodeType === 3 || i !== selectedNodeIndex) {
 
           // Return the component as-is.
-          newParent[i] = newElement;
+          newParent[i] = typeof newElement === "string" ? newElement : React.createElement(newElement.type, {
+            key: i
+          }, newElement.props.children);
 
         } else {
 
           // Add the new formatting.
-          console.log(newElement);
           newParent[i] = React.createElement(elementName, {
             key: i
           }, newElement);
 
         }
 
-        if (i === selectedNodeIndex && typeof newParent[i] !== "string") {
+        if (i === selectedNodeIndex) {
+        
+          // Let's adjust the selection information accordingly.
+          if (typeof newParent[i] !== "string") {
 
-          newContent.selection.childIndex = i;
-          newContent.selection.startOffset = 0;
-          newContent.selection.endOffset = textContent.length;
-          refSet = true;
+            // There's still more formatting in this selection. 
+            newContent.selection.childIndex = i;
+            newContent.selection.startOffset = 0;
+            newContent.selection.endOffset = textContent.length;
+            refSet = true;
+
+          }
 
         }
 
@@ -1005,6 +981,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
     // Iterate through the parent array and merge the text nodes.
     i = newParent.length;
+    let temporaryContentContainer = parent[paragraphIndex].cloneNode(true);
     while (i--) {
 
       // Text nodes are always just strings.
@@ -1015,6 +992,9 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
         // Remove the previous text node.
         newParent.splice(i + 1, 1);
+
+        // Replace the node in our container clone.
+        temporaryContentContainer.childNodes[i].replaceWith(temporaryContentContainer.childNodes[i].textContent);
 
       }
 
@@ -1028,13 +1008,19 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
     if (!refSet) {
 
+      // Simulate a selection on our fake container.
       let rangeClone = range.cloneRange();
-      rangeClone.selectNodeContents(contentRefs.current[paragraphIndex]);
-      rangeClone.setEnd(startContainer, startOffset);
-      newContent.selection.startOffset = rangeClone.toString().length;
-      rangeClone.setEnd(endContainer, endOffset);
-      console.log(newContent.selection.endOffset);
-      newContent.selection.endOffset = rangeClone.toString().length;
+      rangeClone.selectNodeContents(temporaryContentContainer);
+      rangeClone.setStart(temporaryContentContainer.childNodes[selectedNodeIndex], startOffset);
+      rangeClone.setEnd(temporaryContentContainer.childNodes[selectedNodeIndex], endOffset);
+
+      // Merge all text nodes so that the indexes are accurate.
+      temporaryContentContainer.normalize();
+
+      // Set the offsets and the child index.
+      newContent.selection.startOffset = rangeClone.startOffset;
+      newContent.selection.endOffset = rangeClone.endOffset;
+      newContent.selection.childIndex = Array.prototype.indexOf.call(rangeClone.endContainer.parentNode.childNodes, rangeClone.endContainer);
 
     }
 

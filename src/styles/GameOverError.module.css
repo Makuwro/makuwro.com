@@ -1,0 +1,24 @@
+#screen {
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  font-family: "Press Start 2P", monospace;
+}
+
+#stats {
+  display: flex;
+  justify-content: space-around;
+}
+
+#errorCode {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+#screen h1 {
+  text-align: center;
+}
+
+#screen p {
+  font-size: 0.9rem;
+}
