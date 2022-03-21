@@ -478,6 +478,11 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
                 child = <br />;
 
+              } else if (startParagraphIndex === 0) { 
+              
+                // Please don't delete the beginning paragraph.
+                child = newContent.comps[0].props.children;
+
               } else {
 
                 const previousChildNodes = parent.childNodes[startParagraphIndex - 1].childNodes;
@@ -552,6 +557,12 @@ export default function Literature({currentUser, shownLocation, setLocation, set
             ].join("");
 
           } else {
+
+            if (backspace && highlighted) {
+
+              // TODO: Remove highlighted paragraphs
+
+            }
 
             child = [
               textContent.slice(0, startOffset), 
@@ -725,7 +736,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       // Set the previous paragraph.
       newContent.comps[startParagraphIndex] = (
         <p key={generateUUID()}>
-          {previousParagraph}
+          {previousParagraph[0] ? previousParagraph : <br />}
         </p>
       );
 
