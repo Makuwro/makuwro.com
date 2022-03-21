@@ -6,6 +6,7 @@ import sanitize from "sanitize-html";
 import parse, { domToReact } from "html-react-parser";
 import Footer from "../Footer";
 import Dropdown from "../input/Dropdown";
+import PropTypes from "prop-types";
 
 export default function Literature({currentUser, shownLocation, setLocation, setSettingsCache}) {
 
@@ -321,12 +322,14 @@ export default function Literature({currentUser, shownLocation, setLocation, set
           body: formData
         });
 
-        if (response.ok) {
+        if (!response.ok) {
 
-          // Exit edit mode
-          navigate(`/${username}/blog/${slug}`);
+          throw new Error((await response.json()).message);
 
         }
+
+        // Exit edit mode
+        navigate(`/${username}/blog/${slug}`);
 
       } else {
 
@@ -337,7 +340,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
     } catch (err) {
 
-
+      alert(`Couldn't save your changes: ${err.message}`);
 
     }
 
@@ -372,6 +375,59 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
   }
 
+  function fixNodes(node, elementName, isTarget, childNodeIndex) {
+
+    // Get all of the tags that are selected.
+    const tags = [];
+    const {textContent, nodeType} = node;
+    let newElement = textContent;
+    let elementRemoved = false;
+    while (node.nodeType !== 3) {
+
+      tags.push(node.nodeName.toLowerCase());
+      node = node.childNodes[0];
+
+    }
+
+    // Iterate through the tags and remove the formatting, if necessary.
+    for (let x = 0; tags.length > x; x++) {
+
+      if (elementName && elementName === tags[x]) {
+
+        // Remember that we removed the formatting so that we don't re-add it
+        // at the end.
+        elementRemoved = true;
+
+      } else {
+
+        // We don't need to mess with these tags, so we just re-add them
+        // as React components.
+        newElement = React.createElement(tags[x], {
+          key: x,
+        }, newElement);
+
+      }
+
+    }
+
+    if (elementRemoved || nodeType === 3 || !isTarget) {
+
+      // Return the component as-is.
+      return typeof newElement === "string" ? newElement : React.createElement(newElement.type, {
+        key: childNodeIndex
+      }, newElement.props.children);
+
+    } else {
+
+      // Add the new formatting.
+      return React.createElement(elementName, {
+        key: childNodeIndex
+      }, newElement);
+
+    }
+
+  }
+
   function handleInput(event, cutting) {
 
     const {ctrlKey, key} = event;
@@ -385,29 +441,22 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     }
 
     const {startOffset, endOffset, startContainer, endContainer} = selection.getRangeAt(0);
-    let onP = startContainer.nodeName === "P";
     const atBeginning = startOffset === 0;
     const backspace = key === "Backspace";
     const del = key === "Delete";
     const sameContainer = startContainer === endContainer;
     const highlighted = startOffset !== endOffset || !sameContainer;
     const removing = backspace || del;
-    const {paragraphIndex, selectedNodeIndex} = getImportantIndices(startContainer);
-    let endIndex = paragraphIndex;
-
-    if (!sameContainer) {
-
-      onP = startContainer.nodeName === "P";
-      endIndex = (onP ? [...endContainer.parentNode.childNodes] : [...endContainer.parentNode.parentNode.childNodes]).indexOf(onP ? endContainer : endContainer.parentNode);
-
-    }
+    const {paragraphIndex: startParagraphIndex, selectedNodeIndex: startSelectedNodeIndex} = getImportantIndices(startContainer);
+    const {paragraphIndex: endParagraphIndex, selectedNodeIndex: endSelectedNodeIndex} = getImportantIndices(endContainer);
 
     if (cutting || (!ctrlKey && (key.length === 1 || removing))) {
       
       // We're adding or removing characters.
+      let childNodes;
       let newContent;
       let i;
-      let fixFocus;
+      let newParagraph;
       
       // We're handling the content, so prevent the default behavior.
       event.preventDefault();
@@ -423,20 +472,28 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       // Now iterate through the component list from the last to the first.
       // We're doing last to first because if we need to delete a paragraph
       // from the list, it won't break the loop.
-      newContent = {comps: [...content.comps], selection: {startOffset: startOffset + (cutting || backspace || del ? 0 : 1)}};
-      i = content.comps.length;
-      fixFocus = false;
-      while (i--) {
+      childNodes = contentContainer.current.childNodes[startParagraphIndex].childNodes;
+      newContent = {
+        comps: [...content.comps], 
+        selection: {
+          startOffset: startOffset + (cutting || backspace || del ? 0 : 1),
+          paragraphIndex: startParagraphIndex,
+          childIndex: startSelectedNodeIndex
+        }
+      };
+      newParagraph = [];
+      for (i = 0; childNodes.length > i; i++) {
 
-        const isTarget = i === paragraphIndex;
-        let child = content.comps[i].props.children;
+        const isTarget = i === startSelectedNodeIndex;
+        const node = childNodes[i];
+        let child;
 
         if (isTarget) {
 
-          child = (child = content.comps[i].props).children || child;
+          const {textContent, nodeType} = node;
 
           // If a child is empty, it'll should only have a <br /> tag.
-          if (child.type === "br" || atBeginning) {
+          if (node.nodeName === "BR" || atBeginning) {
 
             if (backspace) {
 
@@ -446,10 +503,14 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
               } else {
 
-                newContent.selection.startOffset = content.comps[i - 1].props.children.length;
+                const previousParagraphIndex = startParagraphIndex - 1;
+                const previousChildNodes = parent.childNodes[previousParagraphIndex].childNodes;
+
+                newContent.selection.startOffset = previousChildNodes[previousChildNodes.length - 1].textContent.length;
                 newContent.comps.splice(i, 1);
-                fixFocus = true;
-                continue;
+                newContent.selection.paragraphIndex = previousParagraphIndex;
+
+                break;
 
               }
 
@@ -478,10 +539,11 @@ export default function Literature({currentUser, shownLocation, setLocation, set
                 let offset = 0;
                 do { 
                   
-                  closestSpace = child.lastIndexOf(" ", startOffset - offset);
+                  closestSpace = textContent.lastIndexOf(" ", startOffset - offset);
                   offset++;
 
                 } while (closestSpace !== -1 && closestSpace + 1 === startOffset);
+                
                 backspaceIncrement = startOffset - closestSpace;
                 
                 if (closestSpace === -1) {
@@ -502,37 +564,56 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
             }
 
-            child = [child.slice(0, startOffset - backspaceIncrement), removing ? "" : event.key, child.slice((highlighted ? endOffset : startOffset) + (del ? 1 : 0))].join("");
+            child = [
+              textContent.slice(0, startOffset - backspaceIncrement), 
+              removing ? "" : event.key, 
+              textContent.slice((highlighted ? endOffset : startOffset) + (del ? 1 : 0))
+            ].join("");
 
           } else {
 
-            child = [child.slice(0, startOffset), removing ? "" : event.key, endContainer.textContent.slice(endOffset)].join("");
+            child = [
+              textContent.slice(0, startOffset), 
+              removing ? "" : event.key, 
+              endContainer.textContent.slice(endOffset)
+            ].join("");
 
           }
 
-        } else if (fixFocus && i + 1 === paragraphIndex) {
+          // Check if this node has any tags.
+          if (nodeType !== 3) {
+            
+            // Change from "const" to "let" so we can change it
+            let node = childNodes[i];
+            let newElement = child;
+            const tags = [];
 
-          let previousChild = typeof((previousChild = content.comps[i].props.children)) === "string" ? previousChild : "";
-          const oldChild = content.comps[i + 1].props.children;
-          child = previousChild + (oldChild && oldChild.type !== "br" ? oldChild : "");
+            while (node.nodeType !== 3) {
 
-        } else if (!sameContainer && i <= endIndex && i > paragraphIndex) {
+              tags.push(node.nodeName.toLowerCase());
+              node = node.childNodes[0];
+        
+            }
 
-          // This paragraph was completely highlighted, so we should remove it.
-          newContent.comps.splice(i, 1);
-          continue;
+            for (let x = 0; tags.length > x; x++) {
+
+              newElement = React.createElement(tags[x], {
+                key: x,
+              }, newElement);
+
+            }
+
+            child = newElement;
+
+          }
+
+        } else {
+
+          child = fixNodes(node, undefined, false, i);
         
         }
         
-        newContent.comps[i] = <p key={i}>
-          {child || <br />}
-        </p>;
-
-        if (isTarget || (i + 1 === paragraphIndex && fixFocus)) {
-
-          newContent.selection.paragraphIndex = i;
-
-        }
+        newParagraph.push(child);
 
       }
 
@@ -542,6 +623,11 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       selection.removeAllRanges();
 
       // Finally, set the new content.
+      newContent.comps[startParagraphIndex] = (
+        <p key={startParagraphIndex}>
+          {newParagraph}
+        </p>
+      );
       setContent(newContent);
 
     } else if (key === "Enter") {
@@ -557,9 +643,9 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       while (i--) {
 
         let child;
-        let afterIndex = i - 1 === paragraphIndex;
+        let afterIndex = i - 1 === startParagraphIndex;
         
-        if (paragraphIndex === i) {
+        if (startParagraphIndex === i) {
 
           if (!atBeginning) {
 
@@ -586,7 +672,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
           }
 
-        } else if (!sameContainer && i <= endIndex) {
+        } else if (!sameContainer && i <= endParagraphIndex) {
 
           // This paragraph is completely in the range, so it should be removed.
           newContent.comps.splice(i, 1);
@@ -876,80 +962,16 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     let refSet = false;
     for (i = 0; childNodes.length > i; i++) {
 
-      const tags = [];
       let currentNode = childNodes[i];
       const {textContent, nodeType} = currentNode;
-
-      const fixNodes = (checkNodes) => {
-
-        // Get all of the tags that are selected.
-        let newElement = textContent;
-        let elementRemoved = false;
-        while (currentNode.nodeType !== 3) {
-
-          tags.push(currentNode.nodeName.toLowerCase());
-          currentNode = currentNode.childNodes[0];
-
-        }
-
-        // Iterate through the tags and remove the formatting, if necessary.
-        for (let x = 0; tags.length > x; x++) {
-
-          if (checkNodes && elementName === tags[x]) {
-
-            // Remember that we removed the formatting so that we don't re-add it
-            // at the end.
-            elementRemoved = true;
-
-          } else {
-
-            // We don't need to mess with these tags, so we just re-add them
-            // as React components.
-            newElement = React.createElement(tags[x], {
-              key: x,
-            }, newElement);
-
-          }
-
-        }
-
-        if (elementRemoved || nodeType === 3 || i !== selectedNodeIndex) {
-
-          // Return the component as-is.
-          newParent[i] = typeof newElement === "string" ? newElement : React.createElement(newElement.type, {
-            key: i
-          }, newElement.props.children);
-
-        } else {
-
-          // Add the new formatting.
-          newParent[i] = React.createElement(elementName, {
-            key: i
-          }, newElement);
-
-        }
-
-        if (i === selectedNodeIndex) {
-        
-          // Let's adjust the selection information accordingly.
-          if (typeof newParent[i] !== "string") {
-
-            // There's still more formatting in this selection. 
-            newContent.selection.childIndex = i;
-            newContent.selection.startOffset = 0;
-            newContent.selection.endOffset = textContent.length;
-            refSet = true;
-
-          }
-
-        }
-
-      };
 
       // Find out if this is the target element by checking the start offset and the container.
       if (i === selectedNodeIndex) {
 
         const targetText = textContent.slice(startOffset, endOffset);
+        newContent.selection.startOffset = 0;
+        newContent.selection.endOffset = textContent.length;
+        refSet = true;
 
         // Check if it's a text node.
         if (nodeType === 3) {
@@ -969,13 +991,21 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
         } else {
 
-          fixNodes(true);
+          fixNodes(currentNode, elementName, true, i);
+    
+          // Let's adjust the selection information accordingly.
+          if (typeof newParent[i] !== "string") {
+    
+            // There's still more formatting in this selection. 
+            newContent.selection.childIndex = i;
+    
+          }
 
         }
 
       } else {
 
-        fixNodes();
+        newParent[i] = fixNodes(currentNode, undefined, false, i);
 
       }
 
@@ -1135,3 +1165,10 @@ export default function Literature({currentUser, shownLocation, setLocation, set
   );
 
 }
+
+Literature.propTypes = {
+  currentUser: PropTypes.object,
+  shownLocation: PropTypes.object,
+  setLocation: PropTypes.func,
+  setSettingsCache: PropTypes.func
+};
