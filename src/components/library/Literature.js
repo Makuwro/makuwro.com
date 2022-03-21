@@ -392,9 +392,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     const sameContainer = startContainer === endContainer;
     const highlighted = startOffset !== endOffset || !sameContainer;
     const removing = backspace || del;
-    let currentContainer = startContainer;
-    const {paragraphIndex, selectedNodeIndex} = getImportantIndices(currentContainer);
-    
+    const {paragraphIndex, selectedNodeIndex} = getImportantIndices(startContainer);
     let endIndex = paragraphIndex;
 
     if (!sameContainer) {
