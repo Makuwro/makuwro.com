@@ -375,13 +375,12 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
   }
 
-  function fixNodes(node, elementName, isTarget, childNodeIndex) {
+  function createComponentFromNode(node, key) {
 
     // Get all of the tags that are selected.
     const tags = [];
-    const {textContent, nodeType} = node;
+    const {textContent} = node;
     let newElement = textContent;
-    let elementRemoved = false;
     while (node.nodeType !== 3) {
 
       tags.push(node.nodeName.toLowerCase());
@@ -392,39 +391,16 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     // Iterate through the tags and remove the formatting, if necessary.
     for (let x = 0; tags.length > x; x++) {
 
-      if (elementName && elementName === tags[x]) {
-
-        // Remember that we removed the formatting so that we don't re-add it
-        // at the end.
-        elementRemoved = true;
-
-      } else {
-
-        // We don't need to mess with these tags, so we just re-add them
-        // as React components.
-        newElement = React.createElement(tags[x], {
-          key: x,
-        }, newElement);
-
-      }
-
-    }
-
-    if (elementRemoved || nodeType === 3 || !isTarget) {
-
-      // Return the component as-is.
-      return typeof newElement === "string" ? newElement : React.createElement(newElement.type, {
-        key: childNodeIndex
-      }, newElement.props.children);
-
-    } else {
-
-      // Add the new formatting.
-      return React.createElement(elementName, {
-        key: childNodeIndex
+      // We don't need to mess with these tags, so we just re-add them
+      // as React components.
+      newElement = React.createElement(tags[x], {
+        key: x,
       }, newElement);
 
     }
+
+    // Return the component as-is.
+    return typeof newElement === "string" ? newElement : React.createElement(newElement.type, {key}, newElement.props.children);
 
   }
 
@@ -447,8 +423,9 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     const sameContainer = startContainer === endContainer;
     const highlighted = startOffset !== endOffset || !sameContainer;
     const removing = backspace || del;
-    const {paragraphIndex: startParagraphIndex, selectedNodeIndex: startSelectedNodeIndex} = getImportantIndices(startContainer);
-    const {paragraphIndex: endParagraphIndex, selectedNodeIndex: endSelectedNodeIndex} = getImportantIndices(endContainer);
+    const parent = contentContainer.current;
+    let {paragraphIndex: startParagraphIndex, selectedNodeIndex: startSelectedNodeIndex} = getImportantIndices(startContainer);
+    let {paragraphIndex: endParagraphIndex, selectedNodeIndex: endSelectedNodeIndex} = getImportantIndices(endContainer);
 
     if (cutting || (!ctrlKey && (key.length === 1 || removing))) {
       
@@ -457,6 +434,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       let newContent;
       let i;
       let newParagraph;
+      let nodeMovingToPreviousParagraph;
       
       // We're handling the content, so prevent the default behavior.
       event.preventDefault();
@@ -472,7 +450,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       // Now iterate through the component list from the last to the first.
       // We're doing last to first because if we need to delete a paragraph
       // from the list, it won't break the loop.
-      childNodes = contentContainer.current.childNodes[startParagraphIndex].childNodes;
+      childNodes = parent.childNodes[startParagraphIndex].childNodes;
       newContent = {
         comps: [...content.comps], 
         selection: {
@@ -503,12 +481,15 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
               } else {
 
-                const previousParagraphIndex = startParagraphIndex - 1;
-                const previousChildNodes = parent.childNodes[previousParagraphIndex].childNodes;
+                const previousChildNodes = parent.childNodes[startParagraphIndex - 1].childNodes;
+
+                newContent.comps.splice(startParagraphIndex, 1);
+                
+                startParagraphIndex--;
 
                 newContent.selection.startOffset = previousChildNodes[previousChildNodes.length - 1].textContent.length;
-                newContent.comps.splice(i, 1);
-                newContent.selection.paragraphIndex = previousParagraphIndex;
+                newContent.selection.paragraphIndex = startParagraphIndex;
+                nodeMovingToPreviousParagraph = createComponentFromNode(node, previousChildNodes.length);
 
                 break;
 
@@ -609,7 +590,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
         } else {
 
-          child = fixNodes(node, undefined, false, i);
+          child = createComponentFromNode(node, i);
         
         }
         
@@ -617,17 +598,45 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
       }
 
+      if (nodeMovingToPreviousParagraph) {
+
+        const {childNodes} = parent.childNodes[startParagraphIndex];
+        for (let i = 0; childNodes.length > i; i++) {
+
+          newParagraph[i] = createComponentFromNode(childNodes[i], i);
+
+        }
+        newParagraph[childNodes.length] = nodeMovingToPreviousParagraph;
+
+      }
+
+      // Normalize text nodes.
+      i = newParagraph.length;
+      while (i--) {
+
+        const component = newParagraph[i];
+        if (typeof component === "string" && typeof newParagraph[i - 1] === "string") {
+
+          // Merge the strings.
+          newParagraph[i - 1] += component;
+          newParagraph.splice(i, 1);
+
+        }
+
+      }
+
+      newContent.comps[startParagraphIndex] = (
+        <p key={startParagraphIndex}>
+          {newParagraph}
+        </p>
+      );
+
       // React really likes glitching out the caret when the content is updated, so let's do an illusion. 
       // I think this is way better than the caret resetting to position 0 of the document, and then
       // speeding back to where it should be.
       selection.removeAllRanges();
 
       // Finally, set the new content.
-      newContent.comps[startParagraphIndex] = (
-        <p key={startParagraphIndex}>
-          {newParagraph}
-        </p>
-      );
       setContent(newContent);
 
     } else if (key === "Enter") {
@@ -991,7 +1000,13 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
         } else {
 
-          fixNodes(currentNode, elementName, true, i);
+          // Turn the node into a component.
+          newParent[i] = createComponentFromNode(currentNode, i);
+
+          // Add the element formatting.
+          newParent[i] = React.createElement(elementName, {
+            key: i
+          }, newParent[i]);
     
           // Let's adjust the selection information accordingly.
           if (typeof newParent[i] !== "string") {
@@ -1005,7 +1020,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
       } else {
 
-        newParent[i] = fixNodes(currentNode, undefined, false, i);
+        newParent[i] = createComponentFromNode(currentNode, i);
 
       }
 
