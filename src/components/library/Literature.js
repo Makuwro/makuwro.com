@@ -7,6 +7,7 @@ import parse, { domToReact } from "html-react-parser";
 import Footer from "../Footer";
 import Dropdown from "../input/Dropdown";
 import PropTypes from "prop-types";
+import { v4 as generateUUID } from "uuid";
 
 export default function Literature({currentUser, shownLocation, setLocation, setSettingsCache}) {
 
@@ -129,7 +130,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
     let timeout;
 
-    if (editing && content && (content.selection || content.newParagraph) && content.selection.paragraphIndex !== undefined) {
+    if (editing && typeof content?.selection?.paragraphIndex === "number") {
 
       // Find the text node.
       const {childIndex} = content.selection;
@@ -375,13 +376,12 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
   }
 
-  function createComponentFromNode(node, key) {
+  function createComponentFromNode(node, key, textContent = node.textContent) {
 
     // Get all of the tags that are selected.
     const tags = [];
-    const {textContent} = node;
     let newElement = textContent;
-    while (node.nodeType !== 3) {
+    while (node.nodeType !== 3 && node.nodeName !== "BR") {
 
       tags.push(node.nodeName.toLowerCase());
       node = node.childNodes[0];
@@ -426,11 +426,11 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     const parent = contentContainer.current;
     let {paragraphIndex: startParagraphIndex, selectedNodeIndex: startSelectedNodeIndex} = getImportantIndices(startContainer);
     let {paragraphIndex: endParagraphIndex, selectedNodeIndex: endSelectedNodeIndex} = getImportantIndices(endContainer);
+    let {childNodes} = parent.childNodes[startParagraphIndex];
 
     if (cutting || (!ctrlKey && (key.length === 1 || removing))) {
       
       // We're adding or removing characters.
-      let childNodes;
       let newContent;
       let i;
       let newParagraph;
@@ -450,7 +450,6 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       // Now iterate through the component list from the last to the first.
       // We're doing last to first because if we need to delete a paragraph
       // from the list, it won't break the loop.
-      childNodes = parent.childNodes[startParagraphIndex].childNodes;
       newContent = {
         comps: [...content.comps], 
         selection: {
@@ -468,7 +467,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
         if (isTarget) {
 
-          const {textContent, nodeType} = node;
+          const {textContent, nodeType, nodeName} = node;
 
           // If a child is empty, it'll should only have a <br /> tag.
           if (node.nodeName === "BR" || atBeginning) {
@@ -489,6 +488,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
                 newContent.selection.startOffset = previousChildNodes[previousChildNodes.length - 1].textContent.length;
                 newContent.selection.paragraphIndex = startParagraphIndex;
+                newContent.selection.childIndex = previousChildNodes.length - 1;
                 nodeMovingToPreviousParagraph = createComponentFromNode(node, previousChildNodes.length);
 
                 break;
@@ -562,7 +562,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
           }
 
           // Check if this node has any tags.
-          if (nodeType !== 3) {
+          if (nodeType !== 3 && nodeName !== "BR") {
             
             // Change from "const" to "let" so we can change it
             let node = childNodes[i];
@@ -626,7 +626,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       }
 
       newContent.comps[startParagraphIndex] = (
-        <p key={startParagraphIndex}>
+        <p key={generateUUID()}>
           {newParagraph}
         </p>
       );
@@ -644,80 +644,108 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       // We're handling the content, so prevent the default behavior
       event.preventDefault();
 
-      const newContent = {comps: [...content.comps], selection: {startOffset: 0}, newParagraph: true};
+      const newContent = {
+        comps: [...content.comps], 
+        selection: {
+          startOffset: 0, 
+          childIndex: 0,
+          paragraphIndex: startParagraphIndex + 1
+        }
+      };
 
       // We're only adding a paragraph if it's in the same container.
       // Otherwise, we're just replacing paragraphs.
-      let i = content.comps.length + (sameContainer ? 1 : 0);
-      while (i--) {
-
-        let child;
-        let afterIndex = i - 1 === startParagraphIndex;
+      
+      // Let's split the the current paragraph's content from the current caret position.
+      const newParagraph = [];
+      const previousParagraph = [];
+      for (let i = 0; childNodes.length > i; i++) {
         
-        if (startParagraphIndex === i) {
+        const node = childNodes[i];
+        const {textContent: previousTextContent} = node;
+        const newParagraphSize = newParagraph.length;
 
-          if (!atBeginning) {
+        if (i === startSelectedNodeIndex) {
 
-            // Only cut off the part that we're adding to a new paragraph.
-            child = content.comps[i].props.children.slice(0, startOffset);
+          // Let's cut the paragraph from the exact position.
+          previousParagraph[i] = createComponentFromNode(node, i, previousTextContent.slice(0, highlighted ? endOffset : startOffset));
 
-          }
+          // And add the other half of the content to the new paragraph.
+          newParagraph[newParagraphSize] = createComponentFromNode(node, newParagraphSize, previousTextContent.slice(highlighted ? endOffset : startOffset));
 
-        } else if (afterIndex) {
+        } else if (i > startSelectedNodeIndex) {
 
-          child = content.comps[i - 1].props.children;
-
-          if (!atBeginning) {
-
-            if (sameContainer) {
-
-              child = child.slice(highlighted ? endOffset : startOffset);
-
-            } else {
-
-              child = endContainer.textContent.slice(endOffset);
-
-            }
-
-          }
-
-        } else if (!sameContainer && i <= endParagraphIndex) {
-
-          // This paragraph is completely in the range, so it should be removed.
-          newContent.comps.splice(i, 1);
-          continue;
+          // Add the rest of this content to the new paragraph. 
+          newParagraph[newParagraphSize] = createComponentFromNode(node, newParagraphSize, previousTextContent);
 
         } else {
 
-          // This content doesn't need to be changed.
-          child = (content.comps[i] || content.comps[i - 1]).props.children;
+          // We don't need to do anything to this node.
+          previousParagraph[i] = createComponentFromNode(node, i, previousTextContent);
 
-        }
-
-        // Return the paragraph component.
-        // Also, if the string is empty, we need to add a <br /> because Chromium doesn't like when a paragraph is empty :( 
-        // In other words, it's not selectable.
-        newContent.comps[i] = (
-          <p key={i}>
-            {child || <br />}
-          </p>
-        );
-        
-        if (afterIndex) {
-
-          // The caret position will reset to the correct position.
-          newContent.selection.paragraphIndex = i;
-          
         }
 
       }
+
+      // Let's erase the paragraphs that were completely highlighted.
+      if (startParagraphIndex !== endParagraphIndex) {
+
+        newContent.comps.splice(startParagraphIndex + 1, endParagraphIndex - startParagraphIndex);
+
+      }
+
+      // Next, let's add the text content from the end container.
+      if (!sameContainer) {
+
+        const {childNodes} = endContainer;
+
+        for (let i = 0; childNodes.length > i; i++) {
+          
+          // We only need the nodes that are the end index or after the end index.
+          // We can ignore the previous ones because they were highlighted.
+          const newParagraphSize = newParagraph.length;
+          const node = childNodes[i];
+          const {textContent} = node;
+
+          if (i === endSelectedNodeIndex) {
+            
+            newParagraph[newParagraphSize] = createComponentFromNode(node, newParagraphSize, node.textContent.slice(endOffset));
+
+          } else if (i > endSelectedNodeIndex) {
+
+            newParagraph[newParagraphSize] = createComponentFromNode(node, newParagraphSize, textContent);
+
+          }
+          
+
+        }
+
+      }
+
+      // Set the previous paragraph.
+      newContent.comps[startParagraphIndex] = (
+        <p key={generateUUID()}>
+          {previousParagraph}
+        </p>
+      );
+
+      // Almost done! Let's add the new paragraph component.
+      // If the paragraph array is empty, we need to add a <br /> because 
+      // Chromium doesn't like when a paragraph is empty; it will be unselectable
+      newContent.comps.splice(
+        startParagraphIndex + 1,
+        0,
+        <p key={generateUUID()}>
+          {newParagraph[0] ? newParagraph : <br />}
+        </p>
+      );
 
       // React really likes glitching out the caret when the content is updated, so let's do an illusion. 
       // I think this is way better than the caret resetting to position 0 of the document, and then
       // speeding back to where it should be.
       selection.removeAllRanges();
 
-      // We have to add a new paragraph!
+      // Finally, we update the content state.
       setContent(newContent);
 
     } else if (ctrlKey) {
