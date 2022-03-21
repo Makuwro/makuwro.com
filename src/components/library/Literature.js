@@ -33,7 +33,6 @@ export default function Literature({currentUser, shownLocation, setLocation, set
   const navigate = useNavigate();
   const [caretInfo, setCaretInfo] = useState();
   const isMounted = useRef(true);
-  const contentRefs = useRef([]);
 
   function fixCaret(ref, start, end) {
 
@@ -95,7 +94,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
           } else if (element.name === "p") {
 
-            return <p ref={(element) => (contentRefs.current.push(element))}>{domToReact(element.children)}</p>;
+            return <p>{domToReact(element.children)}</p>;
 
           }
 
@@ -133,7 +132,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
       // Find the text node.
       const {childIndex} = content.selection;
-      let ref = (ref = contentRefs.current[content.selection.paragraphIndex]) && childIndex !== undefined ? ref.childNodes[childIndex] : ref;
+      let ref = (ref = contentContainer.current.childNodes[content.selection.paragraphIndex]) && childIndex !== undefined ? ref.childNodes[childIndex] : ref;
       while (ref.nodeType !== 3 && ref.nodeName !== "BR") {
 
         ref = ref.childNodes[0];
@@ -344,29 +343,59 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
   }
 
+  function getImportantIndices(node) {
+
+    let paragraphIndex;
+    let selectedNodeIndex;
+
+    while (paragraphIndex === undefined) {
+
+      // Check if the current container's parent node is a paragraph.
+      const {parentNode} = node;
+      if (parentNode.nodeName === "P") {
+
+        // Find the index from the paragraph's children.
+        selectedNodeIndex = Array.prototype.indexOf.call(parentNode.childNodes, node);
+
+        // Find the index from the ref list.
+        paragraphIndex = Array.prototype.indexOf.call(contentContainer.current.childNodes, parentNode);
+
+      } else {
+
+        node = parentNode;
+
+      }
+
+    }
+
+    return {paragraphIndex, selectedNodeIndex};
+
+  }
+
   function handleInput(event, cutting) {
 
     const {ctrlKey, key} = event;
-    const selection = document.getSelection();
 
-    // Hold that thought. Make sure we're selecting something.
+    // Make sure we're selecting something.
+    const selection = document.getSelection();
     if (!selection.focusNode) {
 
       return;
 
     }
 
-    // Alright, continue.
     const {startOffset, endOffset, startContainer, endContainer} = selection.getRangeAt(0);
     let onP = startContainer.nodeName === "P";
-    const index = contentRefs.current.indexOf(onP ? startContainer : startContainer.parentNode);
     const atBeginning = startOffset === 0;
     const backspace = key === "Backspace";
     const del = key === "Delete";
     const sameContainer = startContainer === endContainer;
     const highlighted = startOffset !== endOffset || !sameContainer;
-    let endIndex = index;
     const removing = backspace || del;
+    let currentContainer = startContainer;
+    const {paragraphIndex, selectedNodeIndex} = getImportantIndices(currentContainer);
+    
+    let endIndex = paragraphIndex;
 
     if (!sameContainer) {
 
@@ -401,34 +430,28 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       fixFocus = false;
       while (i--) {
 
-        const isTarget = i === index;
+        const isTarget = i === paragraphIndex;
         let child = content.comps[i].props.children;
 
         if (isTarget) {
 
-          // If a child is empty, it'll should only have a <br /> tag.
           child = (child = content.comps[i].props).children || child;
-          const isEmpty = child.type === "br";
 
-          if (isEmpty || atBeginning) {
+          // If a child is empty, it'll should only have a <br /> tag.
+          if (child.type === "br" || atBeginning) {
 
             if (backspace) {
 
-              // Don't delete the beginning paragraph, please.
-              if (content.comps[i - 1]) {
+              if (highlighted) {
 
-                if (highlighted) {
+                child = <br />;
 
-                  child = <br />;
+              } else {
 
-                } else {
-
-                  newContent.selection.startOffset = content.comps[i - 1].props.children.length;
-                  newContent.comps.splice(i, 1);
-                  fixFocus = true;
-                  continue;
-
-                }
+                newContent.selection.startOffset = content.comps[i - 1].props.children.length;
+                newContent.comps.splice(i, 1);
+                fixFocus = true;
+                continue;
 
               }
 
@@ -489,25 +512,25 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
           }
 
-        } else if (fixFocus && i + 1 === index) {
+        } else if (fixFocus && i + 1 === paragraphIndex) {
 
           let previousChild = typeof((previousChild = content.comps[i].props.children)) === "string" ? previousChild : "";
           const oldChild = content.comps[i + 1].props.children;
           child = previousChild + (oldChild && oldChild.type !== "br" ? oldChild : "");
 
-        } else if (!sameContainer && i <= endIndex && i > index) {
+        } else if (!sameContainer && i <= endIndex && i > paragraphIndex) {
 
           // This paragraph was completely highlighted, so we should remove it.
           newContent.comps.splice(i, 1);
           continue;
         
         }
-
-        newContent.comps[i] = <p ref={(element) => (contentRefs.current[i] = element)} key={i}>
+        
+        newContent.comps[i] = <p key={i}>
           {child || <br />}
         </p>;
 
-        if (isTarget || (i + 1 === index && fixFocus)) {
+        if (isTarget || (i + 1 === paragraphIndex && fixFocus)) {
 
           newContent.selection.paragraphIndex = i;
 
@@ -528,7 +551,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       // We're handling the content, so prevent the default behavior
       event.preventDefault();
 
-      const newContent = {comps: [...content.comps], selection: null, newParagraph: true, deleteParagraph: false};
+      const newContent = {comps: [...content.comps], selection: {startOffset: 0}, newParagraph: true};
 
       // We're only adding a paragraph if it's in the same container.
       // Otherwise, we're just replacing paragraphs.
@@ -536,9 +559,9 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       while (i--) {
 
         let child;
-        let afterIndex = i - 1 === index;
+        let afterIndex = i - 1 === paragraphIndex;
         
-        if (index === i) {
+        if (paragraphIndex === i) {
 
           if (!atBeginning) {
 
@@ -581,9 +604,11 @@ export default function Literature({currentUser, shownLocation, setLocation, set
         // Return the paragraph component.
         // Also, if the string is empty, we need to add a <br /> because Chromium doesn't like when a paragraph is empty :( 
         // In other words, it's not selectable.
-        newContent.comps[i] = <p key={i} ref={(element) => (contentRefs.current[i] = element)}>
-          {child || <br />}
-        </p>;
+        newContent.comps[i] = (
+          <p key={i}>
+            {child || <br />}
+          </p>
+        );
         
         if (afterIndex) {
 
@@ -704,7 +729,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     const text = event.clipboardData.getData("text/plain");
     setContent((content) => {
 
-      const newContent = {comps: [...content.comps], selection: {focusOffset}, increment: text.length, deleteParagraph: false};
+      const newContent = {comps: [...content.comps], selection: {focusOffset: focusOffset + text.length}};
       for (let i = 0; content.comps.length > i; i++) {
 
         const isTarget = i === index;
@@ -720,9 +745,11 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
         }
 
-        newContent.comps[i] = <p ref={(element) => (contentRefs.current[i] = element)} key={i}>
-          {child}
-        </p>;
+        newContent.comps[i] = (
+          <p key={i}>
+            {child}
+          </p>
+        );
 
         if (isTarget) {
 
@@ -807,36 +834,13 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     const selection = document.getSelection();
     const range = selection.getRangeAt(0);
     const {startOffset, endOffset, startContainer, endContainer} = range;
-    const parent = contentRefs.current;
+    const parent = contentContainer.current;
+    const {paragraphIndex, selectedNodeIndex} = getImportantIndices(startContainer);
     let childNodes;
     let i;
     let newParent;
     let newContent;
     let elementName;
-
-    // Find the index of the paragraph and the selected node.
-    let paragraphIndex;
-    let selectedNodeIndex;
-    let currentContainer = startContainer;
-    while (paragraphIndex === undefined) {
-
-      // Check if the current container's parent node is a paragraph.
-      const {parentNode} = currentContainer;
-      if (parentNode.nodeName === "P") {
-
-        // Find the index from the paragraph's children.
-        selectedNodeIndex = Array.prototype.indexOf.call(parentNode.childNodes, currentContainer);
-
-        // Find the index from the ref list.
-        paragraphIndex = contentRefs.current.indexOf(parentNode);
-
-      } else {
-
-        currentContainer = parentNode;
-
-      }
-
-    }
 
     // Make sure we're selecting something.
     if (startOffset === endOffset && startContainer === endContainer) {
@@ -868,7 +872,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     }
 
     // Iterate through all of the child nodes in the selected parent.
-    childNodes = parent[paragraphIndex].childNodes;
+    childNodes = parent.childNodes[paragraphIndex].childNodes;
     newParent = [];
     newContent = {comps: [...content.comps], selection: {startOffset, endOffset, paragraphIndex}};
     let refSet = false;
@@ -981,7 +985,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
     // Iterate through the parent array and merge the text nodes.
     i = newParent.length;
-    let temporaryContentContainer = parent[paragraphIndex].cloneNode(true);
+    let temporaryContentContainer = parent.childNodes[paragraphIndex].cloneNode(true);
     while (i--) {
 
       // Text nodes are always just strings.
@@ -1001,7 +1005,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     }
     
     newContent.comps[paragraphIndex] = (
-      <p key={paragraphIndex} ref={(element) => (contentRefs.current[paragraphIndex] = element)}>
+      <p key={paragraphIndex}>
         {newParent}
       </p>
     );

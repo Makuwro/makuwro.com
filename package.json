@@ -26,9 +26,6 @@
     "react-router-dom": "^6.2.1",
     "sanitize-html": "^2.7.0"
   },
-  "resolutions": {
-    "react-error-overlay": "6.0.9"
-  },
   "devDependencies": {
     "babel-preset-razzle": "^4.2.13",
     "eslint": "^8.6.0",

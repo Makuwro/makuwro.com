@@ -59,6 +59,7 @@ export default function Popup({title, children, onClose, open, warnUnfinished, n
 
     }
 
+
   }, [children]);
 
   useEffect(() => {
