@@ -469,8 +469,6 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
           const {textContent, nodeType, nodeName} = node;
 
-          // If a child is empty, it'll should only have a <br /> tag.
-
           if (backspace) {
 
             if (atBeginning) {
@@ -547,6 +545,12 @@ export default function Literature({currentUser, shownLocation, setLocation, set
                 "", 
                 textContent.slice((highlighted ? endOffset : startOffset) + (del ? 1 : 0))
               ].join("");
+
+            }
+
+            if (!sameContainer) {
+                  
+              newContent.comps.splice(startParagraphIndex, endParagraphIndex - startParagraphIndex);
 
             }
 
