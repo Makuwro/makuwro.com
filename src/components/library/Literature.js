@@ -470,18 +470,20 @@ export default function Literature({currentUser, shownLocation, setLocation, set
           const {textContent, nodeType, nodeName} = node;
 
           // If a child is empty, it'll should only have a <br /> tag.
-          if (node.nodeName === "BR" || atBeginning) {
 
-            if (backspace) {
+          if (backspace) {
+
+            if (atBeginning) {
 
               if (highlighted) {
 
+                // Replace the entire paragraph with a <br />.
                 child = <br />;
 
-              } else if (startParagraphIndex === 0) { 
-              
-                // Please don't delete the beginning paragraph.
-                child = newContent.comps[0].props.children;
+              } else if (startParagraphIndex === 0) {
+
+                // Don't change anything; we can't delete the beginning paragraph.
+                return;
 
               } else {
 
@@ -502,15 +504,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
             } else {
 
-              child = event.key;
-
-            }
-          
-          } else if (sameContainer) {
-
-            let backspaceIncrement = 0;
-
-            if (backspace) {
+              let backspaceIncrement = 0;
 
               if (!ctrlKey && !highlighted) {
 
@@ -548,21 +542,23 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
               newContent.selection.startOffset -= backspaceIncrement;
 
+              child = [
+                textContent.slice(0, startOffset - backspaceIncrement), 
+                "", 
+                textContent.slice((highlighted ? endOffset : startOffset) + (del ? 1 : 0))
+              ].join("");
+
             }
 
+          } else if (sameContainer) {
+
             child = [
-              textContent.slice(0, startOffset - backspaceIncrement), 
+              textContent.slice(0, startOffset), 
               removing ? "" : event.key, 
               textContent.slice((highlighted ? endOffset : startOffset) + (del ? 1 : 0))
             ].join("");
 
           } else {
-
-            if (backspace && highlighted) {
-
-              // TODO: Remove highlighted paragraphs
-
-            }
 
             child = [
               textContent.slice(0, startOffset), 
