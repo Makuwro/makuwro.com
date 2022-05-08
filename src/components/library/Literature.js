@@ -65,69 +65,6 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
   useEffect(() => {
 
-    if (!ready && post.content) {
-
-      // Protect us from bad HTML, please!
-      const sanitizedHtml = sanitize(post.content, {
-        allowedAttributes: false, 
-        allowedClasses: false,
-        allowedTags: [
-          "address", "article", "aside", "footer", "header", "h1", "h2", "h3", "h4",
-          "h5", "h6", "hgroup", "main", "nav", "section", "blockquote", "dd", "div",
-          "dl", "dt", "figcaption", "figure", "hr", "li", "main", "ol", "p", "pre",
-          "ul", "a", "abbr", "b", "bdi", "bdo", "br", "cite", "code", "data", "dfn",
-          "em", "i", "kbd", "mark", "q", "rb", "rp", "rt", "rtc", "ruby", "s", "samp",
-          "small", "span", "strong", "sub", "sup", "time", "u", "var", "wbr", "caption",
-          "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr",
-          "audio", "source", "video", "iframe"
-        ]
-      });
-
-      // Now convert the HTML into a React component!
-      let content = Array.isArray(content = parse(sanitizedHtml, {
-
-        replace: (element) => {
-          
-          // Check if the link is an internal link (makuwro.com)
-          if (element.name === "a" && element.attribs.href === "https://makuwro.com") {
-
-            // Replace the element with a React Router link so that the page doesn't refresh
-            return <Link to=""></Link>;
-
-          } else if (element.name === "p") {
-
-            return <p>{domToReact(element.children)}</p>;
-
-          }
-
-          return element;
-
-        }
-
-      })) ? content : [content];
-
-      // Save the react component to the state.
-      setContent({comps: content});
-
-      // Set up the initial clipboard history state for undoing and redoing.
-      console.log("Setting initial clipboard history...");
-      setClipboardHistory((oldHistory) => ({
-        ...oldHistory,
-        content: {
-          position: 0,
-          history: [{comps: content}]
-        }
-      }));
-
-      // And we're done loading!
-      setReady(true);
-
-    }
-
-  }, [post]);
-
-  useEffect(() => {
-
     let timeout;
 
     if (editing && typeof content?.selection?.paragraphIndex === "number") {
@@ -257,9 +194,64 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       }
 
       if (isMounted.current) {
+        
+        // Protect us from bad HTML, please!
+        const sanitizedHtml = sanitize(json.content, {
+          allowedAttributes: false, 
+          allowedClasses: false,
+          allowedTags: [
+            "address", "article", "aside", "footer", "header", "h1", "h2", "h3", "h4",
+            "h5", "h6", "hgroup", "main", "nav", "section", "blockquote", "dd", "div",
+            "dl", "dt", "figcaption", "figure", "hr", "li", "main", "ol", "p", "pre",
+            "ul", "a", "abbr", "b", "bdi", "bdo", "br", "cite", "code", "data", "dfn",
+            "em", "i", "kbd", "mark", "q", "rb", "rp", "rt", "rtc", "ruby", "s", "samp",
+            "small", "span", "strong", "sub", "sup", "time", "u", "var", "wbr", "caption",
+            "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr",
+            "audio", "source", "video", "iframe"
+          ]
+        });
 
+        // Now convert the HTML into a React component!
+        let content = Array.isArray(content = parse(sanitizedHtml, {
+
+          replace: (element) => {
+            
+            // Check if the link is an internal link (makuwro.com)
+            if (element.name === "a" && element.attribs.href === "https://makuwro.com") {
+
+              // Replace the element with a React Router link so that the page doesn't refresh
+              return <Link to=""></Link>;
+
+            } else if (element.name === "p") {
+
+              return <p>{domToReact(element.children)}</p>;
+
+            }
+
+            return element;
+
+          }
+
+        })) ? content : [content];
+
+        // Save the react component to the state.
         setTitle(json.title);
+        setContent({comps: content});
+
+        // Set up the initial clipboard history state for undoing and redoing.
+        console.log("Setting initial clipboard history...");
+        setClipboardHistory((oldHistory) => ({
+          ...oldHistory,
+          content: {
+            position: 0,
+            history: [{comps: content}]
+          }
+        }));
+
+        // And we're done loading!
+        setReady(true);
         setPost(json);
+
 
       }
 
@@ -1128,7 +1120,10 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       {post.id ? (
         <>
           <section id={styles.formatter} className={editing ? styles.available : null}>
-            <section>
+            <section id={styles.mobileTools}>
+
+            </section>
+            <section id={styles.tabletTools}>
               <button 
                 title="Bolden or unbolden text"
                 onClick={() => formatSelection(0)}
@@ -1145,23 +1140,29 @@ export default function Literature({currentUser, shownLocation, setLocation, set
                 title="Strikethrough or unstrikethrough text"
                 onClick={() => formatSelection(3)}
               ><strike>S</strike></button>
-              <button title="Change text color">🎨</button>
+              <button title="Change text color">
+                <img src="/icons/color-palette.svg" />
+              </button>
               <button title="Highlight text">H</button>
-              <button title="Link to another website">🔗</button>
+              <button title="Link to another website">
+                <img src="/icons/link.svg" />
+              </button>
               <button 
                 title="Reset text formatting"
                 onClick={() => formatSelection(4)}
-              >❌</button>
+              >
+                <img src="/icons/format-color.svg" />
+              </button>
+              <Dropdown>
+                <li>Normal text</li>
+                <li>Heading 1</li>
+                <li>Heading 2</li>
+                <li>Heading 3</li>
+                <li>Heading 4</li>
+                <li>Heading 5</li>
+                <li>Heading 6</li>
+              </Dropdown>
             </section>
-            <Dropdown>
-              <li>Normal text</li>
-              <li>Heading 1</li>
-              <li>Heading 2</li>
-              <li>Heading 3</li>
-              <li>Heading 4</li>
-              <li>Heading 5</li>
-              <li>Heading 6</li>
-            </Dropdown>
           </section>
           <section id={styles.belowFormatter}>
             <section id={styles.metadata}>
@@ -1210,6 +1211,15 @@ export default function Literature({currentUser, shownLocation, setLocation, set
               {content ? content.comps : (
                 <p>This blog post doesn't exist...yet ;)</p>
               )}
+            </section>
+            <section>
+              <span>Categories: </span>
+              <ul>
+                <li>Test</li>
+              </ul>
+            </section>
+            <section>
+              <h1>Comments</h1>
             </section>
             <Footer />
           </section>

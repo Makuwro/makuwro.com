@@ -39,7 +39,7 @@ export default function ProfileTerms({setLocation, profileInfo, currentUser}) {
         {profileInfo.id === currentUser.id && (
           <button style={{display: "block", marginTop: "1rem"}} onClick={() => {
             
-            navigate("/settings/profile#terms");
+            navigate("/settings/profile#global-terms");
             
           }}>Edit terms</button>
         )}

@@ -1,6 +1,5 @@
 #home {
   overflow-y: auto;
-  height: calc(100% - 4.5rem);
   transition: 0.3s;
   opacity: 1;
 }

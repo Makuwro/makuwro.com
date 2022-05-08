@@ -124,8 +124,13 @@ section#welcome {
   }
 
   #left ul {
+    margin-top: 0;
     padding-inline-start: 0;
     list-style-type: none;
+  }
+
+  #left li:first-of-type {
+    margin-top: 0;
   }
 
   #left li {

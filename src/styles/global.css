@@ -1,19 +1,23 @@
 :root {
   --background: #26272b;
+  --background-footer: #1c1d1f;
   --button: #2196f3;
   --link: #57bffc;
   --background-input: #202021;
   --article: #313237;
   --text: #b5b5b5;
   --text-important: white;
+  --text-footer: var(--text-important);
   --day-box-shadow: rgba(0, 0, 0, 0.133) 0px 1.6px, rgba(0, 0, 0, 0.11) 0px 0.3px 0.9px 0px;
 }
 
 .light {
   --background: #f2f2f2;
+  --background-footer: #060a1e;
   --text: rgb(96, 94, 92);
   --background-input: #e3e5e8;
   --article: white;
+  --text-footer: white;
   --text-important: rgb(96, 94, 92);
 }
 
@@ -73,9 +77,11 @@ p {
 }
 
 main {
+  padding-top: calc(2rem + 56px);
   width: 100%;
-  height: calc(100% - 3.5rem);
+  height: 100%;
   overflow-y: overlay;
+  box-sizing: border-box;
 }
 
 form p {
@@ -158,7 +164,7 @@ label, section {
   color: var(--text-important);
 }
 
-.light label, .light section {
+.light label, .light section, i, u, strike, button, input[type="button"], input[type="submit"] {
   color: var(--text);
 }
 

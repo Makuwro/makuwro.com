@@ -1,0 +1,18 @@
+#connecting {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  background-color: var(--background);
+  z-index: 2;
+  transition: 0.3s;
+  text-align: center;
+}
+
+.closing {
+  opacity: 0;
+  pointer-events: none;
+}

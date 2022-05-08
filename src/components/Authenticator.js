@@ -12,7 +12,7 @@ export default function Authenticator({currentUser, open, shownLocation}) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [popupOpen, setPopupOpen] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(open);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [birthDate, setBirthDate] = useState();
   const [register, setRegister] = useState(false);
@@ -143,11 +143,13 @@ export default function Authenticator({currentUser, open, shownLocation}) {
 
       document.title = "Create a Makuwro account";
       setRegister(true);
+      setPopupOpen(true);
       
     } else if (pathname === "/signin") {
 
       document.title = "Sign in to Makuwro";
       setRegister(false);
+      setPopupOpen(true);
 
     }
 

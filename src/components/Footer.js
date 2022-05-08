@@ -22,8 +22,9 @@ export default function Footer() {
       ],
       "Library": [
         ["Art", "/library/art"],
+        ["Blogs", "/library/blogs"],
         ["Characters", "/library/characters"],
-        ["Literature", "/library/literature"],
+        ["Stories", "/library/stories"],
         ["Worlds", "/library/worlds"],
         ["Show me everything!", "/library"]
       ],
@@ -31,7 +32,7 @@ export default function Footer() {
         ["Help center", "https://help.makuwro.com"],
         ["Terms of service", "https://help.makuwro.com/policies/terms"],
         ["Community rules", "https://help.makuwro.com/policies/community-rules"],
-        ["Privacy", "https://help.makuwro.com/policies/privacy"],
+        ["Privacy policy", "https://help.makuwro.com/policies/privacy"],
         ["Contact us", "https://help.makuwro.com/contact"]
       ],
       "Social": [
@@ -91,7 +92,7 @@ export default function Footer() {
           {columns}
         </section>
         <p id={styles.copyright}>
-          © 2022 Makuwro, LLC
+          © 2022 Makuwro, LLC. All content belongs to their respective owners.
         </p>
       </section>
     </footer>

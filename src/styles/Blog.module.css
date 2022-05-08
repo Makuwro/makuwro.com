@@ -4,18 +4,27 @@
 }
 
 #formatter {
-  background-color: #141519;
+  background-color: var(--background);
   width: 100%;
   padding: 5px 10px;
   box-sizing: border-box;
   display: flex;
   height: 50.5px;
-  margin-top: -50.5px;
   transition: 0.3s;
+  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.2));
+  opacity: 0;
+}
+
+#formatter img {
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg) brightness(102%) contrast(102%);
 }
 
 #formatter.available {
-  margin-top: 0;
+  opacity: 1;
+}
+
+#formatter > section:first-of-type {
+  display: flex;
 }
 
 #formatter section {
@@ -29,10 +38,15 @@
   height: 40px;
   width: 40px;
   padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.3rem;
 }
 
 #formatter button:hover {
   background-color: var(--article);
+  border-radius: 100%;
 }
 
 #formatter.available + #belowFormatter {
@@ -45,12 +59,11 @@
   flex-direction: column;
   gap: 2rem;
   transition: 0.3s;
-  height: 100%;
+  height: calc(100% - 50.5px);
 }
 
 #postInfo {
   display: flex;
-  margin-top: 2rem;
   flex-direction: column;
 }
 
@@ -136,6 +149,10 @@
   flex: 1;
 }
 
+#tabletTools {
+  display: none;
+}
+
 @media screen and (min-width: 768px) {
 
   #left {
@@ -167,6 +184,10 @@
 
   #actions {
     margin-top: 0;
+  }
+
+  #tabletTools {
+    display: flex;
   }
 
 }

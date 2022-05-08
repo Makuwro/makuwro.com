@@ -46,7 +46,7 @@
   box-shadow: var(--day-box-shadow);
 }
 
-#profile-info > section {
+#profile-info > section:first-of-type {
   display: flex;
   align-items: center;
   padding-top: 4rem;
@@ -56,10 +56,15 @@
   gap: 30px;
 }
 
-#profile-info > section > section:nth-of-type(1) {
+#profile-info > section:first-of-type > section:nth-of-type(1) {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+}
+
+#profile-info > :global(.Dropdown-module-list) {
+  width: auto;
+  margin: 30px 5rem;
 }
 
 #avatar {
@@ -104,6 +109,7 @@
   gap: 2rem;
   width: 100%;
   margin: 2rem 0;
+  min-height: 56px;
 }
 
 #container > section, #selection, #profile-info > section {
@@ -116,7 +122,7 @@
 }
 
 #selection {
-  display: flex;
+  display: none;
   width: 100%;
   flex-wrap: wrap;
   box-sizing: border-box;
@@ -228,19 +234,18 @@
   border-radius: 5px;
 }
 
-.profile-badge {
+.badge {
   border-radius: 5px;
   padding: 0.2rem 0.3rem;
   font-size: 0.9rem;
   color: white;
   cursor: help;
   background: linear-gradient(90deg, rgba(2,0,36,1) 0%, var(--button) 0%, #656dbc 100%);
-  display: none;
   user-select: none;
   font-weight: 300;
 }
 
-:global(.light) .profile-badge {
+:global(.light) .badge {
   color: white;
 }
 
@@ -355,6 +360,23 @@
   margin-top: 0.15rem;
 }
 
+@media screen and (min-width: 1024px) {
+  
+  #profile-info > :global(.Dropdown-module-list) {
+    display: none;
+  }
+
+  #selection {
+    display: flex;
+  }
+
+  section#container > section, #profile-info > section {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+}
+
 @media screen and (min-width: 1440px) {
 
   section#container > section, #profile-info > section {
@@ -391,13 +413,16 @@
     margin: 0 auto;
   }
 
-  #profile-info > section {
-    gap: 0;
-    flex-direction: row;
+  #profile-info > section:first-of-type {
+    margin: 0 auto;
   }
 
   #actions, #actions button {
     width: initial;
+  }
+
+  #profile-info > section:first-of-type {
+    flex-direction: row;
   }
 
 }

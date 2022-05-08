@@ -17,6 +17,7 @@ import OfflineServer from "./components/errors/OfflineServer";
 import OfflineClient from "./components/errors/OfflineClient";
 import GameOverError from "./components/errors/GameOverError";
 import "./styles/global.css";
+import ConnectingScreen from "./components/ConnectingScreen";
 
 const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 const maintenance = false;
@@ -44,10 +45,10 @@ export default function App() {
   const [searchParams] = useSearchParams();
   let [currentUser, setCurrentUser] = useState({});
   const [artCache, setArtCache] = useState({});
+  const [submitterOpen, setSubmitterOpen] = useState(false);
   const [settingsCache, setSettingsCache] = useState();
   const navigate = useNavigate();
   let matchedPath;
-  let action;
   let pathname;
 
   // Check if the website is under maintenance
@@ -126,7 +127,7 @@ export default function App() {
   }, [navigator.onLine]);
 
   // Check if we want to create something
-  action = searchParams.get("action");
+  const action = searchParams.get("action");
   pathname = location.pathname;
   useEffect(async () => {
 
@@ -150,6 +151,7 @@ export default function App() {
           token
         } : {};
 
+
       }
 
       currentUser = token ? cUser || currentUser : {};
@@ -170,7 +172,12 @@ export default function App() {
 
             const artResponse = await fetch(`${api}contents/art/${directory}`, {headers: token ? {token} : {}});
             art = await artResponse.json();
-            artCache[directory] = art;
+            setArtCache(oldArtCache => {
+              
+              oldArtCache[directory] = art;
+              return oldArtCache;
+              
+            });
 
           }
 
@@ -261,110 +268,125 @@ export default function App() {
   }, [document.cookie]);
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => setSystemDark(event.matches));
 
-  return ready ? (
-    errorComponent || (
-      <>
-        <Authenticator open={signInOpen} addNotification={addNotification} shownLocation={shownLocation} currentUser={currentUser} />
-        {popupChildren && (
-          <Popup notify={addNotification} open={popupChildren !== null} onClose={() => {
-            
-            setPopupChildren(null);
-          
-          }}>
-            {popupChildren}
-          </Popup>
-        )}
-        {contentWarning && (
-          <Popup title="Content warning" open={contentWarning !== null} onClose={() => setContentWarning(null)}>
-            <ContentWarning>
-              {contentWarning}
-            </ContentWarning>
-          </Popup>
-        )}
-        {artViewerOpen && (
-          <Art 
-            notify={addNotification} 
-            currentUser={currentUser}
-            art={art}
-            artRegex={artRegex}
-            artDeleted={() => setUpdated(true)}
-            confirmContentWarning={(warningText) => setContentWarning(warningText)}
-            onClose={() => {
+  return (
+    <>
+      <ConnectingScreen 
+        authenticated={currentUser.id !== undefined}
+        ready={ready} 
+      />
+      {
+        ready && (
+          errorComponent || (
+            <>
+              <Authenticator open={signInOpen} addNotification={addNotification} shownLocation={shownLocation} currentUser={currentUser} />
+              {popupChildren && (
+                <Popup notify={addNotification} open={popupChildren !== null} onClose={() => {
+                  
+                  setPopupChildren(null);
+                
+                }}>
+                  {popupChildren}
+                </Popup>
+              )}
+              {contentWarning && (
+                <Popup title="Content warning" open={contentWarning !== null} onClose={() => setContentWarning(null)}>
+                  <ContentWarning>
+                    {contentWarning}
+                  </ContentWarning>
+                </Popup>
+              )}
+              {artViewerOpen && (
+                <Art 
+                  notify={addNotification} 
+                  currentUser={currentUser}
+                  art={art}
+                  artRegex={artRegex}
+                  artDeleted={() => setUpdated(true)}
+                  confirmContentWarning={(warningText) => setContentWarning(warningText)}
+                  onClose={() => {
 
-              navigate(shownLocation);
-              setArtViewerOpen(false);
+                    navigate(shownLocation);
+                    setArtViewerOpen(false);
 
-            }} 
-          />
-        )}
-        <Submitter 
-          currentUser={currentUser}
-        />
-        <Header notify={addNotification} currentUser={currentUser} systemDark={systemDark} setLocation={setLocation} />
-        <section id="live-notifications">
-          {notifications}
-        </section>
-        <Routes location={shownLocation}>
-          {["/", "/register", "/signin"].map((path, index) => {
-
-            return <Route path={path} key={index} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />;
-
-          })}
-          <Route path={"/library"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
-          <Route path={"/library/:category"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
-          {[
-            "/:username", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id", "/:username/:tab/:id/:subtab"
-          ].map((path, index) => {
-            
-            return <Route key={index} path={path} element={(
-              <Profile 
-                updated={updated} 
-                shownLocation={shownLocation} 
-                setLocation={setLocation}
-                currentUser={currentUser} 
-                notify={addNotification} 
-                artViewerOpen={artViewerOpen}
-                setSettingsCache={setSettingsCache}
-              />
-            )} />;
-
-          })}
-          {["/:username/blog/:slug", "/:username/literature/:literatureSlug/chapters/:chapterSlug", "/:username/worlds/:worldSlug/wiki/:articleSlug"].map((path, index) => (
-            <Route 
-              key={index} 
-              path={path} 
-              element={(
-                <Literature 
-                  shownLocation={shownLocation} 
-                  setLocation={setLocation} 
-                  currentUser={currentUser} 
-                  addNotification={addNotification}
-                  setSettingsCache={setSettingsCache}
+                  }} 
                 />
               )}
-            />
-          ))}
-          {["/settings", "/settings/:tab", "/:username/:category/:slug/settings", "/:username/:category/:slug/settings/:tab"].map((path, index) => (
-            <Route 
-              key={index} 
-              path={path} 
-              element={(
-                <Settings 
-                  currentUser={currentUser} 
-                  shownLocation={shownLocation} 
-                  setLocation={setLocation} 
-                  setCurrentUser={setCurrentUser}
-                  settingsCache={settingsCache}
-                  setSettingsCache={setSettingsCache}
+              {submitterOpen && (
+                <Submitter 
+                  currentUser={currentUser}
+                  onClose={() => setSubmitterOpen(false)}
                 />
               )}
-            />
-          ))}
-          <Route path="/gameover" element={<GameOverError />} />
-        </Routes>
-      </>
-    )
-  ) : null;
+              <Header notify={addNotification} currentUser={currentUser} systemDark={systemDark} setLocation={setLocation} />
+              {notifications[0] && (
+                <section id="live-notifications">
+                  {notifications}
+                </section>
+              )}
+              <Routes location={shownLocation}>
+                {["/", "/register", "/signin"].map((path, index) => {
+
+                  return <Route path={path} key={index} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />;
+
+                })}
+                <Route path={"/library"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
+                <Route path={"/library/:category"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
+                {[
+                  "/:username", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id", "/:username/:tab/:id/:subtab"
+                ].map((path, index) => {
+                  
+                  return <Route key={index} path={path} element={(
+                    <Profile 
+                      updated={updated} 
+                      shownLocation={shownLocation} 
+                      setLocation={setLocation}
+                      currentUser={currentUser} 
+                      notify={addNotification} 
+                      artViewerOpen={artViewerOpen}
+                      setSettingsCache={setSettingsCache}
+                    />
+                  )} />;
+
+                })}
+                {["/:username/blog/:slug", "/:username/literature/:literatureSlug/chapters/:chapterSlug", "/:username/worlds/:worldSlug/wiki/:articleSlug"].map((path, index) => (
+                  <Route 
+                    key={index} 
+                    path={path} 
+                    element={(
+                      <Literature 
+                        shownLocation={shownLocation} 
+                        setLocation={setLocation} 
+                        currentUser={currentUser} 
+                        addNotification={addNotification}
+                        setSettingsCache={setSettingsCache}
+                      />
+                    )}
+                  />
+                ))}
+                {["/settings", "/settings/:tab", "/:username/:category/:slug/settings", "/:username/:category/:slug/settings/:tab"].map((path, index) => (
+                  <Route 
+                    key={index} 
+                    path={path} 
+                    element={(
+                      <Settings 
+                        currentUser={currentUser} 
+                        shownLocation={shownLocation} 
+                        setLocation={setLocation} 
+                        setCurrentUser={setCurrentUser}
+                        settingsCache={settingsCache}
+                        setSettingsCache={setSettingsCache}
+                      />
+                    )}
+                  />
+                ))}
+                <Route path="/gameover" element={<GameOverError />} />
+              </Routes>
+            </>
+          )
+        )
+      }
+    </>
+  );
 
 }
 

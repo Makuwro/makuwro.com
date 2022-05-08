@@ -35,17 +35,9 @@ export default function Home({shownLocation, setLocation}) {
       }
 
     }}>
-      <section id={styles["home-tv"]}>
-        <section id={styles["home-tv-overlay"]}>
-          <section>
-            <section>Welcome to Makuwro</section>
-            <section>The easiest way to store characters, worlds, and lore</section>
-          </section>
-          <section>
-            <button onClick={() => navigate("/register")}>Start making</button>
-            <Link to="/signin">I already have an account</Link>
-          </section>
-        </section>
+      <section>
+        <h1>Welcome to Makuwro</h1>
+        <h2>The easiest way to store characters, worlds, and lore</h2>
       </section>
 
       <section id={styles["home-features"]}>

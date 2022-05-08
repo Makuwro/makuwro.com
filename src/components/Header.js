@@ -16,6 +16,9 @@ export default function Header({currentUser, theme, systemDark, query, history, 
   return (
     <header className={!systemDark && theme !== 2 ? "day" : null}>
       <section>
+        <button>
+          <img src="/icons/hamburger-menu.svg" />
+        </button>
         <Link to="/" onClick={() => setLocation(location)} id={styles["wiki-name"]}>Makuwro</Link>
         <section id={styles.leftLinks}>
           <Link to="/library">Library</Link>
@@ -33,11 +36,11 @@ export default function Header({currentUser, theme, systemDark, query, history, 
       </form>
       <section>
         {currentUser && currentUser.id ? (
-          <button title={`${`${currentUser.displayName} (` || ""}@${currentUser.username}${currentUser.displayName ? ")" : ""}`} onClick={() => navigate(`/${currentUser.username}`)} id={styles["account-button"]} style={{
-            backgroundImage: `url(${currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`})`,
-            backgroundSize: "cover",
-            backgroundColor: "gray"
-          }} />
+          <button title={`${`${currentUser.displayName} (` || ""}@${currentUser.username}${currentUser.displayName ? ")" : ""}`} onClick={() => navigate(`/${currentUser.username}`)} id={styles.accountButton}>
+            {currentUser && (
+              <img src={currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`} />
+            )}
+          </button>
         ) : (
           <Link to="/signin" id={styles["login-button"]}>
             Sign in

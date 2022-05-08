@@ -7,7 +7,8 @@ import StorySubmitter from "./submitters/StorySubmitter";
 import Popup from "../Popup";
 
 export default function Submitter({
-  currentUser, art, refreshArt, updated
+  currentUser, art, refreshArt, updated,
+  onClose
 }) {
   
   const [data, setData] = useState({

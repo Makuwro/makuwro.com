@@ -9,6 +9,7 @@ import ProfileTerms from "./profile/ProfileTerms";
 import ProfileBlog from "./profile/ProfileBlog";
 import ProfileAbout from "./profile/ProfileAbout";
 import ProfileChapters from "./profile/ProfileChapters";
+import Dropdown from "./input/Dropdown";
 
 export default function Profile({
   shownLocation, setLocation, currentUser, notify, updated, setSettingsCache
@@ -39,39 +40,30 @@ export default function Profile({
 
         // Add links to the profile navigator
         const navChildren = [];
-        let navItems;
-        
-        if (isCharacter) {
-          
-          navItems = [
-            "About",
-            "Art",
-            "Stories",
-            "Stats",
-            "Worlds"
-          ];
+        let navItems = isCharacter ? [
+          "About",
+          "Art",
+          "Stories",
+          "Stats",
+          "Worlds"
+        ] : [
+          "About",
+          "Art", 
+          "Blog", 
+          "Characters",
+          "Stats",
+          "Stories", 
+          "Terms", 
+          "Worlds"
+        ];
 
-        } else {
-          
-          navItems = [
-            "About",
-            "Art", 
-            "Blog", 
-            "Characters",
-            "Stats",
-            "Stories", 
-            "Terms", 
-            "Worlds"
-          ];
-
-        }
         for (let i = 0; navItems.length > i; i++) {
 
           // First, let's work on the onClick function
           const item = navItems[i];
           const itemLC = item.toLowerCase();
           const href = `/${username}${isCharacter ? `/characters/${id}` : ""}${itemLC !== "about" ? `/${itemLC}` : ""}`;
-          const onClick = (event) => {
+          const onClick = itemLC !== tab && itemLC !== subtab && (tab || itemLC !== "about") ? (event) => {
 
             // Don't go to the link quite yet, let's animate this first
             event.preventDefault();
@@ -81,13 +73,14 @@ export default function Profile({
             // Now it's time to go to the next page
             navigate(href);
 
-          };
+          } : null;
           const element = React.createElement(Link, {
             to: href,
             className: itemLC === tab || itemLC === subtab || ((isCharacter ? !subtab : !tab) && itemLC === "about") ? styles.selected : null,
-            onClick: itemLC !== tab && itemLC !== subtab && (tab || itemLC !== "about") ? onClick : null,
+            onClick,
             onTransitionEnd: (event) => event.stopPropagation(),
             key: itemLC,
+            name: itemLC,
             draggable: false
           }, item);
 
@@ -286,7 +279,7 @@ export default function Profile({
                 <h1>
                   {profileInfo && !profileInfo.isBanned && !profileInfo.isDisabled ? (isCharacter || isStory ? profileInfo.name : (profileInfo.displayName || `@${profileInfo.username}`)) : (isCharacter || isStory ? id : `@${username}`)}
                   {profileInfo && profileInfo.isStaff && (
-                    <span title="This user is a Makuwro staff member" className={styles["profile-badge"]}>STAFF</span>
+                    <span title="This user is a Makuwro staff member" className={styles.badge}>STAFF</span>
                   )}
                 </h1>
                 <h2>
@@ -323,9 +316,18 @@ export default function Profile({
             )}
           </section>
           {!isStory && (
-            <nav id={styles.selection}>
-              {navComponents}
-            </nav>
+            <>
+              <Dropdown index={0}>
+                {navComponents.map((component) => (
+                  <li key={component.props.name}>
+                    {component.props.children}
+                  </li>
+                ))}
+              </Dropdown>
+              <nav id={styles.selection}>
+                {navComponents}
+              </nav>
+            </>
           )}
         </section>
         {profileInfo && !profileInfo.isBanned && !profileInfo.isDisabled && (

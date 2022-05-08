@@ -134,7 +134,7 @@ export default function ProfileSettings({currentUser, menu, toggleMenu, submitti
           </form>
         </SettingsDropdown>
         <SettingsDropdown
-          title="Terms"
+          title="Global terms"
           description="View or modify your terms that apply to all of your characters, art, literature, and worlds."
           open={menu === 5}
           onClick={() => toggleMenu(5)}

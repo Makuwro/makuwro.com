@@ -1,12 +1,12 @@
 footer {
   padding: 2rem 0;
-  background-color: #26272b;
-  border-top: 1px solid #5b5e62;
+  background-color: var(--background-footer);
 }
 
 footer a {
   border-bottom: none;
   font-weight: 300;
+  color: var(--text-footer);
 }
 
 footer a:hover {
