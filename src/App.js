@@ -6,18 +6,14 @@ import Header from "./components/Header";
 import Profile from "./components/Profile";
 import Maintenance from "./components/Maintenance";
 import Art from "./components/library/Art";
-import Popup from "./components/Popup";
+import PopupManager from "./components/PopupManager";
 import Authenticator from "./components/Authenticator";
-import LiveNotification from "./components/LiveNotification";
-import ContentWarning from "./components/ContentWarning";
+import CrashBoundary from "./components/errors/CrashBoundary";
 import Literature from "./components/library/Literature";
 import Settings from "./components/Settings";
 import Submitter from "./components/library/Submitter";
-import OfflineServer from "./components/errors/OfflineServer";
-import OfflineClient from "./components/errors/OfflineClient";
-import GameOverError from "./components/errors/GameOverError";
+import ConnectivityCheck from "./components/ConnectivityCheck";
 import "./styles/global.css";
-import ConnectingScreen from "./components/ConnectingScreen";
 
 const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 const maintenance = false;
@@ -28,137 +24,38 @@ const api = {
 }[mode];
 
 export default function App() {
-  
-  // States
-  const [systemDark, setSystemDark] = useState(window.matchMedia("(prefers-color-scheme: dark)").matches);
-  const [popupChildren, setPopupChildren] = useState(null);
-  const [art, setArt] = useState();
-  const [updated, setUpdated] = useState(false);
-  const [signInOpen, setSignInOpen] = useState(false);
-  const location = useLocation();
-  const [shownLocation, setLocation] = useState(location);
-  const [notifications, setNotifications] = useState([]);
-  const [ready, setReady] = useState(false);
-  const [contentWarning, setContentWarning] = useState(null);
-  const [artViewerOpen, setArtViewerOpen] = useState(false);
-  const [errorComponent, setErrorComponent] = useState(null);
-  const [searchParams] = useSearchParams();
-  let [currentUser, setCurrentUser] = useState({});
-  const [artCache, setArtCache] = useState({});
-  const [submitterOpen, setSubmitterOpen] = useState(false);
-  const [settingsCache, setSettingsCache] = useState();
-  const navigate = useNavigate();
-  let matchedPath;
-  let pathname;
 
   // Check if the website is under maintenance
   if (maintenance) return <Maintenance />;
-
-  function addNotification(config) {
-
-    setNotifications(notifications => {
-      
-      const notification = (
-        <LiveNotification 
-          title={config.title} 
-          timeout={config.timeout} 
-          key={notifications.length}
-          onClose={() => {
-
-            // Remove the notification from the list
-            setNotifications(notifications => notifications.filter((notificationB) => notification !== notificationB));
-      
-          }}
-        >
-          {config.children}
-        </LiveNotification>
-      );
-      
-      return [...notifications, notification];
-    
-    });
-
-  }
-
-  useEffect(async () => {
-
-    let mounted = true;
-
-    try {
-
-      // Check if the client is offline
-      if (!navigator.onLine) {
-
-        throw new Error("0");
-
-      }
-
-      // Check if the server is available
-      const response = await fetch(api);
-      if (!response.ok) {
-
-        throw new Error();
-
-      }
-      setErrorComponent();
-      
-    } catch (err) {
-
-      if (mounted) {
-
-        if (err.message === "0") {
-
-          setErrorComponent(<OfflineClient />);
-
-        } else {
-
-          setErrorComponent(<OfflineServer />);
-
-        }
-
-        setReady(true);
-
-      }
-
-    }
-
-    return () => mounted = false;
-    
-  }, [navigator.onLine]);
+  
+  // Set up the states
+  const [ready, setReady] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [settingsCache, setSettingsCache] = useState();
+  const [currentUser, setCurrentUser] = useState();
+  const navigate = useNavigate();
 
   // Check if we want to create something
   const action = searchParams.get("action");
-  pathname = location.pathname;
-  useEffect(async () => {
+  const location = useLocation();
+  const pathname = location.pathname;
+  const [art, setArt] = useState();
+  const [updated, setUpdated] = useState(false);
+  const [shownLocation, setLocation] = useState(location);
+  const [signInOpen, setSignInOpen] = useState(false);
+  const [artViewerOpen, setArtViewerOpen] = useState(false);
+  const [connected, setConnected] = useState(false);
 
-    if (errorComponent === undefined) {
+  useEffect(() => {
 
-      let mounted = true;
-      let groups;
-      let cUser;
-      const token = document.cookie.match("(^|;)\\s*token\\s*=\\s*([^;]+)")?.pop() || null;
+    let mounted = true;
 
-      if (token && !currentUser.id) {
-
-        const response = await fetch(`${api}accounts/user`, {
-          headers: {
-            token
-          }
-        });
-    
-        cUser = response.ok ? {
-          ...await response.json(),
-          token
-        } : {};
-
-
-      }
-
-      currentUser = token ? cUser || currentUser : {};
+    if (connected) {
 
       // Check if we need the art viewer open
-      matchedPath = [...pathname.matchAll(artRegex)];
-      groups = matchedPath[0] && matchedPath[0].groups;
+      /*
+      const matchedPath = [...pathname.matchAll(artRegex)];
+      const groups = matchedPath[0] && matchedPath[0].groups;
       if (groups && (!art || art.refresh || (groups.username !== art.owner.username || groups.slug !== art.slug))) {
 
         const {username, slug} = groups;
@@ -181,34 +78,22 @@ export default function App() {
 
           }
 
-          if (mounted) {
+          if (art && mounted) {
 
-            if (art) {
+            setArtViewerOpen(true);
+            setArt(art);
 
-              setArtViewerOpen(true);
-              setArt(art);
+          } else {
 
-            } else {
-
-              addNotification({
-                title: "Couldn't get that art",
-                children: art.message
-              });
-              navigate(`/${username}/art`);
-              setLocation(location);
-
-            }
+            throw new Error("Couldn't get that art");
 
           }
 
-        } catch (err) {
+        } catch ({message}) {
 
           if (mounted) {
 
-            addNotification({
-              title: "Couldn't get that art",
-              children: err.message
-            });
+            alert(message);
             navigate(`/${username}/art`);
             setLocation(location);
 
@@ -221,11 +106,12 @@ export default function App() {
         setArt();
 
       }
+      */
 
       if (mounted) {
 
         // Check if we need to sign in
-        if (pathname === "/signin" || pathname === "/register") {
+        if (!currentUser && (pathname === "/signin" || pathname === "/register")) {
 
           setSignInOpen(true);
 
@@ -236,22 +122,22 @@ export default function App() {
         }
 
         setUpdated(false);
-        setCurrentUser(currentUser);
         setReady(true);
 
       }
 
-      return () => {
-        
-        mounted = false;
+    } else {
 
-      };
+      setReady(false);
 
     }
+
+    return () => mounted = false;
   
-  }, [errorComponent, action, pathname, document.cookie, art]);
+  }, [connected, action, pathname, document.cookie, art]);
 
   // Listen for theme changes
+  const [systemDark, setSystemDark] = useState(window.matchMedia("(prefers-color-scheme: dark)").matches);
   useEffect(() => {
 
     const themeCookie = document.cookie.match("(^|;)\\s*theme\\s*=\\s*([^;]+)")?.pop() || null;
@@ -268,124 +154,109 @@ export default function App() {
   }, [document.cookie]);
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => setSystemDark(event.matches));
 
+  // Return the component
+  const [popups, setPopups] = useState([]);
+  function addPopup(popup) {
+
+    setPopups(previousPopups => {
+
+      const newPopups = [...previousPopups];
+      newPopups.push(popup);
+      return newPopups;
+
+    });
+
+  }
+
   return (
-    <>
-      <ConnectingScreen 
-        authenticated={currentUser.id !== undefined}
-        ready={ready} 
+    <CrashBoundary>
+      <ConnectivityCheck 
+        api={api}
+        authenticated={currentUser !== undefined}
+        ready={ready}
+        setConnected={setConnected}
+        setCurrentUser={setCurrentUser}
       />
       {
         ready && (
-          errorComponent || (
-            <>
-              <Authenticator open={signInOpen} addNotification={addNotification} shownLocation={shownLocation} currentUser={currentUser} />
-              {popupChildren && (
-                <Popup notify={addNotification} open={popupChildren !== null} onClose={() => {
-                  
-                  setPopupChildren(null);
+          <>
+            <Authenticator open={signInOpen} shownLocation={shownLocation} currentUser={currentUser} />
+            <PopupManager popups={popups} popupsChanged={newPopups => setPopups(newPopups)} />
+            {artViewerOpen && (
+              <Art 
+                currentUser={currentUser}
+                art={art}
+                artRegex={artRegex}
+                artDeleted={() => setUpdated(true)}
+                onClose={() => {
+
+                  navigate(shownLocation);
+                  setArtViewerOpen(false);
+
+                }} 
+              />
+            )}
+            <Submitter currentUser={currentUser} addPopup={addPopup} />
+            <Header currentUser={currentUser} systemDark={systemDark} setLocation={setLocation} addPopup={addPopup} />
+            <Routes location={shownLocation}>
+              {["/", "/register", "/signin"].map((path, index) => {
+
+                return <Route path={path} key={index} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />;
+
+              })}
+              <Route path={"/library"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
+              <Route path={"/library/:category"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
+              {[
+                "/:username", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id", "/:username/:tab/:id/:subtab"
+              ].map((path, index) => {
                 
-                }}>
-                  {popupChildren}
-                </Popup>
-              )}
-              {contentWarning && (
-                <Popup title="Content warning" open={contentWarning !== null} onClose={() => setContentWarning(null)}>
-                  <ContentWarning>
-                    {contentWarning}
-                  </ContentWarning>
-                </Popup>
-              )}
-              {artViewerOpen && (
-                <Art 
-                  notify={addNotification} 
-                  currentUser={currentUser}
-                  art={art}
-                  artRegex={artRegex}
-                  artDeleted={() => setUpdated(true)}
-                  confirmContentWarning={(warningText) => setContentWarning(warningText)}
-                  onClose={() => {
+                return <Route key={index} path={path} element={(
+                  <Profile 
+                    updated={updated} 
+                    shownLocation={shownLocation} 
+                    setLocation={setLocation}
+                    currentUser={currentUser} 
+                    artViewerOpen={artViewerOpen}
+                    setSettingsCache={setSettingsCache}
+                  />
+                )} />;
 
-                    navigate(shownLocation);
-                    setArtViewerOpen(false);
-
-                  }} 
-                />
-              )}
-              {submitterOpen && (
-                <Submitter 
-                  currentUser={currentUser}
-                  onClose={() => setSubmitterOpen(false)}
-                />
-              )}
-              <Header notify={addNotification} currentUser={currentUser} systemDark={systemDark} setLocation={setLocation} />
-              {notifications[0] && (
-                <section id="live-notifications">
-                  {notifications}
-                </section>
-              )}
-              <Routes location={shownLocation}>
-                {["/", "/register", "/signin"].map((path, index) => {
-
-                  return <Route path={path} key={index} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />;
-
-                })}
-                <Route path={"/library"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
-                <Route path={"/library/:category"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
-                {[
-                  "/:username", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id", "/:username/:tab/:id/:subtab"
-                ].map((path, index) => {
-                  
-                  return <Route key={index} path={path} element={(
-                    <Profile 
-                      updated={updated} 
+              })}
+              {["/:username/blog/:slug", "/:username/literature/:literatureSlug/chapters/:chapterSlug", "/:username/worlds/:worldSlug/wiki/:articleSlug"].map((path, index) => (
+                <Route 
+                  key={index} 
+                  path={path} 
+                  element={(
+                    <Literature 
                       shownLocation={shownLocation} 
-                      setLocation={setLocation}
+                      setLocation={setLocation} 
                       currentUser={currentUser} 
-                      notify={addNotification} 
-                      artViewerOpen={artViewerOpen}
                       setSettingsCache={setSettingsCache}
                     />
-                  )} />;
-
-                })}
-                {["/:username/blog/:slug", "/:username/literature/:literatureSlug/chapters/:chapterSlug", "/:username/worlds/:worldSlug/wiki/:articleSlug"].map((path, index) => (
-                  <Route 
-                    key={index} 
-                    path={path} 
-                    element={(
-                      <Literature 
-                        shownLocation={shownLocation} 
-                        setLocation={setLocation} 
-                        currentUser={currentUser} 
-                        addNotification={addNotification}
-                        setSettingsCache={setSettingsCache}
-                      />
-                    )}
-                  />
-                ))}
-                {["/settings", "/settings/:tab", "/:username/:category/:slug/settings", "/:username/:category/:slug/settings/:tab"].map((path, index) => (
-                  <Route 
-                    key={index} 
-                    path={path} 
-                    element={(
-                      <Settings 
-                        currentUser={currentUser} 
-                        shownLocation={shownLocation} 
-                        setLocation={setLocation} 
-                        setCurrentUser={setCurrentUser}
-                        settingsCache={settingsCache}
-                        setSettingsCache={setSettingsCache}
-                      />
-                    )}
-                  />
-                ))}
-                <Route path="/gameover" element={<GameOverError />} />
-              </Routes>
-            </>
-          )
+                  )}
+                />
+              ))}
+              {["/settings", "/settings/:tab", "/:username/:category/:slug/settings", "/:username/:category/:slug/settings/:tab"].map((path, index) => (
+                <Route 
+                  key={index} 
+                  path={path} 
+                  element={(
+                    <Settings 
+                      currentUser={currentUser} 
+                      shownLocation={shownLocation} 
+                      setLocation={setLocation} 
+                      setCurrentUser={setCurrentUser}
+                      settingsCache={settingsCache}
+                      setSettingsCache={setSettingsCache}
+                    />
+                  )}
+                />
+              ))}
+            </Routes>
+          </>
         )
       }
-    </>
+    </CrashBoundary>
   );
 
 }

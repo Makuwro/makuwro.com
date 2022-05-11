@@ -27,6 +27,7 @@ header > section {
   margin: 0;
   display: flex;
   align-items: center;
+  gap: 1rem;
 }
 
 header > section:first-of-type > button {
@@ -185,8 +186,33 @@ input.no-results {
   position: absolute;
 }
 
+#notificationsButton {
+  background: none;
+  display: none;
+}
+
+@media only screen and (min-width: 375px) {
+
+  #notificationsButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100%;
+    width: 36px;
+    height: 36px;
+    transition: 0.3s;
+  }
+
+  #notificationsButton:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+
+}
+
 @media only screen and (min-width: 768px) {
+
   #search-box {
     display: block;
   }
+
 }

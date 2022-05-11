@@ -3,8 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import styles from "../styles/Authenticator.module.css";
 import BirthdateDropdown from "./input/BirthdateDropdown";
 import Checkbox from "./input/Checkbox";
-import Dropdown from "./input/Dropdown";
-import Popup from "./Popup";
+import Popup from "./PopupManager";
 
 export default function Authenticator({currentUser, open, shownLocation}) {
 

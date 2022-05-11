@@ -4,12 +4,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import CharacterSubmitter from "./submitters/CharacterSubmitter";
 import ArtSubmitter from "./submitters/CharacterSubmitter";
 import StorySubmitter from "./submitters/StorySubmitter";
-import Popup from "../Popup";
 
-export default function Submitter({
-  currentUser, art, refreshArt, updated,
-  onClose
-}) {
+export default function Submitter({currentUser, art, refreshArt, updated, addPopup}) {
   
   const [data, setData] = useState({
     name: "",
@@ -173,8 +169,128 @@ export default function Submitter({
 
       }
 
+      const submitForm = async (event) => {
+
+        event.preventDefault();
+        if (!submitting) {
+          
+          setSubmitting(true);
+          try {
+    
+            const {
+              name, slug = data.name?.toLowerCase().replaceAll(/[^a-zA-Z0-9_]/gm, "-"),
+              collaborators, worlds, characters, folders, description, tags, permissions,
+              ageRestrictionLevel, contentWarning
+            } = data;
+            let oldSlug;
+            let formData;
+            let response;
+            let i;
+            let userIds;
+            let worldIds;
+            let characterIds;
+            let folderIds;
+    
+            // Turn the collaborators array into an array of user IDs
+            userIds = [];
+            for (i = 0; (collaborators?.length || 0) > i; i++) {
+    
+              userIds[i] = collaborators[i].id;
+    
+            }
+    
+            worldIds = [];
+            for (i = 0; (worlds?.length || 0) > i; i++) {
+    
+              worldIds[i] = worlds[i].id;
+    
+            }
+    
+            characterIds = [];
+            for (i = 0; (characters?.length || 0) > i; i++) {
+    
+              characterIds[i] = characters[i].id;
+    
+            }
+    
+            folderIds = [];
+            for (i = 0; (folders?.length || 0) > i; i++) {
+    
+              folderIds[i] = folders[i].id;
+    
+            }
+    
+            // Set up form data
+            formData = new FormData();
+            formData.append("image", image.current.files[0]);
+            formData.append("description", description);
+            formData.append("tags", JSON.stringify(tags));
+            formData.append("folders", JSON.stringify(folderIds));
+            formData.append("worlds", JSON.stringify(worldIds));
+            formData.append("characters", JSON.stringify(characterIds));
+            formData.append("permissions", JSON.stringify(permissions));
+            formData.append("ageRestrictionBLevel", ageRestrictionLevel);
+            formData.append("contentWarning", contentWarning);
+            formData.append("slug", slug);
+    
+            if (type !== "art") {
+    
+              formData.append("name", name);
+    
+            }
+    
+            if (type !== "characters") {
+              
+              formData.append("collaborators", JSON.stringify(userIds));
+    
+            }
+    
+            // If this isn't false, that means we have to update the content
+            // rather than create new content.
+            oldSlug = art?.slug;
+    
+            // Now we're ready to submit the request.
+            response = await fetch(`${process.env.RAZZLE_API_DEV}contents/${type}/${currentUser.username}/${oldSlug || slug}`, {
+              headers: {
+                token: currentUser.token
+              },
+              body: formData,
+              method: oldSlug ? "PATCH" : "POST"
+            });
+    
+            if (response.ok) {
+    
+              navigate(`/${currentUser.username}/${type}/${slug}`);
+              refreshArt();
+              updated();
+    
+            } else {
+    
+              throw new Error((await response.json()).message);
+    
+            }
+    
+          } catch ({message}) {
+    
+            alert(message);
+            setSubmitting(false);
+    
+          }
+    
+        }
+    
+      };
+
       setType(type);
-      setSubmissionComp(comp);
+      addPopup({
+        title: popupConfig.title,
+        warnUnfinished: true,
+        children: (
+          <form onSubmit={submitForm}>
+            {comp}
+          </form>
+        )
+      });
 
     } else {
 
@@ -184,125 +300,7 @@ export default function Submitter({
 
   }, [currentUser, action]);
 
-  async function submitForm(event) {
-
-    event.preventDefault();
-    if (!submitting) {
-      
-      setSubmitting(true);
-      try {
-
-        const {
-          name, slug = data.name?.toLowerCase().replaceAll(/[^a-zA-Z0-9_]/gm, "-"),
-          collaborators, worlds, characters, folders, description, tags, permissions,
-          ageRestrictionLevel, contentWarning
-        } = data;
-        let oldSlug;
-        let formData;
-        let response;
-        let i;
-        let userIds;
-        let worldIds;
-        let characterIds;
-        let folderIds;
-
-        // Turn the collaborators array into an array of user IDs
-        userIds = [];
-        for (i = 0; (collaborators?.length || 0) > i; i++) {
-
-          userIds[i] = collaborators[i].id;
-
-        }
-
-        worldIds = [];
-        for (i = 0; (worlds?.length || 0) > i; i++) {
-
-          worldIds[i] = worlds[i].id;
-
-        }
-
-        characterIds = [];
-        for (i = 0; (characters?.length || 0) > i; i++) {
-
-          characterIds[i] = characters[i].id;
-
-        }
-
-        folderIds = [];
-        for (i = 0; (folders?.length || 0) > i; i++) {
-
-          folderIds[i] = folders[i].id;
-
-        }
-
-        // Set up form data
-        formData = new FormData();
-        formData.append("image", image.current.files[0]);
-        formData.append("description", description);
-        formData.append("tags", JSON.stringify(tags));
-        formData.append("folders", JSON.stringify(folderIds));
-        formData.append("worlds", JSON.stringify(worldIds));
-        formData.append("characters", JSON.stringify(characterIds));
-        formData.append("permissions", JSON.stringify(permissions));
-        formData.append("ageRestrictionBLevel", ageRestrictionLevel);
-        formData.append("contentWarning", contentWarning);
-        formData.append("slug", slug);
-
-        if (type !== "art") {
-
-          formData.append("name", name);
-
-        }
-
-        if (type !== "characters") {
-          
-          formData.append("collaborators", JSON.stringify(userIds));
-
-        }
-
-        // If this isn't false, that means we have to update the content
-        // rather than create new content.
-        oldSlug = art?.slug;
-
-        // Now we're ready to submit the request.
-        response = await fetch(`${process.env.RAZZLE_API_DEV}contents/${type}/${currentUser.username}/${oldSlug || slug}`, {
-          headers: {
-            token: currentUser.token
-          },
-          body: formData,
-          method: oldSlug ? "PATCH" : "POST"
-        });
-
-        if (response.ok) {
-
-          navigate(`/${currentUser.username}/${type}/${slug}`);
-          refreshArt();
-          updated();
-
-        } else {
-
-          throw new Error((await response.json()).message);
-
-        }
-
-      } catch ({message}) {
-
-        alert(message);
-        setSubmitting(false);
-
-      }
-
-    }
-
-  }
-
-  return submissionComp ? (
-    <Popup title={popupConfig.title} open={popupConfig.open} onClose={() => setPopupConfig((config) => ({...config, open: false}))} warnUnfinished>
-      <form onSubmit={submitForm}>
-        {submissionComp}
-      </form>
-    </Popup>
-  ) : null;
+  return null;
   
 }
 

@@ -59,54 +59,58 @@ export default function ProfileBlog({currentUser, profileInfo, notify}) {
   }
 
   // Get the blog posts from this user
-  useEffect(async () => {
+  useEffect(() => {
 
     let mounted = true;
 
-    try {
+    (async () => {
 
-      // Get all the blog posts from the server.
-      const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/blog/${profileInfo.username}`, {
-        headers: currentUser.token ? {
-          token: currentUser.token
-        } : {}
-      });
-      const json = await response.json();
+      try {
 
-      if (!response.ok) {
-
-        throw new Error(json.message);
-
-      }
-
-      if (mounted) {
-
-        const posts = json;
-        for (let i = 0; json.length > i; i++) {
-
-          const {id, owner, title, slug} = posts[i];
-
-          posts[i] = (
-            <BlogPreview
-              key={id}
-              owner={owner}
-              title={title}
-              slug={slug}
-              currentUserIsOwner={currentUser.id === owner.id}
-            />
-          );
-
+        // Get all the blog posts from the server.
+        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/blog/${profileInfo.username}`, {
+          headers: currentUser.token ? {
+            token: currentUser.token
+          } : {}
+        });
+        const json = await response.json();
+  
+        if (!response.ok) {
+  
+          throw new Error(json.message);
+  
         }
-        setPosts(posts);
-        setReady(true);
-
+  
+        if (mounted) {
+  
+          const posts = json;
+          for (let i = 0; json.length > i; i++) {
+  
+            const {id, owner, title, slug} = posts[i];
+  
+            posts[i] = (
+              <BlogPreview
+                key={id}
+                owner={owner}
+                title={title}
+                slug={slug}
+                currentUserIsOwner={currentUser.id === owner.id}
+              />
+            );
+  
+          }
+          setPosts(posts);
+          setReady(true);
+  
+        }
+  
+      } catch (err) {
+  
+        alert(`Couldn't get blog posts: ${err.message}`);
+  
       }
 
-    } catch (err) {
-
-      alert(`Couldn't get blog posts: ${err.message}`);
-
-    }
+    })();
 
     return () => {
       

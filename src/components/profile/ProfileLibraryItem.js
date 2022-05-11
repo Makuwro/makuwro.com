@@ -18,72 +18,77 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
 
   }, [tab]);
 
-  useEffect(async () => {
+  useEffect(() => {
 
     let mounted = true;
 
     if (updated) {
 
       cache[profileInfo.username] = {};
+      setReady(true);
       
     } else if (isCharacter || profileInfo.username) {
+      
+      (async () => {
 
-      // Get the stuff from the server.
-      const headers = currentUser.token ? {
-        token: currentUser.token
-      } : {};
-      const response = !isCharacter && await fetch(`${process.env.RAZZLE_API_DEV}contents/${tab}/${profileInfo.username}`, {headers});
+        // Get the stuff from the server.
+        const headers = currentUser.token ? {
+          token: currentUser.token
+        } : {};
+        const response = !isCharacter && await fetch(`${process.env.RAZZLE_API_DEV}contents/${tab}/${profileInfo.username}`, {headers});
 
-      // Check if everything's OK.
-      if (mounted) {
+        // Check if everything's OK.
+        if (mounted) {
 
-        if (isCharacter || response.ok) {
+          if (isCharacter || response.ok) {
 
-          let content = isCharacter ? [...profileInfo[tab] || []] : await response.json();
+            let content = isCharacter ? [...profileInfo[tab] || []] : await response.json();
 
-          for (let i = 0; content.length > i; i++) {
+            for (let i = 0; content.length > i; i++) {
 
-            content[i] = <Link draggable={false} className={styles["profile-library-item"]} key={i} to={`/${content[i].owner.username}/${tab}/${content[i].slug}`}>
-              {content[i].imagePath || content[i].avatarPath ? (
-                <img 
-                  src={`https://cdn.makuwro.com/${content[i].imagePath || content[i].avatarPath}`} 
-                  alt={content[i].name || content[i].description} 
-                  title={content[i].name || content[i].description} 
-                />
-              ) : content[i].name}
-            </Link>;
+              content[i] = <Link draggable={false} className={styles["profile-library-item"]} key={i} to={`/${content[i].owner.username}/${tab}/${content[i].slug}`}>
+                {content[i].imagePath || content[i].avatarPath ? (
+                  <img 
+                    src={`https://cdn.makuwro.com/${content[i].imagePath || content[i].avatarPath}`} 
+                    alt={content[i].name || content[i].description} 
+                    title={content[i].name || content[i].description} 
+                  />
+                ) : content[i].name}
+              </Link>;
+
+            }
+
+            if (ownProfile && !isCharacter) {
+
+              content.unshift(
+                <Link 
+                  key={"new"} 
+                  draggable={false} 
+                  className={styles["profile-library-item"]} 
+                  style={{backgroundColor: "black"}} 
+                  to={`?action=${tab === "art" ? "upload" : "create"}-${plural.test(tab) ? tab.substring(0, tab.length - 1) : tab}`}>
+                  CREATE NEW
+                </Link>
+              );
+
+            }
+
+            // Push the items to render.
+            if (mounted) setItems(content[0] ? content : null);
+
+          } else {
+
+            setItems(null);
 
           }
-
-          if (ownProfile && !isCharacter) {
-
-            content.unshift(
-              <Link 
-                key={"new"} 
-                draggable={false} 
-                className={styles["profile-library-item"]} 
-                style={{backgroundColor: "black"}} 
-                to={`?action=${tab === "art" ? "upload" : "create"}-${plural.test(tab) ? tab.substring(0, tab.length - 1) : tab}`}>
-                CREATE NEW
-              </Link>
-            );
-
-          }
-
-          // Push the items to render.
-          if (mounted) setItems(content[0] ? content : null);
-
-        } else {
-
-          setItems(null);
-
+        
         }
 
-      }
+        setReady(true);
+
+      })();
       
     }
-
-    setReady(true);
 
     return () => {
       

@@ -11,9 +11,7 @@ import ProfileAbout from "./profile/ProfileAbout";
 import ProfileChapters from "./profile/ProfileChapters";
 import Dropdown from "./input/Dropdown";
 
-export default function Profile({
-  shownLocation, setLocation, currentUser, notify, updated, setSettingsCache
-}) {
+export default function Profile({shownLocation, setLocation, currentUser, notify, updated, setSettingsCache}) {
 
   const {username, tab, id, subtab} = useParams();
   const [leaving, setLeaving] = useState(true);
@@ -172,57 +170,61 @@ export default function Profile({
 
   }, [ready]);
 
-  useEffect(async () => {
+  useEffect(() => {
 
     let mounted = true;
     const isCharacter = tab === "characters" && id;
     const isStory = tab === "stories" && id;
 
-    if (!profileInfo && !matchPath({path: "/:username/art/:id"}, location.pathname)) {
+    (async () => {
+
+      if (!profileInfo && !matchPath({path: "/:username/art/:id"}, location.pathname)) {
     
-      // Get the profile info from the server
-      const headers = currentUser.token ? {
-        token: currentUser.token
-      } : {};
-      const response = await fetch(`${process.env.RAZZLE_API_DEV}${isCharacter || isStory ? `contents/${tab}/${username}/${id}` : `accounts/users/${username}`}`, {headers});
-
-      if (mounted && response.ok) {
-
-        const profileInfo = await response.json();
-
-        if (mounted) {
-
-          document.title = `${isCharacter || isStory ? profileInfo.name : (profileInfo.displayName || profileInfo.username)} on Makuwro`;
-
-          if (profileInfo.css) {
-
-            const style = document.createElement("style");
-            style.textContent = profileInfo.css;
-            document.head.appendChild(style);
-            setStyleElem(style);
-
+        // Get the profile info from the server
+        const headers = currentUser.token ? {
+          token: currentUser.token
+        } : {};
+        const response = await fetch(`${process.env.RAZZLE_API_DEV}${isCharacter || isStory ? `contents/${tab}/${username}/${id}` : `accounts/users/${username}`}`, {headers});
+  
+        if (mounted && response.ok) {
+  
+          const profileInfo = await response.json();
+  
+          if (mounted) {
+  
+            document.title = `${isCharacter || isStory ? profileInfo.name : (profileInfo.displayName || profileInfo.username)} on Makuwro`;
+  
+            if (profileInfo.css) {
+  
+              const style = document.createElement("style");
+              style.textContent = profileInfo.css;
+              document.head.appendChild(style);
+              setStyleElem(style);
+  
+            }
+  
+            setProfileInfo(profileInfo);
+  
           }
-
-          setProfileInfo(profileInfo);
-
+  
+        } else if (mounted) {
+  
+          document.title = `${isCharacter ? "Character" : (isStory ? "Story" : "Account")} not found / Makuwro`;
+          setProfileInfo();
+  
         }
-
-      } else if (mounted) {
-
-        document.title = `${isCharacter ? "Character" : (isStory ? "Story" : "Account")} not found / Makuwro`;
-        setProfileInfo();
-
+  
+        if (mounted) {
+  
+          setIsCharacter(isCharacter);
+          setIsStory(isStory);
+          setReady(true);
+  
+        }
+  
       }
 
-      if (mounted) {
-
-        setIsCharacter(isCharacter);
-        setIsStory(isStory);
-        setReady(true);
-
-      }
-
-    }
+    })();
 
     return () => {
 
@@ -241,7 +243,7 @@ export default function Profile({
       setSettingsCache({...profileInfo, type});
 
     }
-    navigate(`${isNotUser ? location.pathname : ""}/settings/${isNotUser ? "profile" : "account"}`)
+    navigate(`${isNotUser ? location.pathname : ""}/settings/${isNotUser ? "profile" : "account"}`);
 
   }
 
@@ -354,5 +356,6 @@ Profile.propTypes = {
   notify: PropTypes.func,
   updated: PropTypes.bool,
   setLocation: PropTypes.func,
-  currentUser: PropTypes.object
+  currentUser: PropTypes.object,
+  setSettingsCache: PropTypes.func
 };

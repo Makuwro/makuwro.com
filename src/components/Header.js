@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "../styles/Header.module.css";
 import PropTypes from "prop-types";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import Popup from "./PopupManager";
 
-export default function Header({currentUser, theme, systemDark, query, history, setLocation}) {
+export default function Header({currentUser, theme, systemDark, query, setLocation, addPopup}) {
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,11 +37,19 @@ export default function Header({currentUser, theme, systemDark, query, history, 
       </form>
       <section>
         {currentUser && currentUser.id ? (
-          <button title={`${`${currentUser.displayName} (` || ""}@${currentUser.username}${currentUser.displayName ? ")" : ""}`} onClick={() => navigate(`/${currentUser.username}`)} id={styles.accountButton}>
-            {currentUser && (
-              <img src={currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`} />
-            )}
-          </button>
+          <>
+            <button id={styles.notificationsButton} onClick={() => addPopup({
+              title: "Notifications",
+              children: <p>You don't got any, but rest assured: we'll tell you if someone likes your furry fanfiction.</p>
+            })}>
+              <img src="/icons/bell.svg" />
+            </button>
+            <button title={`${`${currentUser.displayName} (` || ""}@${currentUser.username}${currentUser.displayName ? ")" : ""}`} onClick={() => navigate(`/${currentUser.username}`)} id={styles.accountButton}>
+              {currentUser && (
+                <img src={currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`} />
+              )}
+            </button>
+          </>
         ) : (
           <Link to="/signin" id={styles["login-button"]}>
             Sign in
@@ -53,9 +62,8 @@ export default function Header({currentUser, theme, systemDark, query, history, 
 }
 
 Header.propTypes = {
-  userData: PropTypes.object,
-  articleContainer: PropTypes.any,
-  history: PropTypes.object,
+  currentUser: PropTypes.object,
+  setLocation: PropTypes.func,
   query: PropTypes.string,
   theme: PropTypes.number,
   systemDark: PropTypes.bool
