@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, matchPath, useLocation, useNavigate, useParams } from "react-router-dom";
 import styles from "../styles/Settings.module.css";
-import * as pjson from "../../package.json"; 
+import pjson from "../../package.json"; 
 import AccountSettings from "./settings/AccountSettings";
 import AppearanceSettings from "./settings/AppearanceSettings";
 import PrivacySettings from "./settings/PrivacySettings";
@@ -9,7 +9,7 @@ import ProfileSettings from "./settings/ProfileSettings";
 import PropTypes from "prop-types";
 import SharingSettings from "./settings/SharingSettings";
 
-export default function Settings({currentUser, setLocation, setCurrentUser, setSettingsCache, settingsCache}) {
+export default function Settings({client, setLocation, setCurrentUser, setSettingsCache, settingsCache}) {
 
   const {username, slug, category, tab} = useParams();
   const [menu, setMenu] = useState();
@@ -24,6 +24,7 @@ export default function Settings({currentUser, setLocation, setCurrentUser, setS
   const [tabComp, setTabComp] = useState();
   const navigate = useNavigate();
   const location = useLocation();
+  const {user} = client;
   let i;
 
   function toggleMenu(index) {
@@ -52,7 +53,7 @@ export default function Settings({currentUser, setLocation, setCurrentUser, setS
     }
 
 
-    if (!submitting && value !== (character || currentUser)[key]) {
+    if (!submitting && value !== (character || user)[key]) {
 
       // Prevent multiple requests while we do this.
       setSubmitting(true);
@@ -72,7 +73,7 @@ export default function Settings({currentUser, setLocation, setCurrentUser, setS
         const response = await fetch(`${process.env.RAZZLE_API_DEV}${character ? `contents/characters/${character.owner.username}/${character.slug}` : "accounts/user"}`, {
           method: "PATCH",
           headers: {
-            token: currentUser.token
+            token: client.token
           },
           body: formData
         });
@@ -82,7 +83,7 @@ export default function Settings({currentUser, setLocation, setCurrentUser, setS
           // Save the new username to the state.
           if (key !== "newPassword") {
 
-            (character ? setCharacter : setCurrentUser)({...(character || currentUser), [key + (key === "avatar" || key === "banner" ? "Url" : "")]: key === "avatar" || key === "banner" ? URL.createObjectURL(value) : value});
+            (character ? setCharacter : setCurrentUser)({...(character || user), [key + (key === "avatar" || key === "banner" ? "Url" : "")]: key === "avatar" || key === "banner" ? URL.createObjectURL(value) : value});
 
           }
           
@@ -134,7 +135,7 @@ export default function Settings({currentUser, setLocation, setCurrentUser, setS
         const response = await fetch(`${process.env.RAZZLE_API_DEV}accounts/user/sessions`, {
           method: "DELETE",
           headers: {
-            token: currentUser.token
+            token: client.token
           }
         });
 
@@ -174,7 +175,7 @@ export default function Settings({currentUser, setLocation, setCurrentUser, setS
         const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/characters/${character.owner.username}/${character.slug}`, {
           method: "DELETE",
           headers: {
-            token: currentUser.token
+            token: client.token
           }
         });
 
@@ -200,99 +201,104 @@ export default function Settings({currentUser, setLocation, setCurrentUser, setS
 
   }
 
-  useEffect(async () => {
+  useEffect(() => {
 
     let mounted = true;
-    let story;
-    let blogPost;
-    let article;
-    let character;
 
-    if (!currentUser.id) {
+    (async () => {
 
-      // Can't manage settings if there are no settings.
-      navigate(`/signin?redirect=${location.pathname}`, {replace: true});
+      let story;
+      let blogPost;
+      let article;
+      let character;
 
-    } 
+      if (!user) {
 
-    if (settingsCache) {
+        // Can't manage settings if there are no settings.
+        navigate(`/signin?redirect=${location.pathname}`, {replace: true});
 
-      switch (settingsCache.type) {
+      } 
 
-        // Character
-        case 0:
-          character = settingsCache;
-          break;
+      if (settingsCache) {
 
-        // Story
-        case 1: 
-          story = settingsCache;
-          break;
+        switch (settingsCache.type) {
 
-        // Blog post
-        case 2:
-          blogPost = settingsCache;
-          break;
+          // Character
+          case 0:
+            character = settingsCache;
+            break;
 
-        // Wiki article
-        case 3:
-          article = settingsCache;
-          break;
-        
-        default:
-          break;
+          // Story
+          case 1: 
+            story = settingsCache;
+            break;
 
-      }   
+          // Blog post
+          case 2:
+            blogPost = settingsCache;
+            break;
 
-    } else if (category && username && slug) {
+          // Wiki article
+          case 3:
+            article = settingsCache;
+            break;
+          
+          default:
+            break;
 
-      try {
+        }   
 
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/${category}/${username}/${slug}`, {
-          headers: {
-            token: currentUser.token
+      } else if (category && username && slug) {
+
+        try {
+
+          const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/${category}/${username}/${slug}`, {
+            headers: {
+              token: user.token
+            }
+          });
+          const json = await response.json();
+
+          if (response.ok && mounted) {
+
+            const content = {...json};
+
+            switch (category) {
+
+              case "characters":
+                character = content;
+                break;
+              
+              case "blog":
+                blogPost = content;
+                break;
+              
+              default:
+                break;
+
+            }
+
+          } else {
+
+            throw new Error(json.message);
+
           }
-        });
-        const json = await response.json();
 
-        if (response.ok && mounted) {
+        } catch (err) {
 
-          const content = {...json};
-
-          switch (category) {
-
-            case "characters":
-              character = content;
-              break;
-            
-            case "blog":
-              blogPost = content;
-              break;
-            
-            default:
-              break;
-
-          }
-
-        } else {
-
-          throw new Error(json.message);
+          alert("Sorry, I couldn't find that one!");
 
         }
 
-      } catch (err) {
-
-        alert("Sorry, I couldn't find that one!");
-
       }
 
-    }
-
-    setCharacter(character);
-    setStory(story);
-    setBlogPost(blogPost);
-    setArticle(article);
-    setReady(true);
+      setCharacter(character);
+      setStory(story);
+      setBlogPost(blogPost);
+      setArticle(article);
+      setReady(true);
+      
+    })();
 
     return () => {
 
@@ -323,29 +329,28 @@ export default function Settings({currentUser, setLocation, setCurrentUser, setS
 
       const tabs = {
         "account": <AccountSettings 
-          currentUser={currentUser} 
+          client={client} 
           menu={menu} 
           setMenu={setMenu} 
           submitting={submitting}
           updateAccount={updateAccount} />,
         "profile": <ProfileSettings 
-          currentUser={currentUser} 
-          setCurrentUser={setCurrentUser} 
+          client={client} 
           menu={menu} 
           toggleMenu={toggleMenu} 
           submitting={submitting}
           updateAccount={updateAccount}
           character={character} />,
         "appearance": <AppearanceSettings 
-          currentUser={currentUser}
+          client={client}
           menu={menu}
           toggleMenu={toggleMenu} />,
         "privacy": <PrivacySettings 
-          currentUser={currentUser} 
+          client={client} 
           menu={menu}
           toggleMenu={toggleMenu} />,
         "sharing": <SharingSettings
-          currentUser={currentUser}
+          client={client}
           menu={menu}
           blogPost={blogPost}
           toggleMenu={toggleMenu}
@@ -445,7 +450,7 @@ export default function Settings({currentUser, setLocation, setCurrentUser, setS
 }
 
 Settings.propTypes = {
-  currentUser: PropTypes.object,
+  client: PropTypes.object,
   setLocation: PropTypes.func,
   setCurrentUser: PropTypes.func
 };

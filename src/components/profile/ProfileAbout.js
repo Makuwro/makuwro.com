@@ -4,16 +4,16 @@ import parse from "html-react-parser";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 
-export default function ProfileAbout({profileInfo, isCharacter}) {
+export default function ProfileAbout({owner, isCharacter}) {
 
   const [ready, setReady] = useState();
   const [comp, setComp] = useState();
 
   useEffect(() => {
 
-    if (profileInfo) {
+    if (owner) {
 
-      const content = profileInfo[isCharacter ? "description" : "about"];
+      const content = owner[isCharacter ? "description" : "about"];
       if (content) {
 
         // Protect us from bad HTML, please!
@@ -60,16 +60,17 @@ export default function ProfileAbout({profileInfo, isCharacter}) {
 
     }
 
-  }, [profileInfo]);
+  }, [owner]);
 
   return ready ? (
     comp || (
-      <p>We don't know a lot about {profileInfo.username || profileInfo.name}, but I'm sure they're really cool.</p>
+      <p>We don't know a lot about {owner.displayName || owner.username}, but I'm sure they're really cool.</p>
     )
   ) : null;
 
 }
 
 ProfileAbout.propTypes = {
-  profileInfo: PropTypes.object
+  owner: PropTypes.object,
+  isCharacter: PropTypes.bool
 };

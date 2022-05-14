@@ -11,13 +11,13 @@ import ProfileAbout from "./profile/ProfileAbout";
 import ProfileChapters from "./profile/ProfileChapters";
 import Dropdown from "./input/Dropdown";
 
-export default function Profile({shownLocation, setLocation, currentUser, notify, updated, setSettingsCache}) {
+export default function Profile({shownLocation, setLocation, client, notify, updated, setSettingsCache, setCriticalError}) {
 
   const {username, tab, id, subtab} = useParams();
   const [leaving, setLeaving] = useState(true);
   const [shifting, setShifting] = useState(false);
   const [searchParams] = useSearchParams();
-  const [profileInfo, setProfileInfo] = useState();
+  const [owner, setOwner] = useState();
   const [ready, setReady] = useState(false);
   const [styleElem, setStyleElem] = useState();
   const location = useLocation();
@@ -34,7 +34,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
     if (!matchPath({path: "/:username/art/:id"}, location.pathname)) {
 
-      if (profileInfo && !isStory) {
+      if (owner && !isStory) {
 
         // Add links to the profile navigator
         const navChildren = [];
@@ -89,14 +89,14 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
         setNavComponents(navChildren);
 
         const components = {
-          about: <ProfileAbout profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
-          art: <ProfileLibraryItem updated={updated} tab="art" profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} cache={cache} setCache={setCache} />,
-          stories: <ProfileLibraryItem tab="stories" profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
-          worlds: <ProfileLibraryItem tab="worlds" profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
-          stats: <ProfileStats profileInfo={profileInfo} currentUser={currentUser} isCharacter={isCharacter} />,
-          characters: <ProfileLibraryItem tab="characters" profileInfo={profileInfo} currentUser={currentUser} />,
-          terms: <ProfileTerms profileInfo={profileInfo} currentUser={currentUser} />,
-          blog: <ProfileBlog profileInfo={profileInfo} currentUser={currentUser} notify={notify} />
+          about: <ProfileAbout owner={owner} client={client} isCharacter={isCharacter} />,
+          art: <ProfileLibraryItem updated={updated} tab="art" owner={owner} client={client} isCharacter={isCharacter} cache={cache} setCache={setCache} />,
+          stories: <ProfileLibraryItem tab="stories" owner={owner} client={client} isCharacter={isCharacter} />,
+          worlds: <ProfileLibraryItem tab="worlds" owner={owner} client={client} isCharacter={isCharacter} />,
+          stats: <ProfileStats owner={owner} client={client} isCharacter={isCharacter} />,
+          characters: <ProfileLibraryItem tab="characters" owner={owner} client={client} />,
+          terms: <ProfileTerms owner={owner} client={client} />,
+          blog: <ProfileBlog owner={owner} client={client} notify={notify} />
         };  
 
         setTabComponent(components[(isCharacter ? subtab : tab) || "about"]);
@@ -114,7 +114,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
     }
 
-  }, [tab, subtab, profileInfo, isCharacter, isStory]);
+  }, [tab, subtab, owner, isCharacter, isStory]);
   
   useEffect(() => {
 
@@ -178,48 +178,57 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
     (async () => {
 
-      if (!profileInfo && !matchPath({path: "/:username/art/:id"}, location.pathname)) {
+      if (!owner && !matchPath({path: "/:username/art/:id"}, location.pathname)) {
     
-        // Get the profile info from the server
-        const headers = currentUser.token ? {
-          token: currentUser.token
-        } : {};
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}${isCharacter || isStory ? `contents/${tab}/${username}/${id}` : `accounts/users/${username}`}`, {headers});
+        try {
+
+          // Get the profile info from the server
+          let owner;
+
+          if (isCharacter || isStory) {
+
+            // TODO: Support characters and stories
+
+          } else {
+
+            owner = await client.getUser({username});
+
+          }
+    
+          if (owner) {
+    
+            document.title = `${isCharacter || isStory ? owner.name : (owner.displayName || owner.username)} on Makuwro`;
   
-        if (mounted && response.ok) {
-  
-          const profileInfo = await response.json();
-  
-          if (mounted) {
-  
-            document.title = `${isCharacter || isStory ? profileInfo.name : (profileInfo.displayName || profileInfo.username)} on Makuwro`;
-  
-            if (profileInfo.css) {
+            if (owner.css) {
   
               const style = document.createElement("style");
-              style.textContent = profileInfo.css;
+              style.textContent = owner.css;
               document.head.appendChild(style);
               setStyleElem(style);
   
             }
   
-            setProfileInfo(profileInfo);
-  
+            setOwner(owner);
+    
+          } else {
+    
+            document.title = `${isCharacter ? "Character" : (isStory ? "Story" : "Account")} not found / Makuwro`;
+            setOwner();
+    
           }
-  
-        } else if (mounted) {
-  
-          document.title = `${isCharacter ? "Character" : (isStory ? "Story" : "Account")} not found / Makuwro`;
-          setProfileInfo();
-  
-        }
-  
-        if (mounted) {
-  
-          setIsCharacter(isCharacter);
-          setIsStory(isStory);
-          setReady(true);
-  
+    
+          if (mounted) {
+    
+            setIsCharacter(isCharacter);
+            setIsStory(isStory);
+            setReady(true);
+    
+          }
+
+        } catch (err) {
+
+          setCriticalError(err);
+
         }
   
       }
@@ -232,7 +241,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
     };
 
-  }, [profileInfo, tab, id]);
+  }, [owner, tab, id]);
 
   function navigateToSettings() {
 
@@ -240,7 +249,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
     const isNotUser = isCharacter || isStory;
     if (isNotUser) {
 
-      setSettingsCache({...profileInfo, type});
+      setSettingsCache({...owner, type});
 
     }
     navigate(`${isNotUser ? location.pathname : ""}/settings/${isNotUser ? "profile" : "account"}`);
@@ -259,7 +268,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
 
         }
         setReady(false);
-        setProfileInfo();
+        setOwner();
         setLocation(location);
 
       }
@@ -268,48 +277,48 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
       <section>
         <section id={styles["profile-header"]}>
           <section id={styles.profileBannerContainer}>
-            {profileInfo && profileInfo.bannerPath && <img src={`https://cdn.makuwro.com/${profileInfo.bannerPath}`} />}
+            {owner && owner.bannerPath && <img src={`https://cdn.makuwro.com/${owner.bannerPath}`} />}
           </section>
         </section>
-        <section id={styles["profile-info"]} style={!profileInfo || isStory ? {paddingBottom: "80px"} : null}>
+        <section id={styles["profile-info"]} style={!owner || isStory ? {paddingBottom: "80px"} : null}>
           <section>
             <section>
               {!isStory && (
-                <img id={styles.avatar} alt={`${username}'s avatar`} src={`https://cdn.makuwro.com/${profileInfo ? profileInfo.avatarPath : "global/pfp.png"}`} />
+                <img id={styles.avatar} alt={`${username}'s avatar`} src={`https://cdn.makuwro.com/${owner ? owner.avatarPath : "global/pfp.png"}`} />
               )}
               <section>
                 <h1>
-                  {profileInfo && !profileInfo.isBanned && !profileInfo.isDisabled ? (isCharacter || isStory ? profileInfo.name : (profileInfo.displayName || `@${profileInfo.username}`)) : (isCharacter || isStory ? id : `@${username}`)}
-                  {profileInfo && profileInfo.isStaff && (
+                  {owner && !owner.isBanned && !owner.isDisabled ? (isCharacter || isStory ? owner.name : (owner.displayName || `@${owner.username}`)) : (isCharacter || isStory ? id : `@${username}`)}
+                  {owner && owner.isStaff && (
                     <span title="This user is a Makuwro staff member" className={styles.badge}>STAFF</span>
                   )}
                 </h1>
                 <h2>
-                  {profileInfo && !profileInfo.isBanned && !profileInfo.isDisabled && profileInfo.displayName ? `@${profileInfo.username}` : null}
+                  {owner && !owner.isBanned && !owner.isDisabled && owner.displayName ? `@${owner.username}` : null}
                 </h2>
-                {!profileInfo ? (
-                  <p style={{margin: 0}}>This {isCharacter ? "character" : (isStory ? "story" : "account")} doesn't exist. {!isCharacter && !currentUser.id ? <Link to="/register">But it doesn't have to be that way ;)</Link> : ""}</p>
-                ) : (profileInfo.isBanned ? (
+                {!owner ? (
+                  <p style={{margin: 0}}>This {isCharacter ? "character" : (isStory ? "story" : "account")} doesn't exist. {!isCharacter && !client.user ? <Link to="/register">But it doesn't have to be that way ;)</Link> : ""}</p>
+                ) : (owner.isBanned ? (
                   <p style={{margin: 0}}>This account has been banned for violating the <a href="https://about.makuwro.com/policies/terms">terms of service</a></p>
-                ) : (profileInfo.isDisabled ? 
+                ) : (owner.isDisabled ? 
                   <p style={{margin: 0}}>This account is currently disabled. Try again later!</p>
                   : ((isStory || isCharacter) && (
-                    <Link to={`/${profileInfo.owner.username}`} id={styles.owner}>
+                    <Link to={`/${owner.owner.username}`} id={styles.owner}>
                       <span>
-                        <img src={`https://cdn.makuwro.com/${profileInfo.owner.avatarPath}`} />
+                        <img src={`https://cdn.makuwro.com/${owner.owner.avatarPath}`} />
                       </span>
-                      {profileInfo.owner.displayName || `@${profileInfo.owner.username}`}
+                      {owner.owner.displayName || `@${owner.owner.username}`}
                     </Link>
                   ))))}
               </section>
             </section>
-            {profileInfo && (
+            {owner && (
               <section id={styles.actions}>
-                {currentUser && (currentUser.id === profileInfo?.id || currentUser.id === profileInfo?.owner?.id) ? (
+                {client.user && (client.user.id === owner?.id || client.user.id === owner?.owner?.id) ? (
                   <button onClick={navigateToSettings}>Settings</button>
                 ) : (
                   <>
-                    <button onClick={() => currentUser?.id ? navigate("?action=follow") : navigate("/signin")}>Follow</button>
+                    <button onClick={() => client.user?.id ? navigate("?action=follow") : navigate("/signin")}>Follow</button>
                     <button className="destructive" onClick={() => navigate("?action=block")}>Block</button>
                     <button className="destructive" onClick={() => navigate("?action=report-abuse")}>Report</button>
                   </>
@@ -332,7 +341,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
             </>
           )}
         </section>
-        {profileInfo && !profileInfo.isBanned && !profileInfo.isDisabled && (
+        {owner && !owner.isBanned && !owner.isDisabled && (
           <section id={styles.container}>
             <section className={shifting ? styles.invisible : null} onTransitionEnd={(event) => {
 
@@ -340,7 +349,7 @@ export default function Profile({shownLocation, setLocation, currentUser, notify
               setLocation(location);
 
             }}>
-              {isStory ? <ProfileChapters profileInfo={profileInfo} currentUser={currentUser} /> : tabComponent}
+              {isStory ? <ProfileChapters owner={owner} client={client} /> : tabComponent}
             </section>
           </section>
         )}
@@ -356,6 +365,7 @@ Profile.propTypes = {
   notify: PropTypes.func,
   updated: PropTypes.bool,
   setLocation: PropTypes.func,
-  currentUser: PropTypes.object,
-  setSettingsCache: PropTypes.func
+  client: PropTypes.object,
+  setSettingsCache: PropTypes.func,
+  setCriticalError: PropTypes.func
 };

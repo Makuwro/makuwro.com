@@ -4,13 +4,13 @@ import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import BlogPreview from "../BlogPreview";
 
-export default function ProfileBlog({currentUser, profileInfo, notify}) {
+export default function ProfileBlog({client, owner, notify}) {
 
-  const [ready, setReady] = useState(false)
+  const [ready, setReady] = useState(false);
   const [posts, setPosts] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
-  const ownProfile = currentUser.username === profileInfo.username;
+  const ownProfile = client.user?.username === owner.username;
 
   async function createEmptyBlogPost(event) {
 
@@ -23,32 +23,13 @@ export default function ProfileBlog({currentUser, profileInfo, notify}) {
 
       try {
 
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/blog/${currentUser.username}`, {
-          method: "POST",
-          headers: {
-            token: currentUser.token
-          }
-        });
-
-        const {message, slug} = await response.json();
-
-        if (response.ok) {
-
-          navigate(`/${currentUser.username}/blog/${slug}?mode=edit`);
-
-        } else {
-
-          notify({
-            title: "Couldn't create a starting post",
-            children: message
-          });
-
-        }
+        const {slug} = await client.createBlogPost();
+        navigate(`/${client.user.username}/blog/${slug}?mode=edit`);
         
       } catch ({message}) {
 
         notify({
-          title: "Something bad happened",
+          title: "Couldn't create a starting post",
           children: message
         });
 
@@ -68,9 +49,9 @@ export default function ProfileBlog({currentUser, profileInfo, notify}) {
       try {
 
         // Get all the blog posts from the server.
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/blog/${profileInfo.username}`, {
-          headers: currentUser.token ? {
-            token: currentUser.token
+        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/blog/${owner.username}`, {
+          headers: client.user.token ? {
+            token: client.user.token
           } : {}
         });
         const json = await response.json();
@@ -94,7 +75,7 @@ export default function ProfileBlog({currentUser, profileInfo, notify}) {
                 owner={owner}
                 title={title}
                 slug={slug}
-                currentUserIsOwner={currentUser.id === owner.id}
+                currentUserIsOwner={client.user?.id === owner.id}
               />
             );
   
@@ -118,7 +99,7 @@ export default function ProfileBlog({currentUser, profileInfo, notify}) {
 
     };
 
-  }, [profileInfo]);
+  }, [owner]);
 
   return ready ? (
     <section className={styles["profile-card"]} id={styles.blog}>
@@ -135,6 +116,6 @@ export default function ProfileBlog({currentUser, profileInfo, notify}) {
 }
 
 ProfileBlog.propTypes = {
-  profileInfo: PropTypes.object,
-  currentUser: PropTypes.object
+  owner: PropTypes.object.isRequired,
+  client: PropTypes.object.isRequired
 };

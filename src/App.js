@@ -8,12 +8,12 @@ import Maintenance from "./components/Maintenance";
 import Art from "./components/library/Art";
 import PopupManager from "./components/PopupManager";
 import Authenticator from "./components/Authenticator";
-import CrashBoundary from "./components/errors/CrashBoundary";
 import Literature from "./components/library/Literature";
 import Settings from "./components/Settings";
 import Submitter from "./components/library/Submitter";
 import ConnectivityCheck from "./components/ConnectivityCheck";
 import "./styles/global.css";
+import Search from "./components/Search";
 
 const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 const maintenance = false;
@@ -29,28 +29,28 @@ export default function App() {
   if (maintenance) return <Maintenance />;
   
   // Set up the states
+  const [client, setClient] = useState();
   const [ready, setReady] = useState(false);
   const [searchParams] = useSearchParams();
   const [settingsCache, setSettingsCache] = useState();
-  const [currentUser, setCurrentUser] = useState();
   const navigate = useNavigate();
 
   // Check if we want to create something
   const action = searchParams.get("action");
   const location = useLocation();
   const pathname = location.pathname;
-  const [art, setArt] = useState();
+  const [art] = useState();
   const [updated, setUpdated] = useState(false);
   const [shownLocation, setLocation] = useState(location);
   const [signInOpen, setSignInOpen] = useState(false);
   const [artViewerOpen, setArtViewerOpen] = useState(false);
-  const [connected, setConnected] = useState(false);
+  const [criticalError, setCriticalError] = useState();
 
   useEffect(() => {
 
     let mounted = true;
 
-    if (connected) {
+    if (client) {
 
       // Check if we need the art viewer open
       /*
@@ -111,7 +111,7 @@ export default function App() {
       if (mounted) {
 
         // Check if we need to sign in
-        if (!currentUser && (pathname === "/signin" || pathname === "/register")) {
+        if (!client?.user && (pathname === "/signin" || pathname === "/register")) {
 
           setSignInOpen(true);
 
@@ -134,7 +134,7 @@ export default function App() {
 
     return () => mounted = false;
   
-  }, [connected, action, pathname, document.cookie, art]);
+  }, [client, action, pathname, document.cookie, art]);
 
   // Listen for theme changes
   const [systemDark, setSystemDark] = useState(window.matchMedia("(prefers-color-scheme: dark)").matches);
@@ -168,23 +168,32 @@ export default function App() {
 
   }
 
+  useEffect(() => {
+
+    if (criticalError) {
+
+      throw criticalError;
+
+    }
+
+  }, [criticalError]);
+
   return (
-    <CrashBoundary>
+    <>
       <ConnectivityCheck 
         api={api}
-        authenticated={currentUser !== undefined}
+        authenticated={client?.user !== undefined}
         ready={ready}
-        setConnected={setConnected}
-        setCurrentUser={setCurrentUser}
+        setClient={setClient}
       />
       {
-        ready && (
+        ready && client && (
           <>
-            <Authenticator open={signInOpen} shownLocation={shownLocation} currentUser={currentUser} />
+            <Authenticator open={signInOpen} shownLocation={shownLocation} client={client} />
             <PopupManager popups={popups} popupsChanged={newPopups => setPopups(newPopups)} />
             {artViewerOpen && (
               <Art 
-                currentUser={currentUser}
+                client={client}
                 art={art}
                 artRegex={artRegex}
                 artDeleted={() => setUpdated(true)}
@@ -196,8 +205,8 @@ export default function App() {
                 }} 
               />
             )}
-            <Submitter currentUser={currentUser} addPopup={addPopup} />
-            <Header currentUser={currentUser} systemDark={systemDark} setLocation={setLocation} addPopup={addPopup} />
+            <Submitter client={client} addPopup={addPopup} />
+            <Header client={client} systemDark={systemDark} setLocation={setLocation} addPopup={addPopup} />
             <Routes location={shownLocation}>
               {["/", "/register", "/signin"].map((path, index) => {
 
@@ -215,9 +224,10 @@ export default function App() {
                     updated={updated} 
                     shownLocation={shownLocation} 
                     setLocation={setLocation}
-                    currentUser={currentUser} 
+                    client={client} 
                     artViewerOpen={artViewerOpen}
                     setSettingsCache={setSettingsCache}
+                    setCriticalError={setCriticalError}
                   />
                 )} />;
 
@@ -230,7 +240,7 @@ export default function App() {
                     <Literature 
                       shownLocation={shownLocation} 
                       setLocation={setLocation} 
-                      currentUser={currentUser} 
+                      client={client} 
                       setSettingsCache={setSettingsCache}
                     />
                   )}
@@ -242,21 +252,21 @@ export default function App() {
                   path={path} 
                   element={(
                     <Settings 
-                      currentUser={currentUser} 
+                      client={client} 
                       shownLocation={shownLocation} 
                       setLocation={setLocation} 
-                      setCurrentUser={setCurrentUser}
                       settingsCache={settingsCache}
                       setSettingsCache={setSettingsCache}
                     />
                   )}
                 />
               ))}
+              <Route path="search" element={<Search client={client} />} />
             </Routes>
           </>
         )
       }
-    </CrashBoundary>
+    </>
   );
 
 }

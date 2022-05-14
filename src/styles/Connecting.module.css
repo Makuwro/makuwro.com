@@ -7,7 +7,7 @@
   align-items: center;
   font-size: 2rem;
   background-color: var(--background);
-  z-index: 2;
+  z-index: 4;
   transition: 0.3s;
   text-align: center;
 }

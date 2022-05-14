@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import styles from "../styles/Connecting.module.css";
+import PropTypes from "prop-types";
+import { Client } from "makuwro";
 
-export default function ConnectivityCheck({ready, authenticated, api, setConnected, setCurrentUser}) {
+export default function ConnectivityCheck({ready, authenticated, setClient}) {
 
   const [closing, setClosing] = useState(false);
   const [message, setMessage] = useState("Connecting to the Internet...");
@@ -59,51 +61,16 @@ export default function ConnectivityCheck({ready, authenticated, api, setConnect
   
         // Now, check if the server is available.
         setMessage("Connecting to Makuwro...");
-        const controller = new AbortController();
-        setTimeout(() => controller.abort(), 5000);
 
-        // Get the current user.
+        // Get the current user. 
+        // If there isn't a token, this should error.
         const token = document.cookie.match("(^|;)\\s*token\\s*=\\s*([^;]+)")?.pop() || null;
-        let response;
+        let client = new Client();
+        client.token = token;
+        await client.connect();
 
-        if (token) {
-
-          response = await fetch(`${api}accounts/user`, {
-            headers: {
-              token
-            },
-            signal: controller.signal
-          });
-      
-          if (response.ok) {
-
-            setCurrentUser({
-              ...await response.json(),
-              token
-            });
-
-          } else if (response.status === 401) {
-
-            document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            response.ok = true;
-
-          }
-
-        } else {
-
-          response = await fetch(api, {signal: controller.signal});
-
-        }
-  
-        // Check if something bad happened.
-        if (!response.ok) {
-  
-          throw new Error(response.text);
-  
-        }
-  
         // Tell the app that we're connected.
-        setConnected(true);
+        setClient(client);
   
         // Reset the attempts and seconds just in case we get disconnected.
         setAttempt(0);
@@ -118,9 +85,6 @@ export default function ConnectivityCheck({ready, authenticated, api, setConnect
           setAttempt(attempt + 1);
           
         }
-  
-        // Tell the app that we're not connected.
-        setConnected(false);      
   
       }
   
@@ -170,3 +134,9 @@ export default function ConnectivityCheck({ready, authenticated, api, setConnect
   );
 
 }
+
+ConnectivityCheck.propTypes = {
+  ready: PropTypes.bool,
+  authenticated: PropTypes.bool,
+  setClient: PropTypes.func
+};

@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import styles from "../styles/Header.module.css";
 import PropTypes from "prop-types";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import Popup from "./PopupManager";
 
-export default function Header({currentUser, theme, systemDark, query, setLocation, addPopup}) {
+export default function Header({client, theme, systemDark, query, setLocation, addPopup}) {
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -13,6 +12,7 @@ export default function Header({currentUser, theme, systemDark, query, setLocati
     query: useState(query || ""),
     inputFocused: useState(false)
   };
+  const {user} = client;
 
   return (
     <header className={!systemDark && theme !== 2 ? "day" : null}>
@@ -36,7 +36,7 @@ export default function Header({currentUser, theme, systemDark, query, setLocati
         </ul>
       </form>
       <section>
-        {currentUser && currentUser.id ? (
+        {user ? (
           <>
             <button id={styles.notificationsButton} onClick={() => addPopup({
               title: "Notifications",
@@ -44,10 +44,8 @@ export default function Header({currentUser, theme, systemDark, query, setLocati
             })}>
               <img src="/icons/bell.svg" />
             </button>
-            <button title={`${`${currentUser.displayName} (` || ""}@${currentUser.username}${currentUser.displayName ? ")" : ""}`} onClick={() => navigate(`/${currentUser.username}`)} id={styles.accountButton}>
-              {currentUser && (
-                <img src={currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`} />
-              )}
+            <button title={`${`${user.displayName} (` || ""}@${user.username}${user.displayName ? ")" : ""}`} onClick={() => navigate(`/${user.username}`)} id={styles.accountButton}>
+              <img src={`https://cdn.makuwro.com/${user.avatarPath}`} />
             </button>
           </>
         ) : (
