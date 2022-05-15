@@ -7,7 +7,7 @@ import PropTypes from "prop-types";
 import styles from "../../../styles/Library.module.css";
 import SlugInput from "../../input/SlugInput";
 
-export default function ArtSubmitter({currentUser, submitting, data, setData, setPermissions, update}) {
+export default function ArtSubmitter({client, submitting, data, setData, setPermissions, update}) {
 
   const [creatorType, setCreatorType] = useState(0);
   const [imagePath, setImagePath] = useState();
@@ -73,7 +73,7 @@ export default function ArtSubmitter({currentUser, submitting, data, setData, se
             <ContentInput 
               content={data.collaborators} 
               type={0} 
-              currentUser={currentUser} 
+              client={client} 
               onChange={(collaborators) => setData("collaborators", collaborators)} 
             />
           </section>
@@ -104,7 +104,7 @@ export default function ArtSubmitter({currentUser, submitting, data, setData, se
           <ContentInput 
             content={data.folders} 
             type={1} 
-            currentUser={currentUser} 
+            client={client} 
             onChange={(folders) => setData("folders", folders)} 
           />
         </section>
@@ -114,7 +114,7 @@ export default function ArtSubmitter({currentUser, submitting, data, setData, se
           <ContentInput 
             content={data.worlds} 
             type={2} 
-            currentUser={currentUser} 
+            client={client} 
             onChange={(worlds) => setData("worlds", worlds)} 
           />
         </section>
@@ -124,7 +124,7 @@ export default function ArtSubmitter({currentUser, submitting, data, setData, se
           <ContentInput 
             content={data.characters} 
             type={3} 
-            currentUser={currentUser} 
+            client={client} 
             onChange={(characters) => setData("characters", characters)} 
           />
         </section>
@@ -135,7 +135,7 @@ export default function ArtSubmitter({currentUser, submitting, data, setData, se
           <label htmlFor="url">Art URL</label>
           <p>Only alphanumeric characters, underscores, hyphens, and periods are allowed.</p>
           <SlugInput
-            username={currentUser.username}
+            username={client.user.username}
             slug={data.slug}
             onChange={(slug) => setData("slug", slug)}
             placeholder={data.name.replaceAll(/[^a-zA-Z0-9_-]/gm, "-")} 
@@ -212,7 +212,7 @@ export default function ArtSubmitter({currentUser, submitting, data, setData, se
 
 ArtSubmitter.propTypes = {
   data: PropTypes.object,
-  currentUser: PropTypes.object,
+  client: PropTypes.object,
   submitting: PropTypes.bool,
   setData: PropTypes.func,
   setPermissions: PropTypes.func,

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import styles from "../../styles/TagInput.module.css";
 import ddStyles from "../../styles/Dropdown.module.css";
 
-export default function ContentInput({content, onChange, currentUser, type}) {
+export default function ContentInput({content, onChange, client, type}) {
 
   const typeList = ["users", "folders", "worlds", "characters"];
   const [phrase, setPhrase] = useState("");
@@ -70,26 +70,17 @@ export default function ContentInput({content, onChange, currentUser, type}) {
             try {
 
               // Search for this content.
-              const response = await fetch(`${process.env.RAZZLE_API_DEV}${type !== 0 ? `contents/search?type=${typeList[type]}&username=${currentUser.username}&name=${encodeURIComponent(phrase)}` : `accounts/users/${phrase}`}`, {
-                headers: {
-                  token: currentUser.token
-                }
+              let items = await client.requestREST(`${type !== 0 ? `contents/search?type=${typeList[type]}&username=${client.user.username}&name=${encodeURIComponent(phrase)}` : `accounts/users/${phrase}`}`);
+
+              // Add the content to the cache so that we don't have to ask the server again.
+              if (type === 0) items = [items];
+              setCache((oldCache) => {
+
+                const newCache = {...oldCache};
+                newCache[phrase] = items;
+                return newCache;
+
               });
-
-              if (response.ok) {
-
-                // Add the content to the cache so that we don't have to ask the server again.
-                items = await response.json();
-                if (type === 0) items = [items];
-                setCache((oldCache) => {
-
-                  const newCache = {...oldCache};
-                  newCache[phrase] = items;
-                  return newCache;
-
-                });
-
-              }
               
               // And now, back to our regularly scheduled function.
               callback(items);
@@ -126,7 +117,7 @@ export default function ContentInput({content, onChange, currentUser, type}) {
                     alert("You already added that one!");
                     return content;
 
-                  } else if (type === 0 && item.id === currentUser.id) {
+                  } else if (type === 0 && item.id === client.user.id) {
 
                     alert("You can't add yourself!");
                     return content;
@@ -231,6 +222,6 @@ export default function ContentInput({content, onChange, currentUser, type}) {
 ContentInput.propTypes = {
   content: PropTypes.any,
   onChange: PropTypes.func,
-  currentUser: PropTypes.object.isRequired,
+  client: PropTypes.object.isRequired,
   type: PropTypes.number.isRequired
 };

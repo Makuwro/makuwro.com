@@ -77,6 +77,8 @@ export default function ConnectivityCheck({ready, authenticated, setClient}) {
         setSeconds(0);
         
       } catch (err) {
+
+        console.log(err);
   
         if (!seconds) {
   

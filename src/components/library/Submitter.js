@@ -30,7 +30,6 @@ export default function Submitter({client, art, refreshArt, updated, addPopup}) 
   const [searchParams] = useSearchParams();
   const action = searchParams.get("action");
   const [type, setType] = useState();
-  const [submissionComp, setSubmissionComp] = useState(null);
   const [popupConfig, setPopupConfig] = useState({});
 
   function setDataWrapper(key, value) {
@@ -254,9 +253,9 @@ export default function Submitter({client, art, refreshArt, updated, addPopup}) 
                 oldSlug = art?.slug;
         
                 // Now we're ready to submit the request.
-                response = await fetch(`${process.env.RAZZLE_API_DEV}contents/${type}/${currentUser.username}/${oldSlug || slug}`, {
+                response = await fetch(`${process.env.RAZZLE_API_DEV}contents/${type}/${client.user.username}/${oldSlug || slug}`, {
                   headers: {
-                    token: currentUser.token
+                    token: client.token
                   },
                   body: formData,
                   method: oldSlug ? "PATCH" : "POST"
@@ -264,7 +263,7 @@ export default function Submitter({client, art, refreshArt, updated, addPopup}) 
         
                 if (response.ok) {
         
-                  navigate(`/${currentUser.username}/${type}/${slug}`);
+                  navigate(`/${client.user.username}/${type}/${slug}`);
                   refreshArt();
                   updated();
         

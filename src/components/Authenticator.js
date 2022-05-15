@@ -3,9 +3,9 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import styles from "../styles/Authenticator.module.css";
 import BirthdateDropdown from "./input/BirthdateDropdown";
 import Checkbox from "./input/Checkbox";
-import Popup from "./PopupManager";
+import PropTypes from "prop-types"; 
 
-export default function Authenticator({currentUser, open, shownLocation}) {
+export default function Authenticator({client, open, shownLocation, addPopup}) {
 
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [username, setUsername] = useState("");
@@ -15,6 +15,7 @@ export default function Authenticator({currentUser, open, shownLocation}) {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [birthDate, setBirthDate] = useState();
   const [register, setRegister] = useState(false);
+  const [popupChildren, setPopupChildren] = useState(null);
   const {pathname} = useLocation();
   const navigate = useNavigate();
 
@@ -131,9 +132,10 @@ export default function Authenticator({currentUser, open, shownLocation}) {
 
   useEffect(() => {
 
-    if ((location.pathname === "/signin" || location.pathname === "/register") && open && currentUser?.id) {
+    const {user} = client;
+    if ((location.pathname === "/signin" || location.pathname === "/register") && open && user?.id) {
 
-      alert(`You're already signed in, ${currentUser.displayName || currentUser.username}!`);
+      alert(`You're already signed in, ${user.displayName || user.username}!`);
       return onClose();
 
     }
@@ -152,38 +154,59 @@ export default function Authenticator({currentUser, open, shownLocation}) {
 
     }
 
-  }, [pathname, open]);
+  }, [client.user, pathname, open]);
 
-  return popupOpen ? (
-    <Popup title={`Welcome${!register ? " back" : ""} to Makuwro!`} open={open} onClose={onClose}>
-      <section id={styles.authenticator}>
-        <form onSubmit={authenticate}>
-          <label htmlFor="username">Username</label>
-          {register && <p>This will be used for users to uniquely identify you.</p>}
-          <input type="text" name="username" required value={username} onInput={(event) => setUsername(event.target.value)} autoFocus />
-          <label htmlFor="password">Password</label>
-          {register && <p>You will use this to verify your identity.</p>}
-          <input type="password" name="password" required value={password} onInput={(event) => setPassword(event.target.value)} />
-          {register ? (
-            <>
-              <label>Email address</label>
-              <p>This will be used for authenticating you.</p>
-              <input type="email" required value={email} onInput={(event) => setEmail(event.target.value)} />
-              <label>Date of birth</label>
-              <p>We'll use this to ensure you're old enough to access Makuwro and age-gated content. Lying about your age is against the terms of service.</p>
-              <BirthdateDropdown onChange={(birthDate) => setBirthDate(birthDate)} />
-              <Checkbox required checked={termsAccepted} onClick={(accepted) => setTermsAccepted(accepted)}>
-                I accept the <a href="https://help.makuwro.com/policies/terms">terms of service</a> and <a href="https://help.makuwro.com/policies/privacy">privacy policy</a>
-              </Checkbox>
-            </>
-          ) : (
-            <p>I forgot my password</p>
-          )}
-          <input type="submit" disabled={buttonDisabled} value={register ? "Sign up" : "Sign in"} />
-          {register ? <Link to="/signin">I already have an account</Link> : <p>Don't have an account? <Link to="/register">Make one!</Link></p>}
-        </form>
-      </section>
-    </Popup>
-  ) : null;
+  useEffect(() => {
+
+    if (popupOpen) {
+
+      addPopup({
+        title: `Welcome${!register ? " back" : ""} to Makuwro!`,
+        children: (
+          <section id={styles.authenticator}>
+            <form onSubmit={authenticate}>
+              <label htmlFor="username">Username</label>
+              {register && <p>This will be used for users to uniquely identify you.</p>}
+              <input type="text" name="username" required value={username} onInput={(event) => setUsername(event.target.value)} autoFocus />
+              <label htmlFor="password">Password</label>
+              {register && <p>You will use this to verify your identity.</p>}
+              <input type="password" name="password" required value={password} onInput={(event) => setPassword(event.target.value)} />
+              {register ? (
+                <>
+                  <label>Email address</label>
+                  <p>This will be used for authenticating you.</p>
+                  <input type="email" required value={email} onInput={(event) => setEmail(event.target.value)} />
+                  <label>Date of birth</label>
+                  <p>We'll use this to ensure you're old enough to access Makuwro and age-gated content. Lying about your age is against the terms of service.</p>
+                  <BirthdateDropdown onChange={(birthDate) => setBirthDate(birthDate)} />
+                  <Checkbox required checked={termsAccepted} onClick={(accepted) => setTermsAccepted(accepted)}>
+                    I accept the <a href="https://help.makuwro.com/policies/terms">terms of service</a> and <a href="https://help.makuwro.com/policies/privacy">privacy policy</a>
+                  </Checkbox>
+                </>
+              ) : (
+                <p>I forgot my password</p>
+              )}
+              <input type="submit" disabled={buttonDisabled} value={register ? "Sign up" : "Sign in"} />
+              {register ? <Link to="/signin">I already have an account</Link> : <p>Don't have an account? <Link to="/register">Make one!</Link></p>}
+            </form>
+          </section>
+        )
+      });
+
+    }
+
+  }, [popupOpen]);
+
+  useEffect(() => {
+
+  }, [username]);
+
+  return null;
 
 }
+
+Authenticator.propTypes = {
+  client: PropTypes.object.isRequired,
+  open: PropTypes.bool,
+  shownLocation: PropTypes.object
+};

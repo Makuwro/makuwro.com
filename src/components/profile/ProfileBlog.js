@@ -49,40 +49,29 @@ export default function ProfileBlog({client, owner, notify}) {
       try {
 
         // Get all the blog posts from the server.
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/blog/${owner.username}`, {
-          headers: client.user.token ? {
-            token: client.user.token
-          } : {}
-        });
-        const json = await response.json();
-  
-        if (!response.ok) {
-  
-          throw new Error(json.message);
-  
+        const posts = await client.getAllBlogPosts(owner);
+
+        for (let i = 0; posts.length > i; i++) {
+
+          const {id, owner, title, slug} = posts[i];
+
+          posts[i] = (
+            <BlogPreview
+              key={id}
+              owner={owner}
+              title={title}
+              slug={slug}
+              currentUserIsOwner={client.user?.id === owner.id}
+            />
+          );
+
         }
-  
+
         if (mounted) {
-  
-          const posts = json;
-          for (let i = 0; json.length > i; i++) {
-  
-            const {id, owner, title, slug} = posts[i];
-  
-            posts[i] = (
-              <BlogPreview
-                key={id}
-                owner={owner}
-                title={title}
-                slug={slug}
-                currentUserIsOwner={client.user?.id === owner.id}
-              />
-            );
-  
-          }
+          
           setPosts(posts);
           setReady(true);
-  
+
         }
   
       } catch (err) {

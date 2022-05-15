@@ -6,7 +6,7 @@ import Optional from "../../Optional";
 import ContentInput from "../../input/ContentInput";
 import SlugInput from "../../input/SlugInput";
 
-export default function CharacterSubmitter({currentUser, submitting, data, setData, setPermissions}) {
+export default function CharacterSubmitter({client, submitting, data, setData, setPermissions}) {
 
   const [creatorType, setCreatorType] = useState(0);
   const avatarInput = useRef();
@@ -51,7 +51,7 @@ export default function CharacterSubmitter({currentUser, submitting, data, setDa
             <ContentInput 
               type={0} 
               content={data.collaborators} 
-              currentUser={currentUser} 
+              client={client} 
               onChange={(collaborators) => setData("collaborators", collaborators)} 
             />
           </section>
@@ -73,12 +73,12 @@ export default function CharacterSubmitter({currentUser, submitting, data, setDa
         <section>
           <label>Folders<Optional /></label>
           <p>You can add your character to multiple folders.</p>
-          <ContentInput type={1} content={data.folders} currentUser={currentUser} onChange={(folders) => setData("folders", folders)} />
+          <ContentInput type={1} content={data.folders} client={client} onChange={(folders) => setData("folders", folders)} />
         </section>
         <section>
           <label>Worlds<Optional /></label>
           <p>You can directly add your character to worlds you manage here. To add your character to a world that you don't manage, you have to create this character first, then submit a request to the world admins.</p>
-          <ContentInput type={2} content={data.worlds} currentUser={currentUser} onChange={(worlds) => setData("worlds", worlds)} />
+          <ContentInput type={2} content={data.worlds} client={client} onChange={(worlds) => setData("worlds", worlds)} />
         </section>
       </section>
       <section>
@@ -87,7 +87,7 @@ export default function CharacterSubmitter({currentUser, submitting, data, setDa
           <label htmlFor="url">Character URL</label>
           <p>Only alphanumeric characters, underscores, hyphens, and periods are allowed.</p>
           <SlugInput 
-            username={currentUser.username}
+            username={client.user.username}
             slug={data.slug}
             onChange={(slug) => setData("slug", slug)}
             placeholder={data.name.replaceAll(/[^a-zA-Z0-9_-]/gm, "-")} 
@@ -125,7 +125,7 @@ export default function CharacterSubmitter({currentUser, submitting, data, setDa
         </section>
         <section>
           <label>Character terms of use<Optional /></label>
-          <p>This will be shown on your character's page. Your <a target="_blank" href={`/${currentUser.username}/terms`} rel="noreferrer">global terms of use</a> will be shown below this.</p>
+          <p>This will be shown on your character's page. Your <a target="_blank" href={`/${client.user.username}/terms`} rel="noreferrer">global terms of use</a> will be shown below this.</p>
           <textarea 
             placeholder="All rights reserved. Do not use this character without my approval." 
             value={data.terms} 
@@ -149,7 +149,7 @@ export default function CharacterSubmitter({currentUser, submitting, data, setDa
 
 CharacterSubmitter.propTypes = {
   data: PropTypes.object,
-  currentUser: PropTypes.object,
+  client: PropTypes.object.isRequired,
   submitting: PropTypes.bool,
   setData: PropTypes.func,
   setPermissions: PropTypes.func

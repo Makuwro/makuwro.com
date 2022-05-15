@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "../../styles/Profile.module.css";
 
-export default function ProfileTerms({setLocation, profileInfo, currentUser}) {
+export default function ProfileTerms({owner, client}) {
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -10,7 +10,7 @@ export default function ProfileTerms({setLocation, profileInfo, currentUser}) {
 
   useEffect(() => {
 
-    const terms = profileInfo && profileInfo.terms;
+    const terms = owner && owner.terms;
     
     if (terms) {
 
@@ -30,13 +30,13 @@ export default function ProfileTerms({setLocation, profileInfo, currentUser}) {
 
     }
 
-  }, [profileInfo]);
+  }, [owner]);
 
   return (
     <>
       <section className={styles["profile-card"]} id={styles["profile-terms"]}>
         {terms || <p>This user isn't sharing any terms with Makuwro. If you want to commission them, or want to use their characters, art, or literature, you should ask them about their policies before doing so.</p>}
-        {profileInfo.id === currentUser.id && (
+        {owner.id === client.user?.id && (
           <button style={{display: "block", marginTop: "1rem"}} onClick={() => {
             
             navigate("/settings/profile#global-terms");

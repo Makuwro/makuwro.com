@@ -5,12 +5,13 @@ import PropTypes from "prop-types";
 
 const cache = {};
 
-export default function ProfileLibraryItem({tab, profileInfo, currentUser, updated, isCharacter}) {
+export default function ProfileLibraryItem({tab, owner, client, updated, isCharacter}) {
 
   const plural = /s$/g;
   const [items, setItems] = useState(null);
   const [ready, setReady] = useState(false);
-  const ownProfile = currentUser.id && ((profileInfo.id === currentUser.id) || (profileInfo.owner?.id === currentUser.id));
+  const {user} = client;
+  const ownProfile = owner.id === user?.id;
 
   useEffect(() => {
 
@@ -24,29 +25,27 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
 
     if (updated) {
 
-      cache[profileInfo.username] = {};
+      cache[owner.username] = {};
       setReady(true);
       
-    } else if (isCharacter || profileInfo.username) {
+    } else if (isCharacter || owner.username) {
       
       (async () => {
 
         // Get the stuff from the server.
-        const headers = currentUser.token ? {
-          token: currentUser.token
-        } : {};
-        const response = !isCharacter && await fetch(`${process.env.RAZZLE_API_DEV}contents/${tab}/${profileInfo.username}`, {headers});
+        const content = isCharacter ? [...owner[tab]] : await client[`getAll${tab.slice(0, 1).toUpperCase()}${tab.slice(1)}`](owner);
 
         // Check if everything's OK.
-        if (mounted) {
+        if (content) {
 
-          if (isCharacter || response.ok) {
+          for (let i = 0; content.length > i; i++) {
 
-            let content = isCharacter ? [...profileInfo[tab] || []] : await response.json();
-
-            for (let i = 0; content.length > i; i++) {
-
-              content[i] = <Link draggable={false} className={styles["profile-library-item"]} key={i} to={`/${content[i].owner.username}/${tab}/${content[i].slug}`}>
+            content[i] = (
+              <Link 
+                draggable={false} 
+                className={styles["profile-library-item"]} 
+                key={i} 
+                to={`/${content[i].owner.username}/${tab}/${content[i].slug}`}>
                 {content[i].imagePath || content[i].avatarPath ? (
                   <img 
                     src={`https://cdn.makuwro.com/${content[i].imagePath || content[i].avatarPath}`} 
@@ -54,34 +53,33 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
                     title={content[i].name || content[i].description} 
                   />
                 ) : content[i].name}
-              </Link>;
-
-            }
-
-            if (ownProfile && !isCharacter) {
-
-              content.unshift(
-                <Link 
-                  key={"new"} 
-                  draggable={false} 
-                  className={styles["profile-library-item"]} 
-                  style={{backgroundColor: "black"}} 
-                  to={`?action=${tab === "art" ? "upload" : "create"}-${plural.test(tab) ? tab.substring(0, tab.length - 1) : tab}`}>
-                  CREATE NEW
-                </Link>
-              );
-
-            }
-
-            // Push the items to render.
-            if (mounted) setItems(content[0] ? content : null);
-
-          } else {
-
-            setItems(null);
+              </Link>
+            );
 
           }
-        
+
+          if (ownProfile && !isCharacter) {
+
+            content.unshift(
+              <Link 
+                key={"new"} 
+                draggable={false} 
+                className={styles["profile-library-item"]} 
+                style={{backgroundColor: "black"}} 
+                to={`?action=${tab === "art" ? "upload" : "create"}-${plural.test(tab) ? tab.substring(0, tab.length - 1) : tab}`}>
+                CREATE NEW
+              </Link>
+            );
+
+          }
+
+          // Push the items to render.
+          if (mounted) setItems(content[0] ? content : null);
+
+        } else {
+
+          setItems(null);
+
         }
 
         setReady(true);
@@ -96,14 +94,14 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
 
     };
 
-  }, [tab, currentUser, updated]);
+  }, [tab, user, updated]);
 
   return ready && (
     <section className={`${styles["profile-library"]} ${styles["profile-card"]}`} id={styles["profile-" + tab]} onTransitionEnd={(event) => event.stopPropagation()}>
       {items || (ownProfile ? (
         isCharacter && (<p>You can attach this character to {tab} by tagging this character.</p>)
       ) : (
-        <p>{profileInfo.username || profileInfo.owner.username} doesn't have much to share right now, but who knows: they're probably working on the next big thing.</p>
+        <p>{owner.username || owner.owner.username} doesn't have much to share right now, but who knows: they're probably working on the next big thing.</p>
       ))}
     </section>
   );
@@ -111,7 +109,7 @@ export default function ProfileLibraryItem({tab, profileInfo, currentUser, updat
 }
 
 ProfileLibraryItem.propTypes = {
-  tab: PropTypes.string,
-  currentUser: PropTypes.object,
-  profileInfo: PropTypes.object
+  tab: PropTypes.string.isRequired,
+  client: PropTypes.object.isRequired,
+  owner: PropTypes.object.isRequired
 };

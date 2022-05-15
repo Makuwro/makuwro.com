@@ -60,9 +60,10 @@ export default function Header({client, theme, systemDark, query, setLocation, a
 }
 
 Header.propTypes = {
-  currentUser: PropTypes.object,
+  client: PropTypes.object,
   setLocation: PropTypes.func,
   query: PropTypes.string,
   theme: PropTypes.number,
-  systemDark: PropTypes.bool
+  systemDark: PropTypes.bool,
+  addPopup: PropTypes.func
 };

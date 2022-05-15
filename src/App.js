@@ -189,7 +189,7 @@ export default function App() {
       {
         ready && client && (
           <>
-            <Authenticator open={signInOpen} shownLocation={shownLocation} client={client} />
+            <Authenticator open={signInOpen} shownLocation={shownLocation} client={client} addPopup={addPopup} />
             <PopupManager popups={popups} popupsChanged={newPopups => setPopups(newPopups)} />
             {artViewerOpen && (
               <Art 
