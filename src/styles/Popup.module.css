@@ -18,7 +18,7 @@
   pointer-events: initial;
 }
 
-.container {
+.container, .open > section.shifting {
   background-color: var(--article);
   padding: 0 20px 25px;
   transform: scale(0.5);
@@ -26,6 +26,10 @@
   width: 100%;
   box-sizing: border-box;
   border-color: transparent;
+}
+
+.open > section.shifting {
+  opacity: 0;
 }
 
 .header button {
@@ -76,7 +80,7 @@
 
 @media screen and (min-width: 768px) {
   
-  .container {
+  .container, .open > section.shifting {
     width: 728px;
     border: 1px solid #232325;
     border-radius: 5px;

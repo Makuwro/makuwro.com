@@ -14,6 +14,7 @@ import Submitter from "./components/library/Submitter";
 import ConnectivityCheck from "./components/ConnectivityCheck";
 import "./styles/global.css";
 import Search from "./components/Search";
+import Notifications from "./components/Notifications";
 
 const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 const maintenance = false;
@@ -154,20 +155,6 @@ export default function App() {
   }, [document.cookie]);
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => setSystemDark(event.matches));
 
-  // Return the component
-  const [popups, setPopups] = useState([]);
-  function addPopup(popup) {
-
-    setPopups(previousPopups => {
-
-      const newPopups = [...previousPopups];
-      newPopups.push(popup);
-      return newPopups;
-
-    });
-
-  }
-
   useEffect(() => {
 
     if (criticalError) {
@@ -188,9 +175,8 @@ export default function App() {
       />
       {
         ready && client && (
-          <>
-            <Authenticator open={signInOpen} shownLocation={shownLocation} client={client} addPopup={addPopup} />
-            <PopupManager popups={popups} popupsChanged={newPopups => setPopups(newPopups)} />
+          <PopupManager>
+            <Authenticator open={signInOpen} shownLocation={shownLocation} client={client} />
             {artViewerOpen && (
               <Art 
                 client={client}
@@ -205,10 +191,11 @@ export default function App() {
                 }} 
               />
             )}
-            <Submitter client={client} addPopup={addPopup} />
-            <Header client={client} systemDark={systemDark} setLocation={setLocation} addPopup={addPopup} />
+            <Submitter client={client} />
+            <Notifications client={client} shownLocation={shownLocation} />
+            <Header client={client} systemDark={systemDark} setLocation={setLocation} />
             <Routes location={shownLocation}>
-              {["/", "/register", "/signin"].map((path, index) => {
+              {["/", "/register", "/signin", "/notifications"].map((path, index) => {
 
                 return <Route path={path} key={index} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />;
 
@@ -263,7 +250,7 @@ export default function App() {
               ))}
               <Route path="search" element={<Search client={client} />} />
             </Routes>
-          </>
+          </PopupManager>
         )
       }
     </>

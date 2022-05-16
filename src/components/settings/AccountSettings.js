@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import styles from "../../styles/Settings.module.css";
 import SettingsDropdown from "./SettingsDropdown";
 
-export default function AccountSettings({currentUser, menu, setMenu, submitting, updateAccount}) {
+export default function AccountSettings({client, menu, setMenu, submitting, updateAccount}) {
 
+  const {user} = client;
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -83,8 +84,8 @@ export default function AccountSettings({currentUser, menu, setMenu, submitting,
   return (
     <>
       <section id={styles.welcome}>
-        <img className="avatar-preview" src={currentUser.avatarUrl || `https://cdn.makuwro.com/${currentUser.avatarPath}`} />
-        <h1>Hi, {currentUser.displayName || currentUser.username}!</h1>
+        <img className="avatar-preview" src={user.avatarUrl || `https://cdn.makuwro.com/${user.avatarPath}`} />
+        <h1>Hi, {user.displayName || user.username}!</h1>
         <p>You can manage your account information here.</p>
       </section>
       <section id={styles.options}>
@@ -94,8 +95,8 @@ export default function AccountSettings({currentUser, menu, setMenu, submitting,
           open={menu === 0} 
           onClick={() => toggleMenu(0)}
         >
-          {currentUser.displayName && (
-            <p>Your current display name is <b>{currentUser.displayName}</b>.</p>
+          {user.displayName && (
+            <p>Your current display name is <b>{user.displayName}</b>.</p>
           )}
           <form onSubmit={(event) => updateAccountWrapper(event, "displayName", displayName)}>
             <label>New display name</label>
@@ -109,7 +110,7 @@ export default function AccountSettings({currentUser, menu, setMenu, submitting,
           open={menu === 1}
           onClick={() => toggleMenu(1)}
         >
-          <p>Your current username is <b>{currentUser.username}</b>.</p>
+          <p>Your current username is <b>{user.username}</b>.</p>
           <form onSubmit={(event) => updateAccountWrapper(event, "username", username)}>
             <label>New username</label>
             <input type="text" value={username} onInput={(event) => setUsername(event.target.value)} required />

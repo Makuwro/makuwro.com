@@ -4,8 +4,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import CharacterSubmitter from "./submitters/CharacterSubmitter";
 import ArtSubmitter from "./submitters/CharacterSubmitter";
 import StorySubmitter from "./submitters/StorySubmitter";
+import Popup from "../Popup";
 
-export default function Submitter({client, art, refreshArt, updated, addPopup}) {
+export default function Submitter({client, art, refreshArt, updated}) {
   
   const [data, setData] = useState({
     name: "",
@@ -29,8 +30,7 @@ export default function Submitter({client, art, refreshArt, updated, addPopup}) 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const action = searchParams.get("action");
-  const [type, setType] = useState();
-  const [popupConfig, setPopupConfig] = useState({});
+  const [popup, setPopup] = useState(null);
 
   function setDataWrapper(key, value) {
 
@@ -71,6 +71,7 @@ export default function Submitter({client, art, refreshArt, updated, addPopup}) 
 
         let comp;
         let type;
+        let title;
 
         switch (action) {
 
@@ -88,10 +89,7 @@ export default function Submitter({client, art, refreshArt, updated, addPopup}) 
             );
 
             // Set up the popup.
-            setPopupConfig({
-              title: "Create character",
-              open: true
-            });
+            title = "Create character";
             setData((oldData) => ({
               ...oldData
             }));
@@ -103,10 +101,7 @@ export default function Submitter({client, art, refreshArt, updated, addPopup}) 
 
             // Set up the popup.
             const update = art !== undefined;
-            setPopupConfig({
-              title: `Up${update ? "date" : "load"} art`,
-              open: true
-            });
+            title = `Up${update ? "date" : "load"} art`;
 
             // Set up the comp.
             comp = (
@@ -159,10 +154,7 @@ export default function Submitter({client, art, refreshArt, updated, addPopup}) 
               />
             );
 
-            setPopupConfig({
-              title: "Create a story",
-              open: true
-            });
+            title = "Create a story";
             break;
 
           default:
@@ -185,46 +177,38 @@ export default function Submitter({client, art, refreshArt, updated, addPopup}) 
                   collaborators, worlds, characters, folders, description, tags, permissions,
                   ageRestrictionLevel, contentWarning
                 } = data;
-                let oldSlug;
-                let formData;
-                let response;
-                let i;
-                let userIds;
-                let worldIds;
-                let characterIds;
-                let folderIds;
         
                 // Turn the collaborators array into an array of user IDs
-                userIds = [];
-                for (i = 0; (collaborators?.length || 0) > i; i++) {
+                const userIds = [];
+                for (let i = 0; (collaborators?.length || 0) > i; i++) {
         
                   userIds[i] = collaborators[i].id;
         
                 }
         
-                worldIds = [];
-                for (i = 0; (worlds?.length || 0) > i; i++) {
+                const worldIds = [];
+                for (let i = 0; (worlds?.length || 0) > i; i++) {
         
                   worldIds[i] = worlds[i].id;
         
                 }
         
-                characterIds = [];
-                for (i = 0; (characters?.length || 0) > i; i++) {
+                const characterIds = [];
+                for (let i = 0; (characters?.length || 0) > i; i++) {
         
                   characterIds[i] = characters[i].id;
         
                 }
         
-                folderIds = [];
-                for (i = 0; (folders?.length || 0) > i; i++) {
+                const folderIds = [];
+                for (let i = 0; (folders?.length || 0) > i; i++) {
         
                   folderIds[i] = folders[i].id;
         
                 }
         
                 // Set up form data
-                formData = new FormData();
+                const formData = new FormData();
                 formData.append("image", image.current.files[0]);
                 formData.append("description", description);
                 formData.append("tags", JSON.stringify(tags));
@@ -250,10 +234,10 @@ export default function Submitter({client, art, refreshArt, updated, addPopup}) 
         
                 // If this isn't false, that means we have to update the content
                 // rather than create new content.
-                oldSlug = art?.slug;
+                const oldSlug = art?.slug;
         
                 // Now we're ready to submit the request.
-                response = await fetch(`${process.env.RAZZLE_API_DEV}contents/${type}/${client.user.username}/${oldSlug || slug}`, {
+                const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/${type}/${client.user.username}/${oldSlug || slug}`, {
                   headers: {
                     token: client.token
                   },
@@ -284,16 +268,18 @@ export default function Submitter({client, art, refreshArt, updated, addPopup}) 
         
           };
 
-          setType(type);
-          addPopup({
-            title: popupConfig.title,
-            warnUnfinished: true,
-            children: (
+          setPopup(
+            <Popup title={title} warnUnfinished onClose={() => {
+              
+              navigate(location.pathname);
+              setPopup(null);
+            
+            }}>
               <form onSubmit={submitForm}>
                 {comp}
               </form>
-            )
-          });
+            </Popup>
+          );
 
         }
         
@@ -308,7 +294,7 @@ export default function Submitter({client, art, refreshArt, updated, addPopup}) 
 
   }, [client, action]);
 
-  return null;
+  return popup;
   
 }
 

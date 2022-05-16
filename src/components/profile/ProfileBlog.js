@@ -49,7 +49,7 @@ export default function ProfileBlog({client, owner, notify}) {
       try {
 
         // Get all the blog posts from the server.
-        const posts = await client.getAllBlogPosts(owner);
+        const posts = await client.getAllBlogPosts(owner.username);
 
         for (let i = 0; posts.length > i; i++) {
 

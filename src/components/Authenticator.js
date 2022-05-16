@@ -4,8 +4,9 @@ import styles from "../styles/Authenticator.module.css";
 import BirthdateDropdown from "./input/BirthdateDropdown";
 import Checkbox from "./input/Checkbox";
 import PropTypes from "prop-types"; 
+import Popup from "./Popup";
 
-export default function Authenticator({client, open, shownLocation, addPopup}) {
+export default function Authenticator({client, open, shownLocation}) {
 
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [username, setUsername] = useState("");
@@ -15,7 +16,6 @@ export default function Authenticator({client, open, shownLocation, addPopup}) {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [birthDate, setBirthDate] = useState();
   const [register, setRegister] = useState(false);
-  const [popupChildren, setPopupChildren] = useState(null);
   const {pathname} = useLocation();
   const navigate = useNavigate();
 
@@ -50,9 +50,6 @@ export default function Authenticator({client, open, shownLocation, addPopup}) {
       // Please don't send more requests at the moment.
       setButtonDisabled(true);
 
-      let response;
-      let session;
-
       if (register) {
 
         if (!birthDate || !(birthDate instanceof Date) || isNaN(birthDate)) {
@@ -71,7 +68,8 @@ export default function Authenticator({client, open, shownLocation, addPopup}) {
           form.append("password", password);
           form.append("birthDate", birthDate);
           form.append("email", email);
-          response = await fetch(`${process.env.RAZZLE_API_DEV}accounts/user`, {
+
+          const response = await fetch(`${process.env.RAZZLE_API_DEV}accounts/user`, {
             method: "POST",
             body: form
           });
@@ -96,25 +94,10 @@ export default function Authenticator({client, open, shownLocation, addPopup}) {
       try {
 
         // Send the request to the server.
-        response = await fetch(`${process.env.RAZZLE_API_DEV}accounts/user/sessions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "multipart/form-data",
-            username,
-            password
-          }
-        });
-
-        // Make sure the request was successful.
-        session = await response.json();
-        if (!response.ok) {
-
-          throw new Error(session.message);
-
-        }
+        const {token} = await client.createSession(username, password);
 
         // Log the token as a cookie.
-        document.cookie = `token=${session.token}; max-age=63072000; secure; path=/`;
+        document.cookie = `token=${token}; max-age=63072000; secure; path=/`;
 
         // Let's get outta here!
         onClose();
@@ -156,52 +139,42 @@ export default function Authenticator({client, open, shownLocation, addPopup}) {
 
   }, [client.user, pathname, open]);
 
-  useEffect(() => {
+  return popupOpen ? (
+    <Popup title={`Welcome${!register ? " back" : ""} to Makuwro!`} onClose={() => {
+      
+      setPopupOpen(false);
+      onClose();
 
-    if (popupOpen) {
-
-      addPopup({
-        title: `Welcome${!register ? " back" : ""} to Makuwro!`,
-        children: (
-          <section id={styles.authenticator}>
-            <form onSubmit={authenticate}>
-              <label htmlFor="username">Username</label>
-              {register && <p>This will be used for users to uniquely identify you.</p>}
-              <input type="text" name="username" required value={username} onInput={(event) => setUsername(event.target.value)} autoFocus />
-              <label htmlFor="password">Password</label>
-              {register && <p>You will use this to verify your identity.</p>}
-              <input type="password" name="password" required value={password} onInput={(event) => setPassword(event.target.value)} />
-              {register ? (
-                <>
-                  <label>Email address</label>
-                  <p>This will be used for authenticating you.</p>
-                  <input type="email" required value={email} onInput={(event) => setEmail(event.target.value)} />
-                  <label>Date of birth</label>
-                  <p>We'll use this to ensure you're old enough to access Makuwro and age-gated content. Lying about your age is against the terms of service.</p>
-                  <BirthdateDropdown onChange={(birthDate) => setBirthDate(birthDate)} />
-                  <Checkbox required checked={termsAccepted} onClick={(accepted) => setTermsAccepted(accepted)}>
-                    I accept the <a href="https://help.makuwro.com/policies/terms">terms of service</a> and <a href="https://help.makuwro.com/policies/privacy">privacy policy</a>
-                  </Checkbox>
-                </>
-              ) : (
-                <p>I forgot my password</p>
-              )}
-              <input type="submit" disabled={buttonDisabled} value={register ? "Sign up" : "Sign in"} />
-              {register ? <Link to="/signin">I already have an account</Link> : <p>Don't have an account? <Link to="/register">Make one!</Link></p>}
-            </form>
-          </section>
-        )
-      });
-
-    }
-
-  }, [popupOpen]);
-
-  useEffect(() => {
-
-  }, [username]);
-
-  return null;
+    }}>
+      <section id={styles.authenticator}>
+        <form onSubmit={authenticate}>
+          <label htmlFor="username">Username</label>
+          {register && <p>This will be used for users to uniquely identify you.</p>}
+          <input type="text" name="username" required value={username} onChange={(event) => setUsername(event.target.value)} autoFocus />
+          <label htmlFor="password">Password</label>
+          {register && <p>You will use this to verify your identity.</p>}
+          <input type="password" name="password" required value={password} onInput={(event) => setPassword(event.target.value)} />
+          {register ? (
+            <>
+              <label>Email address</label>
+              <p>This will be used for authenticating you.</p>
+              <input type="email" required value={email} onInput={(event) => setEmail(event.target.value)} />
+              <label>Date of birth</label>
+              <p>We'll use this to ensure you're old enough to access Makuwro and age-gated content. Lying about your age is against the terms of service.</p>
+              <BirthdateDropdown onChange={(birthDate) => setBirthDate(birthDate)} />
+              <Checkbox required checked={termsAccepted} onClick={(accepted) => setTermsAccepted(accepted)}>
+                I accept the <a href="https://help.makuwro.com/policies/terms">terms of service</a> and <a href="https://help.makuwro.com/policies/privacy">privacy policy</a>
+              </Checkbox>
+            </>
+          ) : (
+            <p>I forgot my password</p>
+          )}
+          <input type="submit" disabled={buttonDisabled} value={register ? "Sign up" : "Sign in"} />
+          {register ? <Link to="/signin">I already have an account</Link> : <p>Don't have an account? <Link to="/register">Make one!</Link></p>}
+        </form>
+      </section>
+    </Popup>
+  ) : null;
 
 }
 

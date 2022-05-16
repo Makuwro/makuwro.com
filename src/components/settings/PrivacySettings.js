@@ -5,7 +5,7 @@ import Checkbox from "../input/Checkbox";
 import Dropdown from "../input/Dropdown";
 import SettingsDropdown from "./SettingsDropdown";
 
-export default function PrivacySettings({currentUser, menu, toggleMenu}) {
+export default function PrivacySettings({client, menu, toggleMenu}) {
 
   const navigate = useNavigate();
   document.title = "Privacy settings / Makuwro";

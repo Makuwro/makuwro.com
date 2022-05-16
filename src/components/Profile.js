@@ -196,8 +196,6 @@ export default function Profile({shownLocation, setLocation, client, notify, upd
           }
     
           if (owner) {
-    
-            document.title = `${isCharacter || isStory ? owner.name : (owner.displayName || owner.username)} on Makuwro`;
   
             if (owner.css) {
   
@@ -290,7 +288,9 @@ export default function Profile({shownLocation, setLocation, client, notify, upd
                 <h1>
                   {owner && !owner.isBanned && !owner.isDisabled ? (isCharacter || isStory ? owner.name : (owner.displayName || `@${owner.username}`)) : (isCharacter || isStory ? id : `@${username}`)}
                   {owner && owner.isStaff && (
-                    <span title="This user is a Makuwro staff member" className={styles.badge}>STAFF</span>
+                    <span className="material-icons-round" title="This user is a Makuwro staff member">
+                      build_circle
+                    </span>
                   )}
                 </h1>
                 <h2>

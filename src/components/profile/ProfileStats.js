@@ -86,5 +86,6 @@ export default function ProfileStats({owner, isCharacter}) {
 
 ProfileStats.propTypes = {
   owner: PropTypes.object.isRequired,
-  client: PropTypes.object.isRequired
+  client: PropTypes.object.isRequired,
+  isCharacter: PropTypes.bool
 };

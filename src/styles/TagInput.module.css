@@ -57,7 +57,7 @@ section.tagInput:hover {
   margin-right: 10.6px;
 }
 
-section.tagInput > input {
+section.tagInput > input[type="text"] {
   margin-top: 0;
   border: none;
   border-radius: 0;

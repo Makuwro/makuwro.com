@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import sanitize from "sanitize-html";
 import parse from "html-react-parser";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 
 export default function ProfileAbout({owner, isCharacter}) {
 
   const [ready, setReady] = useState();
   const [comp, setComp] = useState();
+  const location = useLocation();
 
   useEffect(() => {
 
@@ -61,6 +62,12 @@ export default function ProfileAbout({owner, isCharacter}) {
     }
 
   }, [owner]);
+
+  useEffect(() => {
+
+    document.title = `${owner.username} on Makuwro`;
+
+  }, []);
 
   return ready ? (
     comp || (

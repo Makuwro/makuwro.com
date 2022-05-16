@@ -132,22 +132,13 @@ export default function Settings({client, setLocation, setCurrentUser, setSettin
       try {
 
         // Send a request to invalidate this cookie
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}accounts/user/sessions`, {
-          method: "DELETE",
-          headers: {
-            token: client.token
-          }
-        });
+        await client.deleteSessionToken();
 
-        if (response.ok) {
+        // Delete the token cookie
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-          // Delete the token cookie
-          document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-          // Redirect to the home page
-          navigate("/");
-
-        }
+        // Redirect to the home page
+        navigate("/");
 
       } catch (err) {
 

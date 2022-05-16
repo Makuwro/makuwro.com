@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 import styles from "../../styles/Profile.module.css";
 import PropTypes from "prop-types";
 
-const cache = {};
-
 export default function ProfileLibraryItem({tab, owner, client, updated, isCharacter}) {
 
   const plural = /s$/g;
@@ -25,7 +23,6 @@ export default function ProfileLibraryItem({tab, owner, client, updated, isChara
 
     if (updated) {
 
-      cache[owner.username] = {};
       setReady(true);
       
     } else if (isCharacter || owner.username) {
@@ -111,5 +108,7 @@ export default function ProfileLibraryItem({tab, owner, client, updated, isChara
 ProfileLibraryItem.propTypes = {
   tab: PropTypes.string.isRequired,
   client: PropTypes.object.isRequired,
-  owner: PropTypes.object.isRequired
+  owner: PropTypes.object.isRequired,
+  isCharacter: PropTypes.bool,
+  updated: PropTypes.bool
 };

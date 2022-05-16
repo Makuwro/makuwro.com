@@ -5,7 +5,7 @@ import Dropdown from "../input/Dropdown";
 import SettingsDropdown from "./SettingsDropdown";
 import PropTypes from "prop-types";
 
-export default function AppearanceSettings({currentUser, menu, toggleMenu}) {
+export default function AppearanceSettings({client, menu, toggleMenu}) {
 
   document.title = "Appearance settings / Makuwro";
   const [theme, setTheme] = useState(document.cookie.match("(^|;)\\s*theme\\s*=\\s*([^;]+)")?.pop() || 0);
@@ -57,7 +57,7 @@ export default function AppearanceSettings({currentUser, menu, toggleMenu}) {
 }
 
 AppearanceSettings.propTypes = {
-  currentUser: PropTypes.object,
+  client: PropTypes.object,
   menu: PropTypes.number,
   toggleMenu: PropTypes.func
 };

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "../styles/Connecting.module.css";
 import PropTypes from "prop-types";
 import { Client } from "makuwro";
+import { InvalidTokenError } from "makuwro";
 
 export default function ConnectivityCheck({ready, authenticated, setClient}) {
 
@@ -78,14 +79,24 @@ export default function ConnectivityCheck({ready, authenticated, setClient}) {
         
       } catch (err) {
 
-        console.log(err);
+        if (err instanceof InvalidTokenError) {
+
+          // Delete the token cookie
+          document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+          // Try again.
+          await verifyConnectionStatus();
+
+        } else {
+
+          if (!seconds) {
   
-        if (!seconds) {
-  
-          // Add five seconds times each attempt.
-          setSeconds((attempt + 1) * 5);
-          setAttempt(attempt + 1);
-          
+            // Add five seconds times each attempt.
+            setSeconds((attempt + 1) * 5);
+            setAttempt(attempt + 1);
+            
+          }
+
         }
   
       }

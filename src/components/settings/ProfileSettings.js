@@ -6,19 +6,20 @@ import Dropdown from "../input/Dropdown";
 import SettingsDropdown from "./SettingsDropdown";
 import Editor from "@monaco-editor/react";
 
-export default function ProfileSettings({currentUser, menu, toggleMenu, submitting, updateAccount, character}) {
+export default function ProfileSettings({client, menu, toggleMenu, submitting, updateAccount, character}) {
 
-  const [terms, setTerms] = useState((character || currentUser).terms || "");
-  const [css, setCSS] = useState((character || currentUser).css || "");
-  const [about, setAbout] = useState((character ? character.description : currentUser.about) || "");
+  const {user} = client;
+  const [terms, setTerms] = useState((character || user).terms || "");
+  const [css, setCSS] = useState((character || user).css || "");
+  const [about, setAbout] = useState((character ? character.description : user.about) || "");
   const bannerImage = useRef();
   const avatarImage = useRef();
 
   function resetFields() {
 
-    setAbout((character ? character.description : currentUser.about) || "")
-    setTerms((character || currentUser).terms || "");
-    setCSS((character || currentUser).css || "");
+    setAbout((character ? character.description : user.about) || "")
+    setTerms((character || user).terms || "");
+    setCSS((character || user).css || "");
 
   }
 
@@ -39,7 +40,7 @@ export default function ProfileSettings({currentUser, menu, toggleMenu, submitti
           open={menu === 0}
           onClick={() => toggleMenu(0)}
         >
-          <img className="avatar-preview" src={`${currentUser.avatarUrl || `https://cdn.makuwro.com/${(character || currentUser).avatarPath}`}`} />
+          <img className="avatar-preview" src={`${user.avatarUrl || `https://cdn.makuwro.com/${(character || user).avatarPath}`}`} />
           <form>
             <input required={true} type="file" accept="image/*" style={{display: "none"}} ref={avatarImage} onChange={(event) => {
               
@@ -139,7 +140,7 @@ export default function ProfileSettings({currentUser, menu, toggleMenu, submitti
           open={menu === 5}
           onClick={() => toggleMenu(5)}
         >
-          <p>This will be shown on <Link to={`/${currentUser.username}/terms`}>your profile</Link>.</p>
+          <p>This will be shown on <Link to={`/${user.username}/terms`}>your profile</Link>.</p>
           <form onSubmit={(event) => updateAccountWrapper(event, "terms", terms)}>
             <textarea placeholder="All rights reserved. Do not use my work without my explicit permission." value={terms} onInput={(event) => setTerms(event.target.value)} />
             <input type="submit" value="Save" disabled={submitting} />
@@ -152,7 +153,7 @@ export default function ProfileSettings({currentUser, menu, toggleMenu, submitti
 }
 
 ProfileSettings.propTypes = {
-  currentUser: PropTypes.object.isRequired, 
+  client: PropTypes.object.isRequired, 
   menu: PropTypes.number, 
   toggleMenu: PropTypes.func.isRequired, 
   submitting: PropTypes.bool.isRequired,

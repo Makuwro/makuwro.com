@@ -340,3 +340,7 @@ button:active:hover, input[type="submit"]:active:hover, input[type="button"]:act
   color: var(--text);
   margin-left: 7px;
 }
+
+.material-icons-round {
+  user-select: none;
+}

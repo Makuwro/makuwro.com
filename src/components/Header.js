@@ -3,7 +3,7 @@ import styles from "../styles/Header.module.css";
 import PropTypes from "prop-types";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-export default function Header({client, theme, systemDark, query, setLocation, addPopup}) {
+export default function Header({client, theme, systemDark, query, setLocation}) {
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -38,11 +38,10 @@ export default function Header({client, theme, systemDark, query, setLocation, a
       <section>
         {user ? (
           <>
-            <button id={styles.notificationsButton} onClick={() => addPopup({
-              title: "Notifications",
-              children: <p>You don't got any, but rest assured: we'll tell you if someone likes your furry fanfiction.</p>
-            })}>
-              <img src="/icons/bell.svg" />
+            <button id={styles.notificationsButton} onClick={() => navigate("/notifications")}>
+              <span className="material-icons-round">
+                notifications
+              </span>
             </button>
             <button title={`${`${user.displayName} (` || ""}@${user.username}${user.displayName ? ")" : ""}`} onClick={() => navigate(`/${user.username}`)} id={styles.accountButton}>
               <img src={`https://cdn.makuwro.com/${user.avatarPath}`} />

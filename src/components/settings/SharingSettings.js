@@ -7,19 +7,20 @@ import SettingsDropdown from "./SettingsDropdown";
 import Editor from "@monaco-editor/react";
 import SlugInput from "../input/SlugInput";
 
-export default function SharingSettings({currentUser, menu, toggleMenu, submitting, updateAccount, character, blogPost}) {
+export default function SharingSettings({client, menu, toggleMenu, submitting, updateAccount, character, blogPost}) {
 
-  const [terms, setTerms] = useState((character || currentUser).terms || "");
-  const [css, setCSS] = useState((character || currentUser).css || "");
-  const [about, setAbout] = useState((character ? character.description : currentUser.about) || "");
+  const {user} = client;
+  const [terms, setTerms] = useState((character || user).terms || "");
+  const [css, setCSS] = useState((character || user).css || "");
+  const [about, setAbout] = useState((character ? character.description : user.about) || "");
   const bannerImage = useRef();
   const avatarImage = useRef();
 
   function resetFields() {
 
-    setAbout((character ? character.description : currentUser.about) || "")
-    setTerms((character || currentUser).terms || "");
-    setCSS((character || currentUser).css || "");
+    setAbout((character ? character.description : user.about) || "")
+    setTerms((character || user).terms || "");
+    setCSS((character || user).css || "");
 
   }
 
@@ -68,7 +69,7 @@ export default function SharingSettings({currentUser, menu, toggleMenu, submitti
 }
 
 SharingSettings.propTypes = {
-  currentUser: PropTypes.object.isRequired, 
+  client: PropTypes.object.isRequired, 
   menu: PropTypes.number, 
   toggleMenu: PropTypes.func.isRequired,
 };

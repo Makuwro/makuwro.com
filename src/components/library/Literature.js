@@ -9,13 +9,13 @@ import Dropdown from "../input/Dropdown";
 import PropTypes from "prop-types";
 import { v4 as generateUUID } from "uuid";
 
-export default function Literature({currentUser, shownLocation, setLocation, setSettingsCache}) {
+export default function Literature({client, shownLocation, setLocation, setSettingsCache}) {
 
   const {username, slug} = useParams();
   const [editing, setEditing] = useState(false);
   const [ready, setReady] = useState(false);
   const [leaving, setLeaving] = useState(true);
-  const [post, setPost] = useState({});
+  const [post, setPost] = useState();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState(null);
   const [searchParams] = useSearchParams();
@@ -164,98 +164,90 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 
   }, [ready, location]);
 
-  useEffect(async () => {
+  useEffect(() => {
 
-    // Try to get the blog post
-    if (!post.id) {
+    (async () => {
 
-      let json = {};
-      try {
+      // Try to get the blog post
+      if (!post) {
 
-        console.log("Getting post from the server...");
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/blog/${username}/${slug}`, {
-          headers: currentUser.token ? {
-            token: currentUser.token
-          } : {}
-        });
-        json = await response.json();
-  
-        if (!response.ok) {
-  
-          throw new Error(json.message);
-  
+        let post;
+        try {
+
+          console.log("Getting post from the server...");
+          post = await client.getBlogPost(username, slug);
+    
+        } catch ({message}) {
+    
+          setReady(true);
+    
         }
-  
-      } catch ({message}) {
-  
-        json = {};
-        setReady(true);
-  
-      }
 
-      if (isMounted.current) {
-        
-        // Protect us from bad HTML, please!
-        const sanitizedHtml = sanitize(json.content, {
-          allowedAttributes: false, 
-          allowedClasses: false,
-          allowedTags: [
-            "address", "article", "aside", "footer", "header", "h1", "h2", "h3", "h4",
-            "h5", "h6", "hgroup", "main", "nav", "section", "blockquote", "dd", "div",
-            "dl", "dt", "figcaption", "figure", "hr", "li", "main", "ol", "p", "pre",
-            "ul", "a", "abbr", "b", "bdi", "bdo", "br", "cite", "code", "data", "dfn",
-            "em", "i", "kbd", "mark", "q", "rb", "rp", "rt", "rtc", "ruby", "s", "samp",
-            "small", "span", "strong", "sub", "sup", "time", "u", "var", "wbr", "caption",
-            "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr",
-            "audio", "source", "video", "iframe"
-          ]
-        });
+        if (isMounted.current) {
+          
+          // Protect us from bad HTML, please!
+          const sanitizedHtml = sanitize(post.content, {
+            allowedAttributes: false, 
+            allowedClasses: false,
+            allowedTags: [
+              "address", "article", "aside", "footer", "header", "h1", "h2", "h3", "h4",
+              "h5", "h6", "hgroup", "main", "nav", "section", "blockquote", "dd", "div",
+              "dl", "dt", "figcaption", "figure", "hr", "li", "main", "ol", "p", "pre",
+              "ul", "a", "abbr", "b", "bdi", "bdo", "br", "cite", "code", "data", "dfn",
+              "em", "i", "kbd", "mark", "q", "rb", "rp", "rt", "rtc", "ruby", "s", "samp",
+              "small", "span", "strong", "sub", "sup", "time", "u", "var", "wbr", "caption",
+              "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr",
+              "audio", "source", "video", "iframe"
+            ]
+          });
 
-        // Now convert the HTML into a React component!
-        let content = Array.isArray(content = parse(sanitizedHtml, {
+          // Now convert the HTML into a React component!
+          let content = Array.isArray(content = parse(sanitizedHtml, {
 
-          replace: (element) => {
-            
-            // Check if the link is an internal link (makuwro.com)
-            if (element.name === "a" && element.attribs.href === "https://makuwro.com") {
+            replace: (element) => {
+              
+              // Check if the link is an internal link (makuwro.com)
+              if (element.name === "a" && element.attribs.href === "https://makuwro.com") {
 
-              // Replace the element with a React Router link so that the page doesn't refresh
-              return <Link to=""></Link>;
+                // Replace the element with a React Router link so that the page doesn't refresh
+                return <Link to=""></Link>;
 
-            } else if (element.name === "p") {
+              } else if (element.name === "p") {
 
-              return <p>{domToReact(element.children)}</p>;
+                return <p>{domToReact(element.children)}</p>;
+
+              }
+
+              return element;
 
             }
 
-            return element;
+          })) ? content : [content];
 
-          }
+          // Save the react component to the state.
+          setTitle(post.title);
+          setContent({comps: content});
 
-        })) ? content : [content];
+          // Set up the initial clipboard history state for undoing and redoing.
+          console.log("Setting initial clipboard history...");
+          setClipboardHistory((oldHistory) => ({
+            ...oldHistory,
+            content: {
+              position: 0,
+              history: [{comps: content}]
+            }
+          }));
 
-        // Save the react component to the state.
-        setTitle(json.title);
-        setContent({comps: content});
+          // And we're done loading!
+          setReady(true);
+          setPost(post);
 
-        // Set up the initial clipboard history state for undoing and redoing.
-        console.log("Setting initial clipboard history...");
-        setClipboardHistory((oldHistory) => ({
-          ...oldHistory,
-          content: {
-            position: 0,
-            history: [{comps: content}]
-          }
-        }));
 
-        // And we're done loading!
-        setReady(true);
-        setPost(json);
-
+        }
 
       }
 
-    }
+    })();
 
   }, [username, slug]);
 
@@ -270,7 +262,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
     } else {
 
       // Reset the content if it wasn't edited.
-      if (!post.content && content) {
+      if (!post?.content && content) {
         
         setContent(null);
 
@@ -301,35 +293,16 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       // Make sure the source was altered
       if (contentString !== post.content || title !== post.title) {
 
-        // Prepare the body
-        const formData = new FormData();
-        formData.append("title", title);
-        formData.append("content", contentString);
-
         // Update the post's content
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/blog/${username}/${slug}`, {
-          headers: {
-            token: currentUser.token
-          },
-          method: "PATCH",
-          body: formData
+        await client.updateBlogPost(post.owner.username, post.slug, {
+          title,
+          content: contentString
         });
 
-        if (!response.ok) {
-
-          throw new Error((await response.json()).message);
-
-        }
-
-        // Exit edit mode
-        navigate(`/${username}/blog/${slug}`);
-
-      } else {
-
-        // We don't need to do anything, so exit edit mode without calling the API.
-        navigate(`/${username}/blog/${slug}`);
-
       }
+
+      // Exit edit mode.
+      navigate(`/${username}/blog/${slug}`);
 
     } catch (err) {
 
@@ -1117,7 +1090,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
       }
 
     }}>
-      {post.id ? (
+      {post ? (
         <>
           <section id={styles.formatter} className={editing ? styles.available : null}>
             <section id={styles.mobileTools}>
@@ -1183,7 +1156,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
                   </Link>
                 </section>
                 <section id={styles.actions}>
-                  {currentUser && currentUser.id === post.owner.id ? (
+                  {client.user?.id === post.owner.id ? (
                     <>
                       <button onClick={async () => editing ? await save() : navigate("?mode=edit")}>{editing ? "Save" : "Edit"}</button>
                       <button onClick={navigateToSettings}>Settings</button>
@@ -1231,7 +1204,7 @@ export default function Literature({currentUser, shownLocation, setLocation, set
 }
 
 Literature.propTypes = {
-  currentUser: PropTypes.object,
+  client: PropTypes.object,
   shownLocation: PropTypes.object,
   setLocation: PropTypes.func,
   setSettingsCache: PropTypes.func

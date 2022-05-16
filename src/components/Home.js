@@ -12,7 +12,7 @@ export default function Home({shownLocation, setLocation}) {
 
   useEffect(() => {
 
-    if (location.pathname !== "/signin" && location.pathname !== "/register" && location.pathname !== "/") {
+    if (location.pathname !== "/signin" && location.pathname !== "/register" && location.pathname !== "/" && location.pathname !== "/notifications") {
 
       setLeaving(true);
 
