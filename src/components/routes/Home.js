@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import styles from "../styles/Home.module.css";
+import styles from "../../styles/Home.module.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import Footer from "./Footer";
+import Footer from "../Footer";
 
 export default function Home({shownLocation, setLocation}) {
 
@@ -39,7 +39,6 @@ export default function Home({shownLocation, setLocation}) {
         <h1>Welcome to Makuwro</h1>
         <h2>The easiest way to store characters, worlds, and lore</h2>
       </section>
-
       <section id={styles["home-features"]}>
         <section>
           <h1>A place for all your worlds</h1>

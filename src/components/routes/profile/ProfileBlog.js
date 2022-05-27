@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import styles from "../../styles/Profile.module.css";
+import styles from "../../../styles/Profile.module.css";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import BlogPreview from "../BlogPreview";
+import BlogPreview from "./BlogPreview";
 
-export default function ProfileBlog({client, owner, notify}) {
+export default function ProfileBlog({client, owner}) {
 
   const [ready, setReady] = useState(false);
   const [posts, setPosts] = useState(null);
@@ -28,10 +28,8 @@ export default function ProfileBlog({client, owner, notify}) {
         
       } catch ({message}) {
 
-        notify({
-          title: "Couldn't create a starting post",
-          children: message
-        });
+        alert(message);
+        setSubmitting(false);
 
       }
 

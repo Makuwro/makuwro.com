@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "../styles/Connecting.module.css";
 import PropTypes from "prop-types";
 import { Client } from "makuwro";
-import { InvalidTokenError } from "makuwro";
+import { InvalidTokenError } from "makuwro-errors";
 
 export default function ConnectivityCheck({ready, authenticated, setClient}) {
 

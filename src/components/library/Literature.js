@@ -5,7 +5,6 @@ import ReactDOMServer from "react-dom/server";
 import sanitize from "sanitize-html";
 import parse, { domToReact } from "html-react-parser";
 import Footer from "../Footer";
-import Dropdown from "../input/Dropdown";
 import PropTypes from "prop-types";
 import { v4 as generateUUID } from "uuid";
 
@@ -36,14 +35,15 @@ export default function Literature({client, shownLocation, setLocation, setSetti
   const [caretInfo, setCaretInfo] = useState();
   const isMounted = useRef(true);
 
-  function fixCaret(ref, start, end) {
+  function fixCaret({current: node}, start, end) {
 
     const currentSelection = document.getSelection();
     const range = document.createRange();
-    range.setStart(ref, start);
+    console.log(range);
+    range.setStart(node, start);
     if (end) {
 
-      range.setEnd(ref, end);
+      range.setEnd(node, end);
 
     } else {
       
@@ -371,8 +371,6 @@ export default function Literature({client, shownLocation, setLocation, setSetti
 
   function handleInput(event, cutting) {
 
-    const {ctrlKey, key} = event;
-
     // Make sure we're selecting something.
     const selection = document.getSelection();
     if (!selection.focusNode) {
@@ -382,7 +380,7 @@ export default function Literature({client, shownLocation, setLocation, setSetti
     }
 
     const {startOffset, endOffset, startContainer, endContainer} = selection.getRangeAt(0);
-    const atBeginning = startOffset === 0;
+    const {ctrlKey, key} = event;
     const backspace = key === "Backspace";
     const del = key === "Delete";
     const sameContainer = startContainer === endContainer;
@@ -396,11 +394,6 @@ export default function Literature({client, shownLocation, setLocation, setSetti
     if (cutting || (!ctrlKey && (key.length === 1 || removing))) {
       
       // We're adding or removing characters.
-      let newContent;
-      let i;
-      let newParagraph;
-      let nodeMovingToPreviousParagraph;
-      
       // We're handling the content, so prevent the default behavior.
       event.preventDefault();
 
@@ -415,7 +408,7 @@ export default function Literature({client, shownLocation, setLocation, setSetti
       // Now iterate through the component list from the last to the first.
       // We're doing last to first because if we need to delete a paragraph
       // from the list, it won't break the loop.
-      newContent = {
+      const newContent = {
         comps: [...content.comps], 
         selection: {
           startOffset: startOffset + (cutting || backspace || del ? 0 : 1),
@@ -423,8 +416,9 @@ export default function Literature({client, shownLocation, setLocation, setSetti
           childIndex: startSelectedNodeIndex
         }
       };
-      newParagraph = [];
-      for (i = 0; childNodes.length > i; i++) {
+      const newParagraph = [];
+      let nodeMovingToPreviousParagraph;
+      for (let i = 0; childNodes.length > i; i++) {
 
         const isTarget = i === startSelectedNodeIndex;
         const node = childNodes[i];
@@ -436,7 +430,7 @@ export default function Literature({client, shownLocation, setLocation, setSetti
 
           if (backspace) {
 
-            if (atBeginning) {
+            if (startOffset === 0) {
 
               if (highlighted) {
 
@@ -587,7 +581,7 @@ export default function Literature({client, shownLocation, setLocation, setSetti
       }
 
       // Normalize text nodes.
-      i = newParagraph.length;
+      let i = newParagraph.length;
       while (i--) {
 
         const component = newParagraph[i];
@@ -902,8 +896,9 @@ export default function Literature({client, shownLocation, setLocation, setSetti
 
       if (newTitle !== undefined && newTitle !== title) {
 
+        
         selection.removeAllRanges();
-        setTitle(newTitle || <br />);
+        setTitle(newTitle);
         setCaretInfo({
           ref: titleRef,
           offset
@@ -928,18 +923,10 @@ export default function Literature({client, shownLocation, setLocation, setSetti
 
   function formatSelection(action) {
 
+    // Make sure we're selecting something.
     const selection = document.getSelection();
     const range = selection.getRangeAt(0);
     const {startOffset, endOffset, startContainer, endContainer} = range;
-    const parent = contentContainer.current;
-    const {paragraphIndex, selectedNodeIndex} = getImportantIndices(startContainer);
-    let childNodes;
-    let i;
-    let newParent;
-    let newContent;
-    let elementName;
-
-    // Make sure we're selecting something.
     if (startOffset === endOffset && startContainer === endContainer) {
 
       return;
@@ -947,6 +934,7 @@ export default function Literature({client, shownLocation, setLocation, setSetti
     }
 
     // Now, check which action we want to do.
+    let elementName;
     switch (action) {
 
       // Bold
@@ -969,13 +957,15 @@ export default function Literature({client, shownLocation, setLocation, setSetti
     }
 
     // Iterate through all of the child nodes in the selected parent.
-    childNodes = parent.childNodes[paragraphIndex].childNodes;
-    newParent = [];
-    newContent = {comps: [...content.comps], selection: {startOffset, endOffset, paragraphIndex}};
+    const {current: parent} = contentContainer;
+    const {paragraphIndex, selectedNodeIndex} = getImportantIndices(startContainer);
+    const childNodes = parent.childNodes[paragraphIndex].childNodes;
+    const newParent = [];
+    const newContent = {comps: [...content.comps], selection: {startOffset, endOffset, paragraphIndex}};
     let refSet = false;
-    for (i = 0; childNodes.length > i; i++) {
+    for (let i = 0; childNodes.length > i; i++) {
 
-      let currentNode = childNodes[i];
+      const currentNode = childNodes[i];
       const {textContent, nodeType} = currentNode;
 
       // Find out if this is the target element by checking the start offset and the container.
@@ -1031,7 +1021,7 @@ export default function Literature({client, shownLocation, setLocation, setSetti
     }
 
     // Iterate through the parent array and merge the text nodes.
-    i = newParent.length;
+    let i = newParent.length;
     let temporaryContentContainer = parent.childNodes[paragraphIndex].cloneNode(true);
     while (i--) {
 
@@ -1093,49 +1083,11 @@ export default function Literature({client, shownLocation, setLocation, setSetti
       {post ? (
         <>
           <section id={styles.formatter} className={editing ? styles.available : null}>
-            <section id={styles.mobileTools}>
-
-            </section>
-            <section id={styles.tabletTools}>
-              <button 
-                title="Bolden or unbolden text"
-                onClick={() => formatSelection(0)}
-              ><b>B</b></button>
-              <button 
-                title="Italicize or unitalicize text"
-                onClick={() => formatSelection(1)}
-              ><i>I</i></button>
-              <button 
-                title="Underline or un...underline text"
-                onClick={() => formatSelection(2)}
-              ><u>U</u></button>
-              <button 
-                title="Strikethrough or unstrikethrough text"
-                onClick={() => formatSelection(3)}
-              ><strike>S</strike></button>
-              <button title="Change text color">
-                <img src="/icons/color-palette.svg" />
-              </button>
-              <button title="Highlight text">H</button>
-              <button title="Link to another website">
-                <img src="/icons/link.svg" />
-              </button>
-              <button 
-                title="Reset text formatting"
-                onClick={() => formatSelection(4)}
-              >
-                <img src="/icons/format-color.svg" />
-              </button>
-              <Dropdown>
-                <li>Normal text</li>
-                <li>Heading 1</li>
-                <li>Heading 2</li>
-                <li>Heading 3</li>
-                <li>Heading 4</li>
-                <li>Heading 5</li>
-                <li>Heading 6</li>
-              </Dropdown>
-            </section>
+            <button>
+              <span className="material-icons-round">
+                edit_note
+              </span>
+            </button>
           </section>
           <section id={styles.belowFormatter}>
             <section id={styles.metadata}>
@@ -1151,7 +1103,7 @@ export default function Literature({client, shownLocation, setLocation, setSetti
                     {title || (!editing ? "Untitled blog" : null)}
                   </h1>
                   <Link to={`/${post.owner.username}`} className={styles.creator}>
-                    <img src={`https://cdn.makuwro.com/${post.owner.avatarPath}`} />
+                    <img src={`https://cdn.makuwro.com/${post.owner.id}/avatar`} />
                     <span>{post.owner.displayName || `@${post.owner.username}`}</span>
                   </Link>
                 </section>
@@ -1181,7 +1133,7 @@ export default function Literature({client, shownLocation, setLocation, setSetti
               suppressContentEditableWarning 
               ref={contentContainer}
             >
-              {content ? content.comps : (
+              {content?.[0] ? content.comps : (
                 <p>This blog post doesn't exist...yet ;)</p>
               )}
             </section>

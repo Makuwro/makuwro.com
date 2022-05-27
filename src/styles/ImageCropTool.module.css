@@ -1,0 +1,33 @@
+#fullImage {
+  height: 320px;
+  width: 100%;
+  overflow: hidden;
+  background-color: hsl(240, 3%, 14%);
+  border-radius: 5px;
+  display: flex;
+  position: relative;
+  justify-content: center;
+  cursor: grab;
+}
+
+#fullImage:hover:active {
+  cursor: grabbing;
+}
+
+#circle {
+  border-radius: 100%;
+  border: 3px solid white;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  z-index: 1;
+  box-shadow: 0 0 0 9999px rgb(0 0 0 / 60%);
+}
+
+#main img {
+  position: absolute;
+  pointer-events: none;
+}
+
+#main input {
+  width: 100%;
+}

@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import CharacterSubmitter from "./submitters/CharacterSubmitter";
-import ArtSubmitter from "./submitters/CharacterSubmitter";
+import ArtSubmitter from "./submitters/ArtSubmitter";
 import StorySubmitter from "./submitters/StorySubmitter";
-import Popup from "../Popup";
+import Popup from "../popups/Popup";
 
 export default function Submitter({client, art, refreshArt, updated}) {
   
@@ -237,25 +237,14 @@ export default function Submitter({client, art, refreshArt, updated}) {
                 const oldSlug = art?.slug;
         
                 // Now we're ready to submit the request.
-                const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/${type}/${client.user.username}/${oldSlug || slug}`, {
-                  headers: {
-                    token: client.token
-                  },
+                await client.requestREST(`contents/${type}/${client.user.username}/${oldSlug || slug}`, {
                   body: formData,
                   method: oldSlug ? "PATCH" : "POST"
                 });
         
-                if (response.ok) {
-        
-                  navigate(`/${client.user.username}/${type}/${slug}`);
-                  refreshArt();
-                  updated();
-        
-                } else {
-        
-                  throw new Error((await response.json()).message);
-        
-                }
+                navigate(`/${client.user.username}/${type}/${slug}`);
+                refreshArt();
+                updated();
         
               } catch ({message}) {
         

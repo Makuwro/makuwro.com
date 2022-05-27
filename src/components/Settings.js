@@ -8,8 +8,15 @@ import PrivacySettings from "./settings/PrivacySettings";
 import ProfileSettings from "./settings/ProfileSettings";
 import PropTypes from "prop-types";
 import SharingSettings from "./settings/SharingSettings";
+import { Client } from "makuwro";
 
-export default function Settings({client, setLocation, setCurrentUser, setSettingsCache, settingsCache}) {
+/**
+ * 
+ * @param {object} props
+ * @param {Client} props.client
+ * @returns 
+ */
+export default function Settings({client, setLocation, setSettingsCache, settingsCache, setImageUrl}) {
 
   const {username, slug, category, tab} = useParams();
   const [menu, setMenu] = useState();
@@ -70,47 +77,27 @@ export default function Settings({client, setLocation, setCurrentUser, setSettin
         }
 
         // Send the request to change the value.
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}${character ? `contents/characters/${character.owner.username}/${character.slug}` : "accounts/user"}`, {
+        await client.requestREST(`${character ? `contents/characters/${character.owner.username}/${character.slug}` : "accounts/user"}`, {
           method: "PATCH",
-          headers: {
-            token: client.token
-          },
           body: formData
         });
+        
+        if (key !== "isDisabled") {
 
-        if (response.ok) {
+          alert("Saved!");
 
-          // Save the new username to the state.
-          if (key !== "newPassword") {
-
-            (character ? setCharacter : setCurrentUser)({...(character || user), [key + (key === "avatar" || key === "banner" ? "Url" : "")]: key === "avatar" || key === "banner" ? URL.createObjectURL(value) : value});
-
-          }
-          
-          if (key !== "isDisabled") {
-
-            alert("Saved!");
-
-          }
-
-          // Reset the field.
-          resetFields();
-
-          // Close the menu.
-          setMenu();
-
-          // We can submit requests again!
-          setSubmitting(false);
-
-          return true;
-
-        } else {
-
-          const {message} = await response.json();
-
-          alert(message);
-          
         }
+
+        // Reset the field.
+        resetFields();
+
+        // Close the menu.
+        setMenu();
+
+        // We can submit requests again!
+        setSubmitting(false);
+
+        return true;
 
       } catch (err) {
 
@@ -163,24 +150,12 @@ export default function Settings({client, setLocation, setCurrentUser, setSettin
     
       try {
 
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/characters/${character.owner.username}/${character.slug}`, {
-          method: "DELETE",
-          headers: {
-            token: client.token
-          }
+        await client.requestREST(`contents/characters/${character.owner.username}/${character.slug}`, {
+          method: "DELETE"
         });
 
-        if (response.ok) {
-
-          alert("And they're outta here!");
-          navigate(`/${character.owner.username}`);
-
-        } else {
-
-          const {message} = await response.json();
-          throw new Error(message);
-
-        }
+        alert("And they're outta here!");
+        navigate(`/${character.owner.username}`);
 
       } catch (err) {
 
@@ -193,8 +168,6 @@ export default function Settings({client, setLocation, setCurrentUser, setSettin
   }
 
   useEffect(() => {
-
-    let mounted = true;
 
     (async () => {
 
@@ -243,35 +216,20 @@ export default function Settings({client, setLocation, setCurrentUser, setSettin
 
         try {
 
-          const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/${category}/${username}/${slug}`, {
-            headers: {
-              token: user.token
-            }
-          });
-          const json = await response.json();
+          const content = await client[`get${category}`](username, slug);
 
-          if (response.ok && mounted) {
+          switch (category) {
 
-            const content = {...json};
-
-            switch (category) {
-
-              case "characters":
-                character = content;
-                break;
-              
-              case "blog":
-                blogPost = content;
-                break;
-              
-              default:
-                break;
-
-            }
-
-          } else {
-
-            throw new Error(json.message);
+            case "characters":
+              character = content;
+              break;
+            
+            case "blog":
+              blogPost = content;
+              break;
+            
+            default:
+              break;
 
           }
 
@@ -290,12 +248,6 @@ export default function Settings({client, setLocation, setCurrentUser, setSettin
       setReady(true);
       
     })();
-
-    return () => {
-
-      mounted = false;
-
-    };
     
   }, [username, slug, category]);
 
@@ -331,7 +283,8 @@ export default function Settings({client, setLocation, setCurrentUser, setSettin
           toggleMenu={toggleMenu} 
           submitting={submitting}
           updateAccount={updateAccount}
-          character={character} />,
+          character={character}
+          setImageUrl={setImageUrl} />,
         "appearance": <AppearanceSettings 
           client={client}
           menu={menu}

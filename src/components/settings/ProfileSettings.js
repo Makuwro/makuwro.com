@@ -6,7 +6,7 @@ import Dropdown from "../input/Dropdown";
 import SettingsDropdown from "./SettingsDropdown";
 import Editor from "@monaco-editor/react";
 
-export default function ProfileSettings({client, menu, toggleMenu, submitting, updateAccount, character}) {
+export default function ProfileSettings({client, menu, toggleMenu, submitting, updateAccount, character, setImageUrl}) {
 
   const {user} = client;
   const [terms, setTerms] = useState((character || user).terms || "");
@@ -17,7 +17,7 @@ export default function ProfileSettings({client, menu, toggleMenu, submitting, u
 
   function resetFields() {
 
-    setAbout((character ? character.description : user.about) || "")
+    setAbout((character ? character.description : user.about) || "");
     setTerms((character || user).terms || "");
     setCSS((character || user).css || "");
 
@@ -40,11 +40,23 @@ export default function ProfileSettings({client, menu, toggleMenu, submitting, u
           open={menu === 0}
           onClick={() => toggleMenu(0)}
         >
-          <img className="avatar-preview" src={`${user.avatarUrl || `https://cdn.makuwro.com/${(character || user).avatarPath}`}`} />
+          <img className="avatar-preview" src={`${user.avatarUrl || `https://cdn.makuwro.com/${user.id}/avatar`}`} />
           <form>
             <input required={true} type="file" accept="image/*" style={{display: "none"}} ref={avatarImage} onChange={(event) => {
               
-              updateAccountWrapper(event, "avatar", event.target.files[0]);
+              const reader = new FileReader();
+              reader.addEventListener("load", () => setImageUrl([reader.result, async (blob) => {
+                
+                if (blob) {
+
+                  await updateAccountWrapper(event, "avatar", blob);
+
+                }
+                
+                setImageUrl();
+              
+              }]));
+              reader.readAsDataURL(event.target.files[0]);
             
             }} />
             <input style={{marginTop: "1rem"}} type="button" value="Change avatar" onClick={() => avatarImage.current.click()} disabled={submitting} />
@@ -56,10 +68,23 @@ export default function ProfileSettings({client, menu, toggleMenu, submitting, u
           open={menu === 1}
           onClick={() => toggleMenu(1)}
         >
+          <img id={styles.banner} src={`https://cdn.makuwro.com/${client.user.id}/banner`} />
           <form>
             <input type="file" ref={bannerImage} accept="image/*" style={{display: "none"}} onChange={(event) => {
               
-              updateAccountWrapper(event, "banner", event.target.files[0]);
+              const reader = new FileReader();
+              reader.addEventListener("load", () => setImageUrl([reader.result, async (blob) => {
+              
+                if (blob) {
+
+                  await updateAccountWrapper(event, "banner", blob);
+
+                }
+
+                setImageUrl();
+                
+              }, true]));
+              reader.readAsDataURL(event.target.files[0]);
             
             }} />
             <input type="button" value="Change banner image" disabled={submitting} onClick={() => bannerImage.current.click()} />

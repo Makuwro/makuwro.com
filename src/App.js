@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useSearchParams, useNavigate, useLocation } from "react-router-dom";
-import Home from "./components/Home";
+import Home from "./components/routes/Home";
 import PropTypes from "prop-types";
 import Header from "./components/Header";
-import Profile from "./components/Profile";
+import Profile from "./components/routes/Profile";
 import Maintenance from "./components/Maintenance";
 import Art from "./components/library/Art";
-import PopupManager from "./components/PopupManager";
+import PopupManager from "./components/popups/PopupManager";
 import Authenticator from "./components/Authenticator";
 import Literature from "./components/library/Literature";
 import Settings from "./components/Settings";
 import Submitter from "./components/library/Submitter";
 import ConnectivityCheck from "./components/ConnectivityCheck";
-import "./styles/global.css";
-import Search from "./components/Search";
+import Search from "./components/routes/Search";
 import Notifications from "./components/Notifications";
+import "./styles/global.css";
+import ImageCropTool from "./components/ImageCropTool";
+import AlertManager from "./components/alerts/AlertManager";
 
 const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 const maintenance = false;
@@ -165,6 +167,21 @@ export default function App() {
 
   }, [criticalError]);
 
+  const [imageUrl, setImageUrl] = useState();
+  const [alerts, setAlerts] = useState([]);
+
+  function addAlert(config) {
+
+    setAlerts((previousAlerts) => {
+
+      const newAlerts = [...previousAlerts];
+      newAlerts.unshift(config);
+      return newAlerts;
+
+    });
+
+  }
+
   return (
     <>
       <ConnectivityCheck 
@@ -191,9 +208,17 @@ export default function App() {
                 }} 
               />
             )}
+            <ImageCropTool client={client} imageUrl={imageUrl} />
             <Submitter client={client} />
             <Notifications client={client} shownLocation={shownLocation} />
             <Header client={client} systemDark={systemDark} setLocation={setLocation} />
+            <AlertManager alerts={alerts} onChange={(index) => setAlerts((oldAlerts) => {
+              
+              const newAlerts = [...oldAlerts];
+              newAlerts.splice(index, 1);
+              return newAlerts;
+            
+            })} />
             <Routes location={shownLocation}>
               {["/", "/register", "/signin", "/notifications"].map((path, index) => {
 
@@ -215,6 +240,7 @@ export default function App() {
                     artViewerOpen={artViewerOpen}
                     setSettingsCache={setSettingsCache}
                     setCriticalError={setCriticalError}
+                    addAlert={addAlert}
                   />
                 )} />;
 
@@ -244,6 +270,7 @@ export default function App() {
                       setLocation={setLocation} 
                       settingsCache={settingsCache}
                       setSettingsCache={setSettingsCache}
+                      setImageUrl={setImageUrl}
                     />
                   )}
                 />

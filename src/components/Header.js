@@ -44,7 +44,7 @@ export default function Header({client, theme, systemDark, query, setLocation}) 
               </span>
             </button>
             <button title={`${`${user.displayName} (` || ""}@${user.username}${user.displayName ? ")" : ""}`} onClick={() => navigate(`/${user.username}`)} id={styles.accountButton}>
-              <img src={`https://cdn.makuwro.com/${user.avatarPath}`} />
+              <img alt="Avatar" src={`https://cdn.makuwro.com/${user.id}/avatar`} />
             </button>
           </>
         ) : (

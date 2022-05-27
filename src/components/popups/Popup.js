@@ -1,11 +1,11 @@
-import styles from "../styles/Popup.module.css";
+import styles from "../../styles/Popup.module.css";
 import React, { useState, useEffect, useContext } from "react";
 import { PopupContext } from "./PopupManager";
 import PropTypes from "prop-types";
 
 export default function Popup({
   onClose, warnUnfinished, exitMessage = "Are you sure you want to exit? You aren't finished yet!", children,
-  title, unclosable
+  title, unclosable, style = null, className, id = null
 }) {
 
   const [previousPopup, setPreviousPopup] = useState();
@@ -42,8 +42,6 @@ export default function Popup({
     // Check if there's currently a popup.
     if (currentPopup) {
 
-      console.log(currentPopup);
-
       // Temporarily close that popup, but save it.
       currentPopup.toggle(false);
       setPreviousPopup(currentPopup);
@@ -56,7 +54,7 @@ export default function Popup({
     });
 
     // Open this popup.
-    setPopupOpen(true);
+    setTimeout(() => setPopupOpen(true), 0);
 
     // Listen for keydown.
     document.addEventListener("keydown", checkForEscape);
@@ -118,10 +116,14 @@ export default function Popup({
             <h1>{title}</h1>
           )}
           {!unclosable && (
-            <button onClick={() => close(true)}>🞫</button>
+            <button onClick={() => close(true)}>
+              <span className="material-icons-round">
+                close
+              </span>
+            </button>
           )}
         </section>
-        <section className={styles.content}>{children}</section>
+        <section id={id} className={`${styles.content}${className ? ` ${className}` : ""}`} style={style}>{children}</section>
       </section>
     </section>
   );

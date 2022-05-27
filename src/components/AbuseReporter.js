@@ -4,7 +4,7 @@ import Dropdown from "./input/Dropdown";
 import CountryDropdown from "./input/CountryDropdown";
 import Checkbox from "./input/Checkbox";
 
-export default function AbuseReporter({setPopupSettings, currentUser, addNotification}) {
+export default function AbuseReporter({client, setPopupSettings, currentUser, addNotification}) {
 
   const [menu, setMenu] = useState([]);
   const [escalate, setEscalate] = useState(false);
@@ -64,34 +64,22 @@ export default function AbuseReporter({setPopupSettings, currentUser, addNotific
       // Just in case there's a problem, wrap it around a try-catch
       try {
 
-        // Send the report to the server
+        // Attach the content field to the request.
         const formData = new FormData();
         formData.append("content", `${contentString}\n\nIs there anything else you'd like us to know?\n${extraDetails || "No"}`);
 
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}${type}/${subType}/${username}${slug ? `/${slug}` : ""}/report`, {
+        // Send the report to the server
+        await client.requestREST(`${type}/${subType}/${username}${slug ? `/${slug}` : ""}/report`, {
           method: "POST",
-          headers: {
-            token: currentUser.token
-          },
           body: formData
         });
 
-        // Check if everything went OK
-        if (response.ok) {
-
-          // Everything went OK, so tell the user!
-          addNotification({
-            title: "Successfully reported to Makuwro Safety & Security",
-            children: "Thanks for helping to keep the community safe."
-          });
-          navigate(location.pathname);
-
-        } else {
-
-          // Something bad happened, so throw an error
-          throw new Error(`${response.status}: ${response.statusText}`);
-
-        }
+        // Everything went OK, so tell the user!
+        addNotification({
+          title: "Successfully reported to Makuwro Safety & Security",
+          children: "Thanks for helping to keep the community safe."
+        });
+        navigate(location.pathname);
 
       } catch (err) {
 

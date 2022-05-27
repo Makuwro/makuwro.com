@@ -77,16 +77,17 @@ export default function Dropdown({index, children, onChange, width, inPopup, tab
 
     };
 
-  }, [index]);
+  }, [children, index]);
 
   return (
     <section className={`${styles.list} ${open ? styles.open : ""} ${above ? styles.above : ""} ${!childrenComponents ? styles.none : ""}`} ref={dropdownRef}>
+      <section className={styles.background} onClick={() => setOpen(false)} />
       <section 
         tabIndex={tabIndex || null} 
         style={{
           width: width || "auto",
         }}
-        className={index === undefined ? styles.noSelection : ""}
+        className={`${styles.toggle}${index === undefined ? ` ${styles.noSelection}` : ""}`}
         onClick={() => children && checkIfFlipNeeded()}
       >
         {text || (childrenComponents ? ((childrenComponents[index] && childrenComponents[index].props.children) || placeholder) : "No options available")}

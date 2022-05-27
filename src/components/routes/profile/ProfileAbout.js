@@ -8,7 +8,7 @@ export default function ProfileAbout({owner, isCharacter}) {
 
   const [ready, setReady] = useState();
   const [comp, setComp] = useState();
-  const location = useLocation();
+  const {pathname} = useLocation();
 
   useEffect(() => {
 
@@ -65,9 +65,13 @@ export default function ProfileAbout({owner, isCharacter}) {
 
   useEffect(() => {
 
-    document.title = `${owner.username} on Makuwro`;
+    if (pathname !== "/notifications" && pathname !== "/register" && pathname !== "/signin") {
 
-  }, []);
+      document.title = `${owner.username} on Makuwro`;
+
+    }
+
+  }, [pathname]);
 
   return ready ? (
     comp || (

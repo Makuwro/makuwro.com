@@ -5,18 +5,11 @@ header {
   height: 56px;
   padding: 0 1.2rem;
   color: white;
-  background-color: #313237;
+  background-color: var(--header);
   filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.2));
   box-sizing: border-box;
   transition: 0.3s;
-  position: absolute;
-  z-index: 1;
-  width: calc(100% - 2rem);
-  border-radius: 5px;
-  margin: 0 auto;
-  top: 1rem;
-  left: 0;
-  right: 0;
+  z-index: 3;
 }
 
 :global(.light) header {
@@ -204,7 +197,7 @@ input.no-results {
   }
 
   #notificationsButton:hover {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.2);
   }
 
 }

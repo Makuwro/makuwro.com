@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import styles from "../../styles/Profile.module.css";
+import styles from "../../../styles/Profile.module.css";
 import PropTypes from "prop-types";
 
 export default function ProfileLibraryItem({tab, owner, client, updated, isCharacter}) {
@@ -30,7 +30,7 @@ export default function ProfileLibraryItem({tab, owner, client, updated, isChara
       (async () => {
 
         // Get the stuff from the server.
-        const content = isCharacter ? [...owner[tab]] : await client[`getAll${tab.slice(0, 1).toUpperCase()}${tab.slice(1)}`](owner);
+        const content = isCharacter ? [...owner[tab]] : await client[`getAll${tab.slice(0, 1).toUpperCase()}${tab.slice(1)}`](owner.username);
 
         // Check if everything's OK.
         if (content) {

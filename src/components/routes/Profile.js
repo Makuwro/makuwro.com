@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Link, matchPath, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import PropTypes from "prop-types";
-import styles from "../styles/Profile.module.css";
-import Footer from "./Footer";
+import styles from "../../styles/Profile.module.css";
+import Footer from "../Footer";
 import ProfileLibraryItem from "./profile/ProfileLibraryItem";
 import ProfileStats from "./profile/ProfileStats";
 import ProfileTerms from "./profile/ProfileTerms";
 import ProfileBlog from "./profile/ProfileBlog";
 import ProfileAbout from "./profile/ProfileAbout";
 import ProfileChapters from "./profile/ProfileChapters";
-import Dropdown from "./input/Dropdown";
+import Dropdown from "../input/Dropdown";
 
-export default function Profile({shownLocation, setLocation, client, notify, updated, setSettingsCache, setCriticalError}) {
+export default function Profile({shownLocation, setLocation, client, notify, updated, setSettingsCache, setCriticalError, addAlert}) {
 
   const {username, tab, id, subtab} = useParams();
   const [leaving, setLeaving] = useState(true);
@@ -26,6 +26,7 @@ export default function Profile({shownLocation, setLocation, client, notify, upd
   const [isStory, setIsStory] = useState(tab === "stories" && id);
   const [navComponents, setNavComponents] = useState([]);
   const [cache, setCache] = useState({});
+  const [dropdownIndex, setDropdownIndex] = useState();
   const navigate = useNavigate();
   const action = searchParams.get("action");
 
@@ -72,15 +73,22 @@ export default function Profile({shownLocation, setLocation, client, notify, upd
             navigate(href);
 
           } : null;
+          const selected = itemLC === tab || itemLC === subtab || ((isCharacter ? !subtab : !tab) && itemLC === "about");
           const element = React.createElement(Link, {
             to: href,
-            className: itemLC === tab || itemLC === subtab || ((isCharacter ? !subtab : !tab) && itemLC === "about") ? styles.selected : null,
+            className: selected ? styles.selected : null,
             onClick,
             onTransitionEnd: (event) => event.stopPropagation(),
             key: itemLC,
             name: itemLC,
             draggable: false
           }, item);
+
+          if (selected) {
+
+            setDropdownIndex(i);
+
+          }
 
           // Push it for use later
           navChildren.push(element);
@@ -147,6 +155,10 @@ export default function Profile({shownLocation, setLocation, client, notify, upd
       ) {
 
         setLeaving(true);
+
+      } else if (onProfile) {
+        
+        setLocation(location);
 
       }
 
@@ -275,14 +287,14 @@ export default function Profile({shownLocation, setLocation, client, notify, upd
       <section>
         <section id={styles["profile-header"]}>
           <section id={styles.profileBannerContainer}>
-            {owner && owner.bannerPath && <img src={`https://cdn.makuwro.com/${owner.bannerPath}`} />}
+            {owner && <img src={`https://cdn.makuwro.com/${owner.id}/banner`} />}
           </section>
         </section>
         <section id={styles["profile-info"]} style={!owner || isStory ? {paddingBottom: "80px"} : null}>
           <section>
             <section>
               {!isStory && (
-                <img id={styles.avatar} alt={`${username}'s avatar`} src={`https://cdn.makuwro.com/${owner ? owner.avatarPath : "global/pfp.png"}`} />
+                <img id={styles.avatar} alt={`${username}'s avatar`} src={`https://cdn.makuwro.com/${owner.id}/avatar`} />
               )}
               <section>
                 <h1>
@@ -305,7 +317,7 @@ export default function Profile({shownLocation, setLocation, client, notify, upd
                   : ((isStory || isCharacter) && (
                     <Link to={`/${owner.owner.username}`} id={styles.owner}>
                       <span>
-                        <img src={`https://cdn.makuwro.com/${owner.owner.avatarPath}`} />
+                        <img src={`https://cdn.makuwro.com/${owner.owner.id}/avatar`} />
                       </span>
                       {owner.owner.displayName || `@${owner.owner.username}`}
                     </Link>
@@ -328,7 +340,7 @@ export default function Profile({shownLocation, setLocation, client, notify, upd
           </section>
           {!isStory && (
             <>
-              <Dropdown index={0}>
+              <Dropdown index={dropdownIndex} onChange={(_, child) => navigate(`/${username}/${child.toLowerCase()}`)}>
                 {navComponents.map((component) => (
                   <li key={component.props.name}>
                     {component.props.children}

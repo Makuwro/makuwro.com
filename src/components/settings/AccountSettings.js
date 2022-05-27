@@ -1,7 +1,9 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../../styles/Settings.module.css";
 import SettingsDropdown from "./SettingsDropdown";
+import PropTypes from "prop-types";
+import Checkbox from "../input/Checkbox";
 
 export default function AccountSettings({client, menu, setMenu, submitting, updateAccount}) {
 
@@ -84,7 +86,7 @@ export default function AccountSettings({client, menu, setMenu, submitting, upda
   return (
     <>
       <section id={styles.welcome}>
-        <img className="avatar-preview" src={user.avatarUrl || `https://cdn.makuwro.com/${user.avatarPath}`} />
+        <img className="avatar-preview" src={`https://cdn.makuwro.com/${user.id}/avatar`} />
         <h1>Hi, {user.displayName || user.username}!</h1>
         <p>You can manage your account information here.</p>
       </section>
@@ -111,6 +113,7 @@ export default function AccountSettings({client, menu, setMenu, submitting, upda
           onClick={() => toggleMenu(1)}
         >
           <p>Your current username is <b>{user.username}</b>.</p>
+          <p>If you change your username, anyone will be able to claim your previous username. Due to this, we will not redirect your creations from your previous username to your new username in order to free the slugs for the new username owner.</p>
           <form onSubmit={(event) => updateAccountWrapper(event, "username", username)}>
             <label>New username</label>
             <input type="text" value={username} onInput={(event) => setUsername(event.target.value)} required />
@@ -132,6 +135,9 @@ export default function AccountSettings({client, menu, setMenu, submitting, upda
             <input type="password" required value={newPassword} onInput={(event) => setNewPassword(event.target.value)} />
             <label>Confirm new password</label>
             <input type="password" required value={passwordAgain} onInput={(event) => setPasswordAgain(event.target.value)}  />
+            <Checkbox>
+              Sign out everywhere else
+            </Checkbox>
             <input type="submit" value="Save" disabled={submitting} />
           </form>
         </SettingsDropdown>
@@ -155,7 +161,8 @@ export default function AccountSettings({client, menu, setMenu, submitting, upda
           open={menu === 5} 
           onClick={() => toggleMenu(5)}
         >
-          <p>Your profile and content will become private and you'll be logged out everywhere.</p>
+          <p>Your profile and content will become private and you'll be signed out everywhere.</p>
+          <p>We will email you every six months to protect your username from the inactive account policy.</p>
           <p>You can re-enable your account by signing back in.</p>
           <form onSubmit={disableAccount}>
             <label>Password</label>
@@ -169,7 +176,7 @@ export default function AccountSettings({client, menu, setMenu, submitting, upda
           onClick={() => toggleMenu(6)}
         >
           <p>If you want to permanently delete your account and all content you uploaded, you may request to do so by pressing the button below.</p>
-          <p>You will have 24 hours to cancel your request by signing back in, but after the time passes, all information you gave us will be deleted.</p>
+          <p>You will have 24 hours to cancel your request by signing back in, but after the time passes, all information you gave us will be deleted and irrecoverable. Additionally, your username will be re-released into the pool of available usernames.</p>
           <form onSubmit={deleteAccount}>
             <label>Password</label>
             <input type="password" value={password} onInput={(event) => setPassword(event.target.value)} />
@@ -181,3 +188,7 @@ export default function AccountSettings({client, menu, setMenu, submitting, upda
   );
 
 }
+
+AccountSettings.propTypes = {
+  client: PropTypes.object
+};

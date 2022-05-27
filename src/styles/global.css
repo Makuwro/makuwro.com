@@ -9,6 +9,7 @@
   --text-important: white;
   --text-footer: var(--text-important);
   --day-box-shadow: rgba(0, 0, 0, 0.133) 0px 1.6px, rgba(0, 0, 0, 0.11) 0px 0.3px 0.9px 0px;
+  --header: #313237;
 }
 
 .light {
@@ -77,10 +78,9 @@ p {
 }
 
 main {
-  padding-top: calc(2rem + 56px);
   width: 100%;
-  height: 100%;
-  overflow-y: overlay;
+  height: calc(100% - 56px);
+  overflow-y: auto;
   box-sizing: border-box;
 }
 
@@ -123,6 +123,7 @@ textarea, form input[type="text"], form input[type="password"], form input[type=
   box-sizing: border-box;
   font-weight: 300;
   margin-top: 1rem;
+  box-shadow: 0 2px 3.6px 0 rgb(0 0 0 / 13%), 0 0px 9px 4px rgb(0 0 0 / 11%);
 }
 
 .light textarea, .light form input[type="text"], .light form input[type="password"], .light form input[type="email"], .light .input-with-prefix {
@@ -198,7 +199,7 @@ button, input[type="button"], input[type="submit"] {
   color: white;
   font-size: 1rem;
   transition: 0.1s;
-  border-radius: 5px;
+  border-radius: 20px;
 }
 
 button:hover, input[type="button"]:hover, input[type="submit"]:hover {
@@ -232,28 +233,6 @@ li {
 
 p, li, dd, .info {
   color: var(--text);
-}
-
-::-webkit-scrollbar {
-  width: 15px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  border-width: 2px;
-}
-
-::-webkit-scrollbar-track {
-  border-radius: 10px;
-  background-clip: padding-box;
-  margin: 5px;
-}
-
-::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: #878792;
-  border: 5px solid transparent;
-  background-clip: padding-box;
-  transition: 0.3s;
 }
 
 button.destructive, input.destructive {

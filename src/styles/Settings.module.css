@@ -111,8 +111,16 @@ section#welcome {
   text-align: center;
 }
 
+#options {
+  margin: 0 15px;
+}
+
 #options > .destructive {
   background-color: #544141;
+}
+
+#banner {
+  border-radius: 5px;
 }
 
 @media screen and (min-width: 1024px) {
@@ -121,6 +129,7 @@ section#welcome {
     display: block;
     width: 288px;
     margin: 0 1rem;
+    padding-top: 1rem;
   }
 
   #left ul {

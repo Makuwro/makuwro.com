@@ -3,11 +3,12 @@ import styles from "../../styles/LibraryViewer.module.css";
 import PropTypes from "prop-types";
 import { Link, useNavigate } from "react-router-dom";
 import Comment from "../Comment";
-const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-export default function Art({art, currentUser, onClose, notify, confirmContentWarning, artDeleted}) {
+export default function Art({art, client, onClose, notify, confirmContentWarning, artDeleted}) {
 
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   let [comments, setComments] = useState();
+  const {user} = client;
   const [commentComps, setCommentComps] = useState([]);
   const [closed, setClosed] = useState(true);
   const [commentsOpen, toggleComments] = useState(false);
@@ -91,30 +92,16 @@ export default function Art({art, currentUser, onClose, notify, confirmContentWa
   useEffect(async () => {
 
     let mounted = true;
-    let comments;
+    let comments = [];
     if (!commentComps[0] && art) {
 
       try {
 
         // Get the comments
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/art/${art.owner.username}/${art.slug}/comments`, {headers: {
-          token: currentUser.token
-        }});
-
-        comments = await response.json();
-        if (!response.ok) {
-
-          comments = [];
-          notify({
-            title: "Couldn't get comments",
-            children: comments.message
-          });
-
-        }
+        comments = await art.getComments();
 
       } catch (err) {
 
-        comments = [];
         notify({
           title: "Couldn't get comments",
           children: err.message
@@ -124,7 +111,7 @@ export default function Art({art, currentUser, onClose, notify, confirmContentWa
 
     }
 
-    if (!closed && comments?.[0]) {
+    if (!closed && comments[0]) {
 
       const newComps = [];
       for (let i = comments.length - 1; i >= 0; i--) {
@@ -133,7 +120,7 @@ export default function Art({art, currentUser, onClose, notify, confirmContentWa
         newComps.push(<Comment name={comment.owner.displayName} username={comment.owner.username} avatarPath={comment.owner.avatarPath} key={comment.id}>{comment.content}</Comment>);
 
       }
-      alert("hello!");
+      
       if (mounted) setCommentComps(newComps);
 
     }
@@ -144,7 +131,7 @@ export default function Art({art, currentUser, onClose, notify, confirmContentWa
 
     };
 
-  }, [art, currentUser]);
+  }, [art, user]);
 
   async function deleteArt() {
 
@@ -154,20 +141,13 @@ export default function Art({art, currentUser, onClose, notify, confirmContentWa
 
       try {
 
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/art/${art.owner.username}/${art.slug}`, {headers: {
-          token: currentUser.token
-        }, method: "DELETE"});
-
-        if (response.ok) {
-
-          notify({
-            title: "Successfully deleted your art",
-            children: "Buh-bye!"
-          });
-          artDeleted();
-          setClosed(true);
-
-        }
+        await art.delete();
+        notify({
+          title: "Successfully deleted your art",
+          children: "Buh-bye!"
+        });
+        artDeleted();
+        setClosed(true);
 
       } catch (err) {
 
@@ -193,24 +173,11 @@ export default function Art({art, currentUser, onClose, notify, confirmContentWa
 
       try {
 
-        const formData = new FormData();
-        formData.append("content", commentContent);
+        await art.createComment(client.user, commentContent);
 
-        const response = await fetch(`${process.env.RAZZLE_API_DEV}contents/art/${art.owner.username}/${art.slug}/comments`, {
-          headers: {
-            token: currentUser.token,
-          }, 
-          method: "POST",
-          body: formData
-        });
-
-        if (response.ok) {
-
-          // Refresh the comments
-          setCommentContent("");
-          setComments();
-
-        }
+        // Refresh the comments
+        setCommentContent("");
+        setComments();
 
       } catch (err) {
 
@@ -303,7 +270,7 @@ export default function Art({art, currentUser, onClose, notify, confirmContentWa
               <section id={styles.actions}>
                 <button id={styles.like} className={!commentsEnabled ? styles.disabled : null} onClick={null}>Like</button>
                 <button id={styles["show-comments"]} className={!commentsEnabled ? styles.disabled : null} onClick={commentsEnabled ? () => toggleComments(true) : null}>{commentsEnabled ? "Comments" : "Comments disabled"}</button>
-                {currentUser.id === art.owner.id && (
+                {user?.id === art.owner.id && (
                   <>
                     <button onClick={() => navigate("?action=edit-art")}>Edit</button>
                     <button className="destructive" onClick={deleteArt}>Delete</button>
@@ -312,15 +279,15 @@ export default function Art({art, currentUser, onClose, notify, confirmContentWa
               </section>
             </section>
             <section id={styles["comment-container"]}>
-              {currentUser.id && (
+              {user && (
                 <form id={styles["comment-creator"]} onSubmit={submitComment}>
-                  <img src={`https://cdn.makuwro.com/${currentUser.avatarPath}`} />
+                  <img src={`https://cdn.makuwro.com/${user.avatarPath}`} />
                   <section>
                     <section id={styles.commentNames}>
-                      {currentUser.displayName && (
-                        <section>{currentUser.displayName}</section>
+                      {user.displayName && (
+                        <section>{user.displayName}</section>
                       )}
-                      <section className={styles.username}>@{currentUser.username}</section>
+                      <section className={styles.username}>@{user.username}</section>
                     </section>
                     <textarea placeholder="This is cool!" required value={commentContent} onInput={(event) => setCommentContent(event.target.value)} />
                     <input type="submit" value="Post" disabled={submitting} />
@@ -341,7 +308,7 @@ export default function Art({art, currentUser, onClose, notify, confirmContentWa
 }
 
 Art.propTypes = {
-  currentUser: PropTypes.object,
+  client: PropTypes.object.isRequired,
   art: PropTypes.object,
   onClose: PropTypes.func,
   notify: PropTypes.func

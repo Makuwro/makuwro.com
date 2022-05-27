@@ -4,7 +4,7 @@ import styles from "../styles/Authenticator.module.css";
 import BirthdateDropdown from "./input/BirthdateDropdown";
 import Checkbox from "./input/Checkbox";
 import PropTypes from "prop-types"; 
-import Popup from "./Popup";
+import Popup from "./popups/Popup";
 
 export default function Authenticator({client, open, shownLocation}) {
 
@@ -69,17 +69,10 @@ export default function Authenticator({client, open, shownLocation}) {
           form.append("birthDate", birthDate);
           form.append("email", email);
 
-          const response = await fetch(`${process.env.RAZZLE_API_DEV}accounts/user`, {
+          await client.requestREST("accounts/user", {
             method: "POST",
             body: form
           });
-
-          if (!response.ok) {
-
-            const {message} = await response.json();
-            throw new Error(message);
-
-          }
 
         } catch (err) {
 
@@ -116,7 +109,7 @@ export default function Authenticator({client, open, shownLocation}) {
   useEffect(() => {
 
     const {user} = client;
-    if ((location.pathname === "/signin" || location.pathname === "/register") && open && user?.id) {
+    if ((location.pathname === "/signin" || location.pathname === "/register") && open && user) {
 
       alert(`You're already signed in, ${user.displayName || user.username}!`);
       return onClose();

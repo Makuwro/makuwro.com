@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
-import profileStyles from "../styles/Profile.module.css";
-import styles from "../styles/Blog.module.css";
+import profileStyles from "../../../styles/Profile.module.css";
+import styles from "../../../styles/Blog.module.css";
 
 export default function BlogPreview({
   owner, title, coverURL, slug, published, currentUserIsOwner
@@ -24,7 +24,7 @@ export default function BlogPreview({
         )}
       </h1>
       <section className={styles.creator}>
-        <img src={`https://cdn.makuwro.com/${owner.avatarPath}`} />
+        <img src={`https://cdn.makuwro.com/${owner.id}/avatar`} />
         <span>{owner.displayName || `@${owner.username}`}</span>
       </section>
     </Link>

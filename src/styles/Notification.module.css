@@ -1,0 +1,18 @@
+.notification {
+  background-color: #232325;
+  padding: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+}
+
+.notification h3, .notification p {
+  margin: 0;
+}
+
+.textContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
