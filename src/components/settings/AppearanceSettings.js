@@ -51,6 +51,18 @@ export default function AppearanceSettings({client, menu, toggleMenu}) {
           <li>Light</li>
         </Dropdown>
       </SettingsDropdown>
+      <SettingsDropdown
+        title="Customize collaboration flags"
+        description="How do you want us to tell you that your chums are on a paragraph?"
+        open={menu === 1}
+        onClick={() => toggleMenu(1)}
+      >
+        <Dropdown index={0}>
+          <li>Show display names</li>
+          <li>Show usernames</li>
+          <li>Show avatars</li>
+        </Dropdown>
+      </SettingsDropdown>
     </section>
   );
 

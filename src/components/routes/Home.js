@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import styles from "../../styles/Home.module.css";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Footer from "../Footer";
 
-export default function Home({shownLocation, setLocation}) {
+export default function Home({setLocation}) {
 
-  const navigate = useNavigate();
   const location = useLocation();
   const [leaving, setLeaving] = useState(true);
 

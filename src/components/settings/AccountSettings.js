@@ -175,13 +175,20 @@ export default function AccountSettings({client, menu, setMenu, submitting, upda
           open={menu === 6} 
           onClick={() => toggleMenu(6)}
         >
-          <p>If you want to permanently delete your account and all content you uploaded, you may request to do so by pressing the button below.</p>
-          <p>You will have 24 hours to cancel your request by signing back in, but after the time passes, all information you gave us will be deleted and irrecoverable. Additionally, your username will be re-released into the pool of available usernames.</p>
-          <form onSubmit={deleteAccount}>
-            <label>Password</label>
-            <input type="password" value={password} onInput={(event) => setPassword(event.target.value)} />
-            <input type="submit" className="destructive" value="Delete account" />
-          </form>
+          {client.user.isStaff ? (
+            <section className="info">This account is currently protected by Makuwro, LLC. It cannot be deleted on Makuwro.com.</section>
+          ) : (
+            <>
+              <section className="info">You currently own teams! You must transfer or delete them of them before deleting your account.</section>
+              <p>If you want to permanently delete your account and all content you uploaded, you may request to do so by pressing the button below.</p>
+              <p>You will have 24 hours to cancel your request by signing back in, but after the time passes, all information you gave us will be deleted and irrecoverable. It will not be anonymized; it will be <b>gone</b>. Makuwro staff members will not be able to recover your account after this. Additionally, your username will be re-released into the pool of available usernames.</p>
+              <form onSubmit={deleteAccount}>
+                <label>Password</label>
+                <input type="password" value={password} onInput={(event) => setPassword(event.target.value)} />
+                <input type="submit" className="destructive" value="Delete account" />
+              </form>
+            </>
+          )}
         </SettingsDropdown>
       </section>
     </>

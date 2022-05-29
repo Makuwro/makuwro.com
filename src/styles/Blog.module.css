@@ -3,12 +3,40 @@
   transition: 0.3s;
 }
 
+#mobileTools {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  max-height: 275px;
+  background-color: var(--background-input);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+#mobileTools > section {
+  justify-content: center;
+  display: flex;
+}
+
+#mobileTools > section > button {
+  width: 100%;
+}
+
+#mobileTools > button {
+  border-radius: 0;
+  text-align: left;
+  background-color: transparent;
+  font-weight: 300;
+}
+
 #formatter {
   background-color: var(--background);
   width: 100%;
   padding: 5px 10px;
   box-sizing: border-box;
-  display: flex;
+  display: none;
   height: 50.5px;
   transition: 0.3s;
   filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.2));
@@ -25,20 +53,14 @@
   margin-bottom: 0;
 }
 
-#formatter > section:first-of-type {
-  display: flex;
-}
-
-#formatter section {
-  margin-top: 0;
-  height: 100%;
-}
-
 #formatter button {
+  width: 40px;
+}
+
+#formatter button, #mobileTools > section > button {
   background-color: transparent;
   font-weight: 100;
   height: 40px;
-  width: 40px;
   padding: 0;
   display: flex;
   justify-content: center;
@@ -77,7 +99,7 @@
 
 #metadata {
   margin-top: 2rem;
-  max-width: 1280px;
+  max-width: 1080px;
   margin: 2rem 2rem 0;
 }
 
@@ -93,7 +115,7 @@
   background-color: gray;
   aspect-ratio: 4;
   box-shadow: var(--day-box-shadow);
-  margin: 2rem -2rem 0;
+  margin-top: 2rem;
   border-radius: 5px;
 }
 
@@ -122,7 +144,7 @@
 
 #content {
   margin: 0 2rem;
-  max-width: 1280px;
+  max-width: 864px;
   white-space: pre-wrap;
   box-sizing: border-box;
   user-select: text;
@@ -153,6 +175,30 @@
 
 #tabletTools {
   display: none;
+}
+
+.stick {
+  background-color: var(--button);
+  height: 22px;
+  width: 1px;
+  display: block;
+}
+
+.flag {
+  position: absolute;
+  color: white;
+  top: -22px;
+  max-width: 176px;
+  pointer-events: none;
+}
+
+.flagOwner {
+  display: flex;
+  background-color: var(--button);
+  height: 24px;
+  padding: 0 3px;
+  justify-content: left;
+  align-items: center;
 }
 
 @media screen and (min-width: 768px) {
@@ -188,8 +234,20 @@
     margin-top: 0;
   }
 
-  #tabletTools {
+  #formatter {
     display: flex;
+  }
+
+  #mobileTools {
+    display: none;
+  }
+
+}
+
+@media screen and (min-width: 1024px) {
+
+  #content {
+    margin: 0 auto;
   }
 
 }

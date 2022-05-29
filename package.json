@@ -26,8 +26,7 @@
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-router-dom": "^6.3.0",
-    "sanitize-html": "^2.7.0",
-    "uuid": "^8.3.2"
+    "sanitize-html": "^2.7.0"
   },
   "devDependencies": {
     "@babel/core": "^7.17.10",

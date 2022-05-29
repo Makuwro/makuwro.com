@@ -19,6 +19,10 @@
   transition: 0.3s;
 }
 
+:global(.light) #profileBannerContainer {
+  background-color: var(--header);
+}
+
 #owner {
   display: flex;
   align-items: center;
@@ -90,6 +94,10 @@
   align-items: center;
   gap: 0.5rem;
   user-select: text;
+}
+
+:global(.light) #profile-info h1, :global(.light) #profile-info h2 {
+  color: white;
 }
 
 #profile-info h2 {
@@ -402,6 +410,10 @@
   #selection > a.selected {
     background-color: white;
     color: black;
+  }
+
+  :global(.light) #selection > a.selected {
+    color: var(--header);
   }
   
   #selection > a:hover:active {

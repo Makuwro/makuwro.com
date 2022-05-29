@@ -1,10 +1,7 @@
 import React, { useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import styles from "../../styles/Settings.module.css";
 import PropTypes from "prop-types";
-import Dropdown from "../input/Dropdown";
 import SettingsDropdown from "./SettingsDropdown";
-import Editor from "@monaco-editor/react";
 import SlugInput from "../input/SlugInput";
 
 export default function SharingSettings({client, menu, toggleMenu, submitting, updateAccount, character, blogPost}) {
@@ -48,7 +45,7 @@ export default function SharingSettings({client, menu, toggleMenu, submitting, u
               slug={blogPost.slug}
               path="blog"
             />
-            <input style={{marginTop: "1rem"}} type="submit" value="Change avatar" disabled={submitting} />
+            <input style={{marginTop: "1rem"}} type="submit" value="Update" disabled={submitting} />
           </form>
         </SettingsDropdown>
         <SettingsDropdown
