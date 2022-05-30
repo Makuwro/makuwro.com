@@ -289,31 +289,21 @@ export default function Literature({ client, shownLocation, setLocation, setSett
   }
 
   /**
-   * 
-   * @param {string} [alignment] 
-   */
-  function alignSelection(alignment = "") {
-
-    // First thing's first: let's get the start and end paragraphs.
-    const selection = window.getSelection();
-    const {startContainer, endContainer} = selection.getRangeAt(0);
-  
-    /**
      * Gets the first paragraph parent element.
      * @param {Node} node The child child to search.
      * @returns {Element} The first paragraph parent element.
      */
-    function getParagraphElement(element) {
+  function getParagraphElement(element) {
 
-      let paragraphElement = element;
-      while (paragraphElement.tagName !== "P") {
+    let paragraphElement = element;
+    while (paragraphElement.tagName !== "P") {
 
-        paragraphElement = paragraphElement.parentNode;
-  
-      }
-      return paragraphElement;
+      paragraphElement = paragraphElement.parentNode;
 
     }
+    return paragraphElement;
+
+  }
 
     const startParagraph = getParagraphElement(startContainer);
     const endParagraph = getParagraphElement(endContainer);
@@ -346,9 +336,49 @@ export default function Literature({ client, shownLocation, setLocation, setSett
 
     // Check if it's a backspace.
     const selection = window.getSelection();
-    if (Array.from(contentContainer.current.children).indexOf(selection.anchorNode) === 0 && event.keyCode === 8 && /<p.*>(<br>)?<\/p>/gm.test(event.target.innerHTML)) {
+    if (event.code === "Backspace") {
 
-      return event.preventDefault();
+      if (Array.from(contentContainer.current.children).indexOf(selection.anchorNode) === 0 && /<p.*>(<br>)?<\/p>/gm.test(event.target.innerHTML)) {
+
+        return event.preventDefault();
+
+      } else if (event.type === "keydown") {
+
+        // Check if we're at the beginning of the element.
+        const range = selection.getRangeAt(0);
+        const {startContainer, startOffset} = range;
+
+        // Now check if the element is at the beginning of the paragraph.
+        const startParagraph = getParagraphElement(startContainer);
+        const preCaretRange = range.cloneRange();
+        preCaretRange.selectNodeContents(startParagraph);
+        preCaretRange.setStart(startContainer, startOffset);
+
+        if (preCaretRange.startOffset === 0) {
+
+          // I really hate those <span> tags that generate, so let's stop the browser from doing that.
+          event.preventDefault();
+
+          // Record the new caret position for later.
+          const {previousElementSibling} = startParagraph;
+          preCaretRange.selectNodeContents(previousElementSibling);
+          preCaretRange.setStart(previousElementSibling.lastChild, previousElementSibling.lastChild.textContent.length);
+          const newCaretPosition = preCaretRange.startOffset;
+
+          // Append the HTML to the previous element.
+          startParagraph.previousElementSibling.innerHTML += startParagraph.innerHTML;
+
+          // Restore the caret position.
+          range.selectNodeContents(previousElementSibling);
+          range.setStart(previousElementSibling.lastChild, newCaretPosition);
+          range.collapse(true);
+
+          // Remove the element we were just on.
+          startParagraph.remove();
+
+        }
+
+      }
 
     }
 
