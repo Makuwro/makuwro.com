@@ -402,7 +402,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
           const nodeIndex = Array.from(newStartParagraph.childNodes).indexOf(lastChild);
 
           // Append the HTML to the previous element.
-          newStartParagraph.innerHTML += startParagraph.innerHTML;
+          newStartParagraph.innerHTML += paragraphToRemove.innerHTML;
 
           // Remove the previous paragraph that we were on.
           paragraphToRemove.remove();
