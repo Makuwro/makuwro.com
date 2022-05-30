@@ -8,6 +8,7 @@ import Popup from "./popups/Popup";
 
 export default function Authenticator({client, open, shownLocation}) {
 
+  const navigate = useNavigate();
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -17,15 +18,26 @@ export default function Authenticator({client, open, shownLocation}) {
   const [birthDate, setBirthDate] = useState();
   const [register, setRegister] = useState(false);
   const {pathname} = useLocation();
-  const navigate = useNavigate();
 
-  function onClose() {
+  function onClose(authenticated) {
 
     if (shownLocation.pathname === "/signin" || shownLocation.pathname === "/register") {
+
+      if (authenticated) {
+
+        return location.replace("/");
+
+      }
 
       navigate("/", {replace: true});
 
     } else {
+
+      if (authenticated) {
+
+        return location.replace(shownLocation.pathname);
+
+      }
 
       navigate(shownLocation, {replace: true});
 
@@ -85,7 +97,7 @@ export default function Authenticator({client, open, shownLocation}) {
         document.cookie = `token=${token}; max-age=63072000; secure; path=/`;
 
         // Let's get outta here!
-        onClose();
+        onClose(true);
 
       } catch (err) {
         
