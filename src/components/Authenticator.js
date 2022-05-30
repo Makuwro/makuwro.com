@@ -63,19 +63,11 @@ export default function Authenticator({client, open, shownLocation}) {
         try {
 
           // Send a request to the server to create the account.
-          const form = new FormData();
-          form.append("username", username);
-          form.append("password", password);
-          form.append("birthDate", birthDate);
-          form.append("email", email);
-
-          await client.requestREST("accounts/user", {
-            method: "POST",
-            body: form
-          });
+          await client.createUser({username, password, birthDate, email});
 
         } catch (err) {
 
+          console.error(err);
           alert(`Couldn't create account: ${err.message}`);
           setButtonDisabled(false);
           return;

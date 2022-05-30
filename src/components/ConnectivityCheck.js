@@ -66,7 +66,7 @@ export default function ConnectivityCheck({ready, authenticated, setClient}) {
         // Get the current user. 
         // If there isn't a token, this should error.
         const token = document.cookie.match("(^|;)\\s*token\\s*=\\s*([^;]+)")?.pop() || null;
-        let client = new Client();
+        const client = new Client();
         client.token = token;
         await client.connect();
 
