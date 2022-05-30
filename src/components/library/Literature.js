@@ -304,6 +304,16 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
   }
 
+  /**
+   * 
+   * @param {string} [alignment] 
+   */
+  function alignSelection(alignment = "") {
+
+    // First thing's first: let's get the start and end paragraphs.
+    const selection = window.getSelection();
+    const {startContainer, endContainer} = selection.getRangeAt(0);
+
     const startParagraph = getParagraphElement(startContainer);
     const endParagraph = getParagraphElement(endContainer);
 
