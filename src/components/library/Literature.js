@@ -337,6 +337,15 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
   }
 
+  function downloadHTML() {
+
+    const fakeLink = document.createElement("a");
+    fakeLink.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(content.current));
+    fakeLink.setAttribute("download", `${titleRef.current}.html`);
+    fakeLink.click();
+
+  }
+
   /**
    * 
    * @param {KeyboardEvent} event 
@@ -510,7 +519,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
             </button>
             <button>Bullet list</button>
             <button>Revert to backup</button>
-            <button>Save to device</button>
+            <button onClick={downloadHTML}>Save to device</button>
             <button>Collaboration settings</button>
           </section>
           <section id={styles.belowFormatter}>
