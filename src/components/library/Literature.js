@@ -380,10 +380,12 @@ export default function Literature({ client, shownLocation, setLocation }) {
             // Place the caret clone at the end of the previous paragraph.
             const {previousElementSibling} = startParagraph;
             preCaretRange.selectNodeContents(previousElementSibling);
-            preCaretRange.setStart(previousElementSibling.lastChild, previousElementSibling.lastChild.textContent.length);
+            const {lastChild} = previousElementSibling;
+            preCaretRange.setStart(lastChild, lastChild.textContent.length);
 
             // Record the new caret position for later.
             const newCaretPosition = preCaretRange.startOffset;
+            const nodeIndex = Array.from(previousElementSibling.childNodes).indexOf(lastChild);
             
             // Append the HTML to the previous element.
             startParagraph.previousElementSibling.innerHTML += startParagraph.innerHTML;
@@ -393,7 +395,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
             // Restore caret position.
             range.selectNodeContents(previousElementSibling);
-            range.setStart(previousElementSibling.lastChild, newCaretPosition);
+            range.setStart(previousElementSibling.childNodes[nodeIndex], newCaretPosition);
 
           } else {
 
@@ -402,10 +404,12 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
             // Place the caret clone at the end of the previous paragraph.
             preCaretRange.selectNodeContents(startParagraph);
-            preCaretRange.setStart(startParagraph.lastChild, startParagraph.lastChild.textContent.length);
+            const {lastChild} = startParagraph;
+            preCaretRange.setStart(lastChild, lastChild.textContent.length);
 
             // Record the new caret position for later.
             const newCaretPosition = preCaretRange.startOffset;
+            const nodeIndex = Array.from(startParagraph.childNodes).indexOf(lastChild);
 
             // Append what's left in the start paragraph.
             startParagraph.innerHTML += endParagraph.innerHTML;
@@ -415,7 +419,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
             // Restore caret position.
             range.selectNodeContents(startParagraph);
-            range.setStart(startParagraph.lastChild, newCaretPosition);
+            range.setStart(startParagraph.childNodes[nodeIndex], newCaretPosition);
 
           }
 
