@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import styles from "../../styles/Settings.module.css";
 import SettingsDropdown from "./SettingsDropdown";
 import PropTypes from "prop-types";
