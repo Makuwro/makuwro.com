@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import styles from "../../styles/Settings.module.css";
 import SettingsDropdown from "./SettingsDropdown";
 import PropTypes from "prop-types";
@@ -35,10 +34,13 @@ export default function AccountSettings({client, menu, setMenu, submitting, upda
       // Send a request to disable the account
       await client.user.disable(password);
 
-      // Delete the token cookie
+      // Delete the token cookie.
       document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-      // Redirect to the home page
+      // Tell the user.
+      alert("Your account has been disabled and you have been signed out. You may come back whenever you would like by signing back in. We hope you enjoy your break!");
+
+      // Redirect to the home page.
       location = "/";
 
     }
@@ -51,7 +53,17 @@ export default function AccountSettings({client, menu, setMenu, submitting, upda
     
     if (!submitting && confirm("Woahh there, buddy. Are you sure you want to delete your account? You will have 24 hours to change your mind by signing in before everything goes POOF!")) {
 
+      // Send a request to delete the account.
+      await client.user.delete(password);
 
+      // Delete the token cookie.
+      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+      // Tell the user.
+      alert("You have been signed out and your account has been marked for deletion. Additionally, all of your uploaded content is now private. If you did this by mistake, sign back in immediately! If you didn't, we hope you had a great time at Makuwro, and hope you give it another spin one of these days.")
+
+      // Redirect to the home page.
+      location = "/";
 
     }
 
