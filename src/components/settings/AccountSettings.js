@@ -8,7 +8,6 @@ import Checkbox from "../input/Checkbox";
 export default function AccountSettings({client, menu, setMenu, submitting, updateAccount}) {
 
   const {user} = client;
-  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -34,15 +33,13 @@ export default function AccountSettings({client, menu, setMenu, submitting, upda
     if (!submitting && confirm("Are you sure you want to disable your account? You can come back at any time.")) {
 
       // Send a request to disable the account
-      if (await updateAccountWrapper(event, "isDisabled", true)) {
+      await client.user.disable(password);
 
-        // Delete the token cookie
-        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      // Delete the token cookie
+      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-        // Redirect to the home page
-        navigate("/");
-
-      }
+      // Redirect to the home page
+      location = "/";
 
     }
 
