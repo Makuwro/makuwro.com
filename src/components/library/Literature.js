@@ -268,8 +268,6 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
     if (!parents[0]) {
 
-      console.log(newParents);
-
       // Append the rest of the text nodes.
       const textNodeRight = document.createTextNode(currentTextContent.substring(endOffset));
       parent.appendChild(textNodeRight);
@@ -328,7 +326,6 @@ export default function Literature({ client, shownLocation, setLocation }) {
       const endIndex = children.indexOf(endParagraph);
       for (let i = startIndex; endIndex >= i; i++) {
 
-        console.log(i);
         children[i].style.textAlign = alignment;
 
       }
