@@ -364,35 +364,66 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
         // Check if we're at the beginning of the element.
         const range = selection.getRangeAt(0);
-        const {startContainer, startOffset} = range;
+        const {startContainer, startOffset, endContainer} = range;
 
         // Now check if the element is at the beginning of the paragraph.
         const startParagraph = getParagraphElement(startContainer);
+        const endParagraph = getParagraphElement(endContainer);
         const preCaretRange = range.cloneRange();
         preCaretRange.selectNodeContents(startParagraph);
         preCaretRange.setStart(startContainer, startOffset);
 
-        if (preCaretRange.startOffset === 0) {
+        if (preCaretRange.startOffset === 0 || startParagraph !== endParagraph) {
 
           // I really hate those <span> tags that generate, so let's stop the browser from doing that.
           event.preventDefault();
 
-          // Record the new caret position for later.
-          const {previousElementSibling} = startParagraph;
-          preCaretRange.selectNodeContents(previousElementSibling);
-          preCaretRange.setStart(previousElementSibling.lastChild, previousElementSibling.lastChild.textContent.length);
-          const newCaretPosition = preCaretRange.startOffset;
+          if (startParagraph === endParagraph) {
 
-          // Append the HTML to the previous element.
-          startParagraph.previousElementSibling.innerHTML += startParagraph.innerHTML;
+            // Place the caret clone at the end of the previous paragraph.
+            const {previousElementSibling} = startParagraph;
+            preCaretRange.selectNodeContents(previousElementSibling);
+            preCaretRange.setStart(previousElementSibling.lastChild, previousElementSibling.lastChild.textContent.length);
 
-          // Restore the caret position.
-          range.selectNodeContents(previousElementSibling);
-          range.setStart(previousElementSibling.lastChild, newCaretPosition);
+            // Record the new caret position for later.
+            const newCaretPosition = preCaretRange.startOffset;
+            
+            // Append the HTML to the previous element.
+            startParagraph.previousElementSibling.innerHTML += startParagraph.innerHTML;
+
+            // Remove the element we were just on.
+            startParagraph.remove();
+
+            // Restore caret position.
+            range.selectNodeContents(previousElementSibling);
+            range.setStart(previousElementSibling.lastChild, newCaretPosition);
+
+          } else {
+
+            // Remove what's selected.
+            range.extractContents();
+
+            // Place the caret clone at the end of the previous paragraph.
+            preCaretRange.selectNodeContents(startParagraph);
+            preCaretRange.setStart(startParagraph.lastChild, startParagraph.lastChild.textContent.length);
+
+            // Record the new caret position for later.
+            const newCaretPosition = preCaretRange.startOffset;
+
+            // Append what's left in the start paragraph.
+            startParagraph.innerHTML += endParagraph.innerHTML;
+
+            // Remove the end paragraph.
+            endParagraph.remove();
+
+            // Restore caret position.
+            range.selectNodeContents(startParagraph);
+            range.setStart(startParagraph.lastChild, newCaretPosition);
+
+          }
+
+          // We don't want to highlight anything, so set the end position to the start.
           range.collapse(true);
-
-          // Remove the element we were just on.
-          startParagraph.remove();
 
         }
 
