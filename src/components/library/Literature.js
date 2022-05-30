@@ -5,7 +5,7 @@ import sanitize from "sanitize-html";
 import Footer from "../Footer";
 import PropTypes from "prop-types";
 
-export default function Literature({ client, shownLocation, setLocation, setSettingsCache }) {
+export default function Literature({ client, shownLocation, setLocation }) {
 
   const { username, slug } = useParams();
   const [editing, setEditing] = useState(false);
@@ -191,7 +191,7 @@ export default function Literature({ client, shownLocation, setLocation, setSett
 
     // Let's check if the selection is wrapped with this element already.
     const range = selection.getRangeAt(0);
-    const { startOffset, endOffset, commonAncestorContainer, endContainer } = range;
+    const { startOffset, endOffset, commonAncestorContainer } = range;
     const parents = [];
     let paragraphElement = commonAncestorContainer.parentNode;
     while (paragraphElement.tagName !== "P") {
@@ -272,7 +272,6 @@ export default function Literature({ client, shownLocation, setLocation, setSett
 
       // Append the rest of the text nodes.
       const textNodeRight = document.createTextNode(currentTextContent.substring(endOffset));
-      console.log(textNodeRight);
       parent.appendChild(textNodeRight);
 
     }
@@ -564,6 +563,5 @@ export default function Literature({ client, shownLocation, setLocation, setSett
 Literature.propTypes = {
   client: PropTypes.object,
   shownLocation: PropTypes.object,
-  setLocation: PropTypes.func,
-  setSettingsCache: PropTypes.func
+  setLocation: PropTypes.func
 };
