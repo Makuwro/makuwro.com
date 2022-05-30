@@ -35,10 +35,13 @@ export default function AccountSettings({client, menu, setMenu, submitting, upda
       // Send a request to disable the account
       await client.user.disable(password);
 
-      // Delete the token cookie
+      // Delete the token cookie.
       document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-      // Redirect to the home page
+      // Tell the user.
+      alert("Your account has been disabled and you have been signed out. You may come back whenever you would like by signing back in. We hope you enjoy your break!");
+
+      // Redirect to the home page.
       location = "/";
 
     }
