@@ -4,6 +4,7 @@ import styles from "../../styles/Blog.module.css";
 import sanitize from "sanitize-html";
 import Footer from "../Footer";
 import PropTypes from "prop-types";
+import { BlogPost } from "makuwro";
 
 export default function Literature({ client, shownLocation, setLocation }) {
 
@@ -22,6 +23,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
   const isMounted = useRef(true);
   const [contentState, setContentState] = useState();
   const [updateTime, setUpdateTime] = useState();
+  const [newSlug, setNewSlug] = useState();
 
   useEffect(() => {
 
@@ -61,10 +63,33 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
   useEffect(() => {
 
-    if (location.pathname !== "/signin" && location.pathname !== "/register" && location.pathname !== shownLocation.pathname) {
+    if (newSlug) {
+
+      const path = `/${post.owner.username}/blog/${newSlug}`;
+      
+      if (location.pathname === path) {
+
+        if (shownLocation.pathname === path) {
+
+          setPost((oldPost) => new BlogPost({...oldPost, slug: newSlug}, client));
+          setNewSlug();
+          
+        } else {
+          
+          setLocation(location);
+
+        }
+
+      } else {
+
+        navigate(`${path}?mode=edit`);
+
+      }
+      
+    } else if (!newSlug && location.pathname !== "/signin" && location.pathname !== "/register" && location.pathname !== shownLocation.pathname) {
 
       setLeaving(true);
-
+    
     } else if (ready && leaving) {
 
       console.log("Ready!");
@@ -72,7 +97,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
     }
 
-  }, [ready, location]);
+  }, [ready, location, shownLocation, newSlug]);
 
   useEffect(() => {
 
@@ -474,6 +499,32 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
   }
 
+  async function changeBlogURL() {
+
+    // Get a new slug from the user.
+    let slug;
+    while (!slug) {
+
+      slug = prompt(`The current slug for this blog post is "${post.slug}".\n\nWhat would you like to change it to? Try to only use alphanumeric characters, hyphens, and periods.`);
+      
+      // If the user pressed OK without typing anything, newBlogSlug will be null.
+      // They might've meant to press Cancel.
+      if (!slug || slug === post.slug) {
+        
+        return;
+
+      }
+
+    }
+
+    // Request the server to change the slug.
+    await post.update({slug});
+
+    // Change the URL on the search bar.
+    setNewSlug(slug);
+
+  }
+
   return ready && (
     <main id={styles.post} className={leaving ? "leaving" : ""} onTransitionEnd={() => {
 
@@ -541,6 +592,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
             <button>Revert to backup</button>
             <button onClick={downloadHTML}>Save to device</button>
             <button>Collaboration settings</button>
+            <button onClick={changeBlogURL}>Change blog URL</button>
           </section>
           <section id={styles.belowFormatter}>
             <section id={styles.metadata}>
