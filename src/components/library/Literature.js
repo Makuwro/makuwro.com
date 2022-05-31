@@ -558,16 +558,16 @@ export default function Literature({ client, shownLocation, setLocation }) {
         <>
           <section id={styles.formatter} className={formatterExpanded ? styles.expanded : null}>
             <section>
-              <button onClick={() => formatSelection("b")}>
+              <button onClick={() => formatSelection("b")} type="button" title="Bold">
                 <b>B</b>
               </button>
-              <button onClick={() => formatSelection("i")}>
+              <button onClick={() => formatSelection("i")} type="button" title="Italicize">
                 <i>I</i>
               </button>
-              <button onClick={() => formatSelection("u")}>
+              <button onClick={() => formatSelection("u")} type="button" title="Underline">
                 <u>U</u>
               </button>
-              <button onClick={() => formatSelection("strike")}>
+              <button onClick={() => formatSelection("strike")} type="button" title="Strikethrough">
                 <strike>S</strike>
               </button>
               <button onClick={() => setFormatterExpanded((expanded) => !expanded)} type="button" title="Expand">
@@ -577,41 +577,41 @@ export default function Literature({ client, shownLocation, setLocation }) {
               </button>
             </section>
             <section>
-              <button onClick={() => alignSelection()}>
+              <button onClick={() => alignSelection()} type="button" title="Align paragraph to the left">
                 <span className="material-icons-round">
                   format_align_left
                 </span>
               </button>
-              <button onClick={() => alignSelection("center")}>
+              <button onClick={() => alignSelection("center")} type="button" title="Align paragraph to the center">
                 <span className="material-icons-round">
                   format_align_center
                 </span>
               </button>
-              <button onClick={() => alignSelection("right")}>
+              <button onClick={() => alignSelection("right")} type="button" title="Align paragraph to the right">
                 <span className="material-icons-round">
                   format_align_right
                 </span>
               </button>
-              <button onClick={() => alignSelection("justify")}>
+              <button onClick={() => alignSelection("justify")} type="button" title="Justify paragraph">
                 <span className="material-icons-round">
                   format_align_justify
                 </span>
               </button>
             </section>
-            <button>
+            <button type="button" title="Change font color">
               Change font color
             </button>
-            <button>
+            <button type="button" title="Change highlight color">
               Change highlight color
             </button>
-            <button>
+            <button type="button" title="Clear formatting">
               Clear formatting
             </button>
-            <button>Bullet list</button>
-            <button>Revert to backup</button>
-            <button onClick={downloadHTML}>Save to device</button>
-            <button>Collaboration settings</button>
-            <button onClick={changeBlogURL}>Change blog URL</button>
+            <button type="button" title="Bullet list">Bullet list</button>
+            <button type="button" title="Revert to backup">Revert to backup</button>
+            <button onClick={downloadHTML} type="button" title="Save to device">Save to device</button>
+            <button type="button" title="Collaboration settings">Collaboration settings</button>
+            <button onClick={changeBlogURL} type="button" title="Change blog URL">Change blog URL</button>
           </section>
           <section id={styles.belowFormatter}>
             <section id={styles.metadata}>
