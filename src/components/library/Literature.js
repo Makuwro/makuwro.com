@@ -15,7 +15,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
   const [post, setPost] = useState();
   const content = useRef();
   const [searchParams] = useSearchParams();
-  const [objectStore, setObjectStore] = useState();
+  const [db, setDB] = useState();
   const location = useLocation();
   const contentContainer = useRef();
   const titleRef = useRef();
@@ -27,23 +27,39 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
   useEffect(() => {
 
-    // console.log("Attempting to use IndexedDB for autosaving...");
-    // const request = indexedDB.open("Literature");
-    // request.onsuccess = (event) => {
+    console.log("Attempting to use IndexedDB for autosaving...");
+    const request = indexedDB.open("Literature");
+    request.onsuccess = (event) => {
+      
+      const db = event.target.result;
 
-    //   // const db = event.target.result;
+      event.target.result.transaction("blogPosts", "readwrite").objectStore("blogPosts").oncomplete = () => {
 
-    //   // setObjectStore(db.transaction(["blogPosts"], "readwrite").objectStore("blogPosts"));
+      };
+      
+      setDB(db);
 
-    // };
-    // request.onerror = (event) => {
+    };
 
-    //   console.warn(`Unable to access database: ${event.target.errorCode}`);
-    //   console.warn("Data will not be autosaved.");
+    request.onupgradeneeded = (event) => {
+      
+      console.log("IndexedDB database opened!");
 
-    //   alert(`Unable to access IndexedDB: ${event.target.errorCode}\nDue to this, data will not be autosaved.`);
+      /** @type {IDBDatabase} */
+      const db = event.target.result;
+      const objectStore = db.createObjectStore("blogPosts", {keyPath: "id"});
+      objectStore.createIndex("id", "id", {unique: true});
+      objectStore.createIndex("content", "content", {unique: false});
 
-    // };
+    };
+    request.onerror = (event) => {
+
+      console.warn(`Unable to access database: ${event.target.errorCode}`);
+      console.warn("Data will not be autosaved.");
+
+      alert(`Unable to access IndexedDB: ${event.target.errorCode}\nDue to this, data will not be autosaved.`);
+
+    };
 
     // This is for detecting if the component is mounted or not.
     // Helpful in async actions.
@@ -53,13 +69,13 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
   useEffect(() => {
 
-    if (objectStore && updateTime && post) {
+    if (db && updateTime && post) {
 
-      objectStore.put(contentState, post.id);
+      db.transaction("blogPosts", "readwrite").objectStore("blogPosts").put({id: post.id, content: content.current});
 
     }
 
-  }, [objectStore, updateTime, post]);
+  }, [db, updateTime, post]);
 
   useEffect(() => {
 
