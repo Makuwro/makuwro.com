@@ -262,8 +262,17 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
     }
 
-    // Create a fragment to hold the elements.
+    // Get the link, if we're formatting a link.
     const removing = parents.find((possibleMatch) => possibleMatch.tagName.toLowerCase() === tagName);
+    let href;
+    if (!removing && tagName === "a") {
+
+      href = prompt("Please enter your link below.");
+
+    }
+    
+
+    // Create a fragment to hold the elements.
     let parent;
     if (removing || !parents[0]) {
 
@@ -304,6 +313,13 @@ export default function Literature({ client, shownLocation, setLocation }) {
       node = document.createElement(tagName);
       node.innerHTML = selectedText;
 
+      if (href) {
+
+        node.href = href;
+        node.target = "_blank";
+
+      }
+
     }
 
     // Apend the node to the fragment.
@@ -325,6 +341,10 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
     // Erase the empty text nodes.
     paragraphElement.normalize();
+
+    // Save the changes.
+    content.current = contentContainer.current.innerHTML;
+    setUpdateTime(new Date());
 
   }
 
@@ -496,6 +516,8 @@ export default function Literature({ client, shownLocation, setLocation }) {
         // Now, let's format this bad boy.
         formatSelection(tagName, selection);
 
+        return;
+
       }
 
     }
@@ -569,6 +591,11 @@ export default function Literature({ client, shownLocation, setLocation }) {
               </button>
               <button onClick={() => formatSelection("strike")} type="button" title="Strikethrough">
                 <strike>S</strike>
+              </button>
+              <button onClick={() => formatSelection("a")} type="button" title="Link">
+                <span className="material-icons-round">
+                  link
+                </span>
               </button>
               <button onClick={() => setFormatterExpanded((expanded) => !expanded)} type="button" title="Expand">
                 <span className="material-icons-round">
