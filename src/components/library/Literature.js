@@ -98,7 +98,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
       } else {
 
-        navigate(`${path}?mode=edit`);
+        navigate(`${path}?mode=edit`, {replace: true});
 
       }
       
