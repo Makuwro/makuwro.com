@@ -24,6 +24,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
   const [contentState, setContentState] = useState();
   const [updateTime, setUpdateTime] = useState();
   const [newSlug, setNewSlug] = useState();
+  const [formatterExpanded, setFormatterExpanded] = useState(false);
 
   useEffect(() => {
 
@@ -555,12 +556,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
     }}>
       {post ? (
         <>
-          <section id={styles.formatter} className={editing ? styles.available : null}>
-            <button>
-
-            </button>
-          </section>
-          <section id={styles.mobileTools}>
+          <section id={styles.formatter} className={formatterExpanded ? styles.expanded : null}>
             <section>
               <button onClick={() => formatSelection("b")}>
                 <b>B</b>
@@ -573,6 +569,11 @@ export default function Literature({ client, shownLocation, setLocation }) {
               </button>
               <button onClick={() => formatSelection("strike")}>
                 <strike>S</strike>
+              </button>
+              <button onClick={() => setFormatterExpanded((expanded) => !expanded)} type="button" title="Expand">
+                <span className="material-icons-round">
+                  {`expand_${formatterExpanded ? "more" : "less"}`}
+                </span>
               </button>
             </section>
             <section>
