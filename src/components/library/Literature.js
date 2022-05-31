@@ -157,6 +157,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
           // Save the react component to the state.
           titleRef.current = post.title;
+          document.title = post.title;
 
           // And we're done loading!
           setReady(true);
@@ -512,6 +513,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
   function changeTitle(event) {
 
     titleRef.current = event.target.textContent;
+    document.title = titleRef.current;
 
   }
 
@@ -618,6 +620,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
                     contentEditable={editing}
                     placeholder={editing ? "Untitled blog" : null}
                     onKeyDown={changeTitle}
+                    onKeyUp={changeTitle}
                     suppressContentEditableWarning
                     dangerouslySetInnerHTML={titleRef.current && editing ? { __html: titleRef.current } : null}
                   >
