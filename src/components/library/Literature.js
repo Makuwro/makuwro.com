@@ -720,7 +720,23 @@ export default function Literature({ client, shownLocation, setLocation }) {
                 <section id={styles.actions}>
                   {client.user?.id === post.owner.id ? (
                     <>
-                      <button onClick={async () => editing ? await save() : navigate("?mode=edit")}>{editing ? "Save" : "Edit"}</button>
+                      <button onClick={async () => editing ? await save() : navigate("?mode=edit")}>
+                        {editing ? (
+                          <>
+                            <span className="material-icons-round">
+                              save
+                            </span>
+                            Save
+                          </>
+                        ) : (
+                          <>
+                            <span className="material-icons-round">
+                              edit
+                            </span>
+                            Edit
+                          </>
+                        )}
+                      </button>
                     </>
                   ) : <button className="destructive" onClick={() => navigate("?action=report-abuse")}>Report</button>}
                 </section>
