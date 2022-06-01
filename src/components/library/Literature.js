@@ -412,10 +412,29 @@ export default function Literature({ client, shownLocation, setLocation }) {
    */
   function handleInput(event) {
 
-    // Check if it's a backspace.
     const selection = window.getSelection();
-    if (event.code === "Backspace") {
 
+    if (event.type === "keydown" && event.code === "Tab") {
+
+      // The user wants to add a tab.
+      // We'll handle this, browser.
+      event.preventDefault();
+
+      // Remove the selected content.
+      const range = selection.getRangeAt(0);
+      range.extractContents();
+
+      // Replace the content with a tab.
+      const {startContainer, startOffset} = range;
+      startContainer.textContent = `${startContainer.textContent.slice(0, startOffset)}	${startContainer.textContent.slice(startOffset)}`;
+
+      // Fix the caret.
+      range.setStart(startContainer, startOffset + 1);
+
+    } else if (event.code === "Backspace") {
+
+      // The user wants to remove content.
+      // Check if we're at the beginning of the first paragraph.
       if (Array.from(contentContainer.current.children).indexOf(selection.anchorNode) === 0 && /<p.*>(<br>)?<\/p>/gm.test(event.target.innerHTML)) {
 
         return event.preventDefault();
@@ -481,10 +500,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
       }
 
-    }
-
-    // Check if we want to format something.
-    if (event.type === "keydown" && !event.shiftKey && event.ctrlKey && event.code !== "Control") {
+    } else if (event.type === "keydown" && !event.shiftKey && event.ctrlKey && event.code !== "Control") {
 
       let tagName;
 
