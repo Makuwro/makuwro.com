@@ -682,6 +682,10 @@ export default function Literature({ client, shownLocation, setLocation }) {
                 </span>
               </button>
             </section>
+            <section>
+              <button>Lexend Deca</button>
+              <button type="button" id={styles.fontSize}>16</button>
+            </section>
             <button type="button" title="Change font color">
               Change font color
             </button>
