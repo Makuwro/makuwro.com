@@ -248,14 +248,6 @@ export default function Literature({ client, shownLocation, setLocation }) {
     const preCaretRange = range.cloneRange();
     const selectedText = preCaretRange.toString();
 
-    // Now, find the end offset.
-    // preCaretRange.selectNodeContents(paragraphElement);
-    // preCaretRange.setEnd(endContainer, endOffset);
-    // const endOffsetRelativeToParagraph = preCaretRange.toString().length;
-
-    // Next, find the start offset.
-    // const startOffsetRelativeToParagraph = endOffsetRelativeToParagraph - selectedText.length;
-
     if (commonAncestorContainer.nodeType === 1) {
 
       parents.push(commonAncestorContainer);
@@ -263,11 +255,17 @@ export default function Literature({ client, shownLocation, setLocation }) {
     }
 
     // Get the link, if we're formatting a link.
-    const removing = parents.find((possibleMatch) => possibleMatch.tagName.toLowerCase() === tagName);
+    const removing = tagName !== "size" && parents.find((possibleMatch) => possibleMatch.tagName.toLowerCase() === tagName);
     let href;
+    let fontSize;
     if (!removing && tagName === "a") {
 
       href = prompt("Please enter your link below.");
+
+    } else if (tagName === "size") {
+
+      fontSize = prompt("Please enter a font size in pixels below.");
+      tagName = "span";
 
     }
     
@@ -317,6 +315,10 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
         node.href = href;
         node.target = "_blank";
+
+      } else if (fontSize) {
+
+        node.style.fontSize = `${fontSize}px`;
 
       }
 
@@ -684,7 +686,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
             </section>
             <section>
               <button>Lexend Deca</button>
-              <button type="button" id={styles.fontSize}>16</button>
+              <button type="button" id={styles.fontSize} onClick={() => formatSelection("size")}>16</button>
             </section>
             <button type="button" title="Change font color">
               Change font color
