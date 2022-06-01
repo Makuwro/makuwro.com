@@ -19,9 +19,6 @@ export default function BlogPreview({
       )}
       <h1>
         {title || "Untitled blog"}
-        {currentUserIsOwner && (
-          <span>{published ? "PUBLIC" : "PRIVATE"}</span>
-        )}
       </h1>
       <section className={styles.creator}>
         <img src={`https://cdn.makuwro.com/${owner.id}/avatar`} />
