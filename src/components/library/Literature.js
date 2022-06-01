@@ -527,9 +527,35 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
   }
 
-  function handlePaste(event) {
+  /**
+   * 
+   * @param {ClipboardEvent} event 
+   */
+  async function handlePaste(event) {
 
+    // We'll handle this, browser.
+    event.preventDefault();
 
+    // Let's iterate through each item in the clipboard data.
+    const {items} = event.clipboardData;
+
+    for (let i = 0; items.length > i; i++) {
+
+      const item = items[i];
+      if (item.kind === "file") {
+
+        // Make sure that the file is an image.
+        if (/^image\//.test(item.type)) {
+
+          // Upload the image to the server.
+          const {imagePath} = await post.uploadImage(item.getAsFile());
+          event.target.innerHTML += `<img src="https://cdn.makuwro.com/${imagePath}" alt="" />`;
+
+        }
+
+      }
+
+    }
 
   }
 
@@ -649,6 +675,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
                     placeholder={editing ? "Untitled blog" : null}
                     onKeyDown={changeTitle}
                     onKeyUp={changeTitle}
+                    onPaste={handlePaste}
                     suppressContentEditableWarning
                     dangerouslySetInnerHTML={titleRef.current && editing ? { __html: titleRef.current } : null}
                   >
