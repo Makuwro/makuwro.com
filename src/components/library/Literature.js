@@ -722,15 +722,6 @@ export default function Literature({ client, shownLocation, setLocation }) {
               dangerouslySetInnerHTML={{ __html: contentState }}
             >
             </section>
-            <section>
-              <span>Categories: </span>
-              <ul>
-                <li>Test</li>
-              </ul>
-            </section>
-            <section>
-              <h1>Comments</h1>
-            </section>
             <Footer />
           </section>
         </>
