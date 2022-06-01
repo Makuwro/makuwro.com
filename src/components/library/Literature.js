@@ -553,6 +553,21 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
         }
 
+      } else {
+
+        const pasteText = () => new Promise((resolve) => {
+
+          item.getAsString((string) => {
+            
+            event.target.innerHTML += string;
+            resolve();
+
+          });
+
+        });
+
+        await pasteText();
+
       }
 
     }
