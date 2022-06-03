@@ -502,7 +502,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
       }
 
-    } else if (event.type === "keydown" && !event.shiftKey && event.ctrlKey && event.code !== "Control") {
+    } else if (event.type === "keydown" && event.ctrlKey && event.code !== "Control") {
 
       let tagName;
 
@@ -542,7 +542,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
       }
 
-      if (tagName) {
+      if (tagName && !event.shiftKey) {
 
         // We don't want the default formatter to mess things up, so let's cancel the default action.
         event.preventDefault();
