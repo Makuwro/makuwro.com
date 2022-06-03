@@ -520,6 +520,22 @@ export default function Literature({ client, shownLocation, setLocation }) {
           tagName = "u";
           break;
 
+        case "KeyM": {
+
+          // We're indenting the paragraph!
+          event.preventDefault();
+
+          // Get the paragraph element.
+          const {anchorNode} = window.getSelection();
+          const paragraphElement = getParagraphElement(anchorNode);
+
+          // Add an indent to the pragraph element.
+          const currentPadding = parseInt(paragraphElement.style.paddingLeft, 10) || 0;
+          paragraphElement.style.paddingLeft = currentPadding + (event.shiftKey ? -50 : 50) + "px";
+          break;
+
+        }
+
         case "KeyS":
           alert("Don't worry! We autosave changes to your device.");
           return event.preventDefault();
