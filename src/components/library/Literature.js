@@ -656,11 +656,27 @@ export default function Literature({ client, shownLocation, setLocation }) {
       try {
         
         const range = window.getSelection().getRangeAt(0);
-        const {startContainer, startOffset, endContainer, endOffset} = range;
+        const {startContainer, startOffset, endContainer} = range;
+        const startParagraph = getParagraphElement(startContainer);
+        const endParagraph = getParagraphElement(endContainer);
 
-        if (startContainer !== endContainer || startOffset !== endOffset) {
+        if (startParagraph !== endParagraph) {
 
+          // Remove the selection.
           range.extractContents();
+          
+          // Move all end container children to the start container.
+          while (endParagraph.childNodes.length) {
+
+            startParagraph.appendChild(endParagraph.firstChild);
+
+          }
+
+          // Remove the end paragraph.
+          endParagraph.remove();
+
+          // Normalize the start paragraph.
+          startParagraph.normalize();
 
         }
 
@@ -675,8 +691,37 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
         img.onload = () => {
 
-          // Paste an <img> tag wherever the cursor is.
-          startContainer.parentNode.insertBefore(img, startContainer);
+          // Create a fragment containing the previous nodes, the <img>, and the next text.
+          const fragment = document.createDocumentFragment();
+
+          function getElementBeforeParagraph() {
+
+            let paragraphElement = startContainer;
+            while (paragraphElement.parentNode.tagName !== "P") {
+
+              paragraphElement = paragraphElement.parentNode;
+
+            }
+            return paragraphElement;
+
+          }
+
+          // Make two clones of the element.
+          const elementBeforeParagraph = getElementBeforeParagraph();
+          const left = elementBeforeParagraph.cloneNode(true);
+          const right = elementBeforeParagraph.cloneNode(true);
+
+          // Split the text content.
+          left.textContent = startContainer.textContent.slice(0, startOffset);
+          right.textContent = startContainer.textContent.slice(startOffset);
+
+          // Append the children.
+          fragment.appendChild(left);
+          fragment.appendChild(img);
+          fragment.appendChild(right);
+
+          // Replace the child with the fragment.
+          startParagraph.replaceChild(fragment, startContainer);
 
         };
 
