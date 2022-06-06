@@ -353,14 +353,14 @@ export default function Literature({ client, shownLocation, setLocation }) {
   /**
      * Gets the first paragraph parent element.
      * @param {Node} node The child child to search.
-     * @returns {Element} The first paragraph parent element.
+     * @returns {Element?} The first paragraph parent element.
      */
   function getParagraphElement(element) {
 
     let paragraphElement = element;
-    while (paragraphElement.tagName !== "P") {
+    while (paragraphElement && paragraphElement.tagName !== "P") {
 
-      paragraphElement = paragraphElement.parentNode;
+      paragraphElement = paragraphElement?.parentNode;
 
     }
     return paragraphElement;
@@ -646,104 +646,112 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
   function requestImage() {
 
-    // Create a fake file input.
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
+    // Verify that the user is selecting a paragraph.
+    const selection = window.getSelection();
+    const {anchorNode} = selection;
+    
+    if (anchorNode && getParagraphElement(anchorNode)) {
 
-    input.onchange = async (event) => {
+      // Create a fake file input.
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
 
-      try {
-        
-        const range = window.getSelection().getRangeAt(0);
-        const {startContainer, startOffset, endContainer} = range;
-        const startParagraph = getParagraphElement(startContainer);
-        const endParagraph = getParagraphElement(endContainer);
+      input.onchange = async (event) => {
 
-        if (startParagraph !== endParagraph) {
-
-          // Remove the selection.
-          range.extractContents();
+        try {
           
-          // Move all end container children to the start container.
-          while (endParagraph.childNodes.length) {
+          const range = selection.getRangeAt(0);
+          const {startContainer, startOffset, endContainer} = range;
+          const startParagraph = getParagraphElement(startContainer);
+          const endParagraph = getParagraphElement(endContainer);
 
-            startParagraph.appendChild(endParagraph.firstChild);
+          if (startParagraph !== endParagraph) {
+
+            // Remove the selection.
+            range.extractContents();
+            
+            // Move all end container children to the start container.
+            while (endParagraph.childNodes.length) {
+
+              startParagraph.appendChild(endParagraph.firstChild);
+
+            }
+
+            // Remove the end paragraph.
+            endParagraph.remove();
+
+            // Normalize the start paragraph.
+            startParagraph.normalize();
 
           }
 
-          // Remove the end paragraph.
-          endParagraph.remove();
+          // Get the file.
+          const file = event.target.files[0];
 
-          // Normalize the start paragraph.
-          startParagraph.normalize();
+          // Upload the file to the server.
+          const {imagePath} = await post.uploadImage(file);
+
+          // Create an img tag.
+          const img = document.createElement("img");
+
+          img.onload = () => {
+
+            // Create a fragment containing the previous nodes, the <img>, and the next text.
+            const fragment = document.createDocumentFragment();
+
+            function getElementBeforeParagraph() {
+
+              let paragraphElement = startContainer;
+              while (paragraphElement.parentNode.tagName !== "P") {
+
+                paragraphElement = paragraphElement.parentNode;
+
+              }
+              return paragraphElement;
+
+            }
+
+            // Make two clones of the element.
+            const elementBeforeParagraph = getElementBeforeParagraph();
+            const left = elementBeforeParagraph.cloneNode(true);
+            const right = elementBeforeParagraph.cloneNode(true);
+
+            // Split the text content.
+            left.textContent = startContainer.textContent.slice(0, startOffset);
+            right.textContent = startContainer.textContent.slice(startOffset);
+
+            // Append the children.
+            fragment.appendChild(left);
+            fragment.appendChild(img);
+            fragment.appendChild(right);
+
+            // Replace the child with the fragment.
+            startParagraph.replaceChild(fragment, startContainer);
+
+          };
+
+          img.onerror = () => {
+
+            
+
+          };
+
+          // Set the <img> source with the image path.
+          img.src = `https://cdn.makuwro.com/${imagePath}`;
+
+        } catch (err) {
+
+          alert(err);
 
         }
 
-        // Get the file.
-        const file = event.target.files[0];
+      };
 
-        // Upload the file to the server.
-        const {imagePath} = await post.uploadImage(file);
+      // Simulate a click on the fake file input in order to request for an image.
+      input.click();
 
-        // Create an img tag.
-        const img = document.createElement("img");
-
-        img.onload = () => {
-
-          // Create a fragment containing the previous nodes, the <img>, and the next text.
-          const fragment = document.createDocumentFragment();
-
-          function getElementBeforeParagraph() {
-
-            let paragraphElement = startContainer;
-            while (paragraphElement.parentNode.tagName !== "P") {
-
-              paragraphElement = paragraphElement.parentNode;
-
-            }
-            return paragraphElement;
-
-          }
-
-          // Make two clones of the element.
-          const elementBeforeParagraph = getElementBeforeParagraph();
-          const left = elementBeforeParagraph.cloneNode(true);
-          const right = elementBeforeParagraph.cloneNode(true);
-
-          // Split the text content.
-          left.textContent = startContainer.textContent.slice(0, startOffset);
-          right.textContent = startContainer.textContent.slice(startOffset);
-
-          // Append the children.
-          fragment.appendChild(left);
-          fragment.appendChild(img);
-          fragment.appendChild(right);
-
-          // Replace the child with the fragment.
-          startParagraph.replaceChild(fragment, startContainer);
-
-        };
-
-        img.onerror = () => {
-
-
-
-        };
-
-        // Set the <img> source with the image path.
-        img.src = `https://cdn.makuwro.com/${imagePath}`;
-
-      } catch (err) {
-
-        alert(err);
-
-      }
-
-    };
-
-    // Simulate a click on the fake file input in order to request for an image.
-    input.click();
+    }
 
   }
 
