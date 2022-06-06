@@ -801,6 +801,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
               onKeyUp={handleInput}
               onCut={(event) => handleInput(event, true)}
               onPaste={handlePaste}
+              onSelect={() => setFormatterExpanded(false)}
               suppressContentEditableWarning
               ref={contentContainer}
               dangerouslySetInnerHTML={{ __html: contentState }}
