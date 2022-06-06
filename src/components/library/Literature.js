@@ -443,12 +443,13 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
       } else if (event.type === "keydown") {
 
-        // Check if we're at the beginning of the element.
+        // Remove the placeholder attribute, if there is one.
         const range = selection.getRangeAt(0);
         const {startContainer, startOffset, endContainer} = range;
-
-        // Now check if the element is at the beginning of the paragraph.
         const startParagraph = getParagraphElement(startContainer);
+        startParagraph.removeAttribute("placeholder");
+        
+        // Now check if the element is at the beginning of the paragraph.
         const endParagraph = getParagraphElement(endContainer);
         const preCaretRange = range.cloneRange();
         preCaretRange.selectNodeContents(startParagraph);
@@ -486,7 +487,9 @@ export default function Literature({ client, shownLocation, setLocation }) {
           const nodeIndex = Array.from(newStartParagraph.childNodes).indexOf(lastChild);
 
           // Append the HTML to the previous element.
-          newStartParagraph.innerHTML += paragraphToRemove.innerHTML;
+          // If the paragraph will be empty, use a <br> tag so that the 
+          // user can type in the paragraph.
+          newStartParagraph.innerHTML += paragraphToRemove.innerHTML || "<br>";
 
           // Remove the previous paragraph that we were on.
           paragraphToRemove.remove();
