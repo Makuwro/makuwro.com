@@ -670,7 +670,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
             // Remove the selection.
             range.extractContents();
-            
+
             // Move all end container children to the start container.
             while (endParagraph.childNodes.length) {
 
