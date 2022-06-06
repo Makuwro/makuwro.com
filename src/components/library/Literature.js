@@ -644,6 +644,64 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
   }
 
+  function requestImage() {
+
+    // Create a fake file input.
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+
+    input.onchange = async (event) => {
+
+      try {
+        
+        const range = window.getSelection().getRangeAt(0);
+        const {startContainer, startOffset, endContainer, endOffset} = range;
+
+        if (startContainer !== endContainer || startOffset !== endOffset) {
+
+          range.extractContents();
+
+        }
+
+        // Get the file.
+        const file = event.target.files[0];
+
+        // Upload the file to the server.
+        const {imagePath} = await post.uploadImage(file);
+
+        // Create an img tag.
+        const img = document.createElement("img");
+
+        img.onload = () => {
+
+          // Paste an <img> tag wherever the cursor is.
+          startContainer.parentNode.insertBefore(img, startContainer);
+
+        };
+
+        img.onerror = () => {
+
+
+
+        };
+
+        // Set the <img> source with the image path.
+        img.src = `https://cdn.makuwro.com/${imagePath}`;
+
+      } catch (err) {
+
+        alert(err);
+
+      }
+
+    };
+
+    // Simulate a click on the fake file input in order to request for an image.
+    input.click();
+
+  }
+
   return ready && (
     <main id={styles.post} className={leaving ? "leaving" : ""} onTransitionEnd={() => {
 
@@ -692,7 +750,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
                     format_indent_decrease
                   </span>
                 </button>
-                <button onClick={() => formatSelection("a")} type="button" title="Link">
+                <button onClick={requestImage} type="button" title="Link">
                   <span className="material-icons-round">
                     add_photo_alternate
                   </span>
