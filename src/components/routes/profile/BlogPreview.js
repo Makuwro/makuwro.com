@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import profileStyles from "../../../styles/Profile.module.css";
-import styles from "../../../styles/Blog.module.css";
+import styles from "../../../styles/Literature.module.css";
 
 export default function BlogPreview({
   owner, title, coverURL, slug, published, currentUserIsOwner

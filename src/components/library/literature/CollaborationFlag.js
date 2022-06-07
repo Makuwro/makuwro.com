@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import styles from "../../../styles/Blog.module.css";
+import styles from "../../../styles/Literature.module.css";
 
 export default function CollaborationFlag({username, ...props}) {
 

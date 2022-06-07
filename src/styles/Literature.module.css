@@ -27,7 +27,6 @@
   flex-direction: column;
   gap: 2rem;
   transition: 0.3s;
-  height: 100%;
 }
 
 #content {
@@ -270,7 +269,6 @@
 
   #desktopFormatter > nav > button.selected {
     color: white;
-    font-weight: 500;
     background-color: #292929;
   }
 
@@ -328,8 +326,12 @@
     gap: 5px;
   }
 
-  #currentMenu {
+  .expanded #currentMenu {
     display: flex;
+  }
+
+  #currentMenu {
+    display: none;
     background-color: var(--background-box);
     flex-direction: row;
     border-radius: 10px;
@@ -345,6 +347,13 @@
     width: 60px;
   }
 
+  #formatter .wordButton {
+    width: auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
 }
 
 @media screen and (min-width: 1024px) {
@@ -357,6 +366,14 @@
   #metadata {
     margin: 2rem auto 0;
     width: 100%;
+  }
+
+}
+
+@media print {
+
+  header, footer, #post #formatter, #actions {
+    display: none;
   }
 
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import styles from "../../styles/Blog.module.css";
+import styles from "../../styles/Literature.module.css";
 import sanitize from "sanitize-html";
 import Footer from "../Footer";
 import PropTypes from "prop-types";
