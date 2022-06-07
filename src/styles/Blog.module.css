@@ -82,15 +82,21 @@
 }
 
 #formatter {
+  display: none;
+  opacity: 0;
   position: fixed;
   bottom: -235px;
   left: 0;
   width: 100%;
   height: 275px;
   background-color: var(--background-input);
-  display: flex;
   flex-direction: column;
   transition: 0.15s;
+}
+
+#formatter.enabled {
+  display: flex;
+  opacity: 1;
 }
 
 #formatter.expanded {

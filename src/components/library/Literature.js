@@ -767,7 +767,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
     }}>
       {post ? (
         <>
-          <section id={styles.formatter} className={formatterExpanded ? styles.expanded : null}>
+          <section id={styles.formatter} className={`${editing ? styles.enabled : ""}${formatterExpanded ? ` ${styles.expanded}` : ""}`}>
             <section id={styles.mobileFormatter}>
               <section id={styles.quickOptions}>
                 <section>
