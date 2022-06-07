@@ -55,7 +55,7 @@
   box-sizing: border-box;
   flex-direction: column;
   box-shadow: var(--day-box-shadow);
-  background-color: var(--header);
+  background-color: var(--background-box);
 }
 
 #profile-info > section:first-of-type {
@@ -129,7 +129,7 @@
 }
 
 #container > section {
-  background-color: var(--article);
+  background-color: var(--background-box);
   transition: 0.3s;
 }
 
@@ -275,10 +275,6 @@
   gap: 1.5rem;
 }
 
-#blog h1 {
-  font-weight: 100;
-}
-
 .blogPost {
   display: flex;
   gap: 0.5rem;
@@ -310,7 +306,6 @@
   background-color: var(--background-input);
   padding: 1rem;
   border-radius: 5px;
-  border: 1px solid #111111;
   box-sizing: border-box;
 }
 
@@ -320,7 +315,7 @@
 }
 
 .blogPreview:hover {
-  filter: brightness(1.2);
+  filter: brightness(1.05);
 }
 
 .blogPreview:active:hover {

@@ -1,6 +1,7 @@
 :root {
-  --background: #26272b;
-  --background-footer: #1c1d1f;
+  --background: #0e0e0e;
+  --background-footer: #0a0a0a;
+  --background-box: #292929;
   --button: #2196f3;
   --link: #57bffc;
   --background-input: #202021;
@@ -9,18 +10,24 @@
   --text-important: white;
   --text-footer: var(--text-important);
   --day-box-shadow: rgba(0, 0, 0, 0.133) 0px 1.6px, rgba(0, 0, 0, 0.11) 0px 0.3px 0.9px 0px;
+  --box-shadow: 0 2px 3.6px 0 rgb(0 0 0 / 13%), 0 0px 9px 4px rgb(0 0 0 / 11%);
   --header: #313237;
+  --formatter-selected: #4a4a4b;
 }
 
 .light {
   --background: #f2f2f2;
   --background-footer: #060a1e;
+  --background-box: white;
   --text: rgb(96, 94, 92);
   --background-input: #e3e5e8;
   --article: white;
   --text-footer: white;
-  --text-important: rgb(96, 94, 92);
+  --text-important: rgb(68, 66, 64);
   --header: #45af50;
+  --button: var(--header);
+  --link: var(--header);
+  --formatter-selected: #24a13e5c;
 }
 
 html, body, #root {
@@ -54,7 +61,15 @@ a {
   color: var(--text-important);
 }
 
-a:hover, .light a:hover {
+.light a {
+  color: var(--link);
+}
+
+.light a:hover {
+  color: var(--text-important);
+}
+
+a:hover {
   color: var(--link);
 }
 
@@ -74,7 +89,7 @@ h1 {
 
 p {
   margin-bottom: 1rem;
-  font-size: 1rem;
+  font-size: 16px;
   font-weight: 300;
 }
 
@@ -124,7 +139,7 @@ textarea, form input[type="text"], form input[type="password"], form input[type=
   box-sizing: border-box;
   font-weight: 300;
   margin-top: 1rem;
-  box-shadow: 0 2px 3.6px 0 rgb(0 0 0 / 13%), 0 0px 9px 4px rgb(0 0 0 / 11%);
+  box-shadow: var(--box-shadow);
 }
 
 .light textarea, .light form input[type="text"], .light form input[type="password"], .light form input[type="email"], .light .input-with-prefix {
@@ -196,7 +211,7 @@ button, input[type="button"], input[type="submit"] {
   cursor: pointer;
   background-color: var(--button);
   border: none;
-  padding: 0.6rem 1rem;
+  padding: 5px 10px;
   color: white;
   font-size: 1rem;
   transition: 0.1s;

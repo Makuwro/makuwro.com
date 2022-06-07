@@ -17,9 +17,6 @@ export default function Header({client, theme, systemDark, query, setLocation}) 
   return (
     <header className={!systemDark && theme !== 2 ? "day" : null}>
       <section>
-        <button>
-          <img src="/icons/hamburger-menu.svg" />
-        </button>
         <Link to="/" onClick={() => setLocation(location)} id={styles["wiki-name"]}>Makuwro</Link>
         <section id={styles.leftLinks}>
           <Link to="/library">Library</Link>

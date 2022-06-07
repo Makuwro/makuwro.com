@@ -768,95 +768,223 @@ export default function Literature({ client, shownLocation, setLocation }) {
       {post ? (
         <>
           <section id={styles.formatter} className={formatterExpanded ? styles.expanded : null}>
-            <section id={styles.quickOptions}>
-              <section>
-                <button onClick={() => formatSelection("b")} type="button" title="Bold">
-                  <b>B</b>
-                </button>
-                <button onClick={() => formatSelection("i")} type="button" title="Italicize">
-                  <i>I</i>
-                </button>
-                <button onClick={() => formatSelection("u")} type="button" title="Underline">
-                  <u>U</u>
-                </button>
-                <button onClick={() => formatSelection("strike")} type="button" title="Strikethrough">
-                  <strike>S</strike>
-                </button>
-                <button onClick={() => formatSelection("a")} type="button" title="Link">
+            <section id={styles.mobileFormatter}>
+              <section id={styles.quickOptions}>
+                <section>
+                  <button onClick={() => formatSelection("b")} type="button" title="Bold">
+                    <b>B</b>
+                  </button>
+                  <button onClick={() => formatSelection("i")} type="button" title="Italicize">
+                    <i>I</i>
+                  </button>
+                  <button onClick={() => formatSelection("u")} type="button" title="Underline">
+                    <u>U</u>
+                  </button>
+                  <button onClick={() => formatSelection("strike")} type="button" title="Strikethrough">
+                    <strike>S</strike>
+                  </button>
+                  <button onClick={() => formatSelection("a")} type="button" title="Link">
+                    <span className="material-icons-round">
+                      link
+                    </span>
+                  </button>
+                  <button onClick={() => formatSelection("a")} type="button" title="Link">
+                    <span id={styles.textColor}>C</span>
+                  </button>
+                  <button onClick={() => formatSelection("a")} type="button" title="Link">
+                    🖌️
+                  </button>
+                  <button onClick={() => formatSelection("a")} type="button" title="Link">
+                    <span className="material-icons-round">
+                      format_indent_increase
+                    </span>
+                  </button>
+                  <button onClick={() => formatSelection("a")} type="button" title="Link">
+                    <span className="material-icons-round">
+                      format_indent_decrease
+                    </span>
+                  </button>
+                  <button onClick={requestImage} type="button" title="Link">
+                    <span className="material-icons-round">
+                      add_photo_alternate
+                    </span>
+                  </button>
+                </section>
+                <button id={styles.expansionToggle} onClick={() => setFormatterExpanded((expanded) => !expanded)} type="button" title="Expand">
                   <span className="material-icons-round">
-                    link
-                  </span>
-                </button>
-                <button onClick={() => formatSelection("a")} type="button" title="Link">
-                  <span id={styles.textColor}>C</span>
-                </button>
-                <button onClick={() => formatSelection("a")} type="button" title="Link">
-                  🖌️
-                </button>
-                <button onClick={() => formatSelection("a")} type="button" title="Link">
-                  <span className="material-icons-round">
-                    format_indent_increase
-                  </span>
-                </button>
-                <button onClick={() => formatSelection("a")} type="button" title="Link">
-                  <span className="material-icons-round">
-                    format_indent_decrease
-                  </span>
-                </button>
-                <button onClick={requestImage} type="button" title="Link">
-                  <span className="material-icons-round">
-                    add_photo_alternate
+                    {`expand_${formatterExpanded ? "more" : "less"}`}
                   </span>
                 </button>
               </section>
-              <button id={styles.expansionToggle} onClick={() => setFormatterExpanded((expanded) => !expanded)} type="button" title="Expand">
-                <span className="material-icons-round">
-                  {`expand_${formatterExpanded ? "more" : "less"}`}
-                </span>
-              </button>
+              <section id={styles.expandedMenu}>
+                <section id={styles.alignOptions}>
+                  <button onClick={() => alignSelection()} type="button" title="Align paragraph to the left">
+                    <span className="material-icons-round">
+                      format_align_left
+                    </span>
+                  </button>
+                  <button onClick={() => alignSelection("center")} type="button" title="Align paragraph to the center">
+                    <span className="material-icons-round">
+                      format_align_center
+                    </span>
+                  </button>
+                  <button onClick={() => alignSelection("right")} type="button" title="Align paragraph to the right">
+                    <span className="material-icons-round">
+                      format_align_right
+                    </span>
+                  </button>
+                  <button onClick={() => alignSelection("justify")} type="button" title="Justify paragraph">
+                    <span className="material-icons-round">
+                      format_align_justify
+                    </span>
+                  </button>
+                </section>
+                <section id={styles.fontSelection}>
+                  <button>Lexend Deca</button>
+                  <button type="button" className={styles.fontSize} onClick={() => formatSelection("size")}>16</button>
+                </section>
+                <section id={styles.otherOptions}>
+                  <button type="button" title="Change font color">
+                    Change font color
+                  </button>
+                  <button type="button" title="Change highlight color">
+                    Change highlight color
+                  </button>
+                  <button type="button" title="Clear formatting">
+                    Clear formatting
+                  </button>
+                  <button type="button" title="Bullet list">Bullet list</button>
+                  <button type="button" title="Revert to backup">Revert to backup</button>
+                  <button onClick={downloadHTML} type="button" title="Save to device">Save to device</button>
+                  <button type="button" title="Collaboration settings">Collaboration settings</button>
+                  <button onClick={changeBlogURL} type="button" title="Change blog URL">Change blog URL</button>
+                </section>
+              </section>
             </section>
-            <section id={styles.expandedMenu}>
-              <section id={styles.alignOptions}>
-                <button onClick={() => alignSelection()} type="button" title="Align paragraph to the left">
-                  <span className="material-icons-round">
-                    format_align_left
-                  </span>
+            <section id={styles.desktopFormatter}>
+              <nav>
+                <button>
+                  File
                 </button>
-                <button onClick={() => alignSelection("center")} type="button" title="Align paragraph to the center">
-                  <span className="material-icons-round">
-                    format_align_center
-                  </span>
+                <button>
+                  Edit
                 </button>
-                <button onClick={() => alignSelection("right")} type="button" title="Align paragraph to the right">
-                  <span className="material-icons-round">
-                    format_align_right
-                  </span>
+                <button>
+                  Insert
                 </button>
-                <button onClick={() => alignSelection("justify")} type="button" title="Justify paragraph">
-                  <span className="material-icons-round">
-                    format_align_justify
-                  </span>
+                <button>
+                  Collaborate
                 </button>
-              </section>
-              <section id={styles.fontSelection}>
-                <button>Lexend Deca</button>
-                <button type="button" id={styles.fontSize} onClick={() => formatSelection("size")}>16</button>
-              </section>
-              <section id={styles.otherOptions}>
-                <button type="button" title="Change font color">
-                  Change font color
+                <button>
+                  Help
                 </button>
-                <button type="button" title="Change highlight color">
-                  Change highlight color
-                </button>
-                <button type="button" title="Clear formatting">
-                  Clear formatting
-                </button>
-                <button type="button" title="Bullet list">Bullet list</button>
-                <button type="button" title="Revert to backup">Revert to backup</button>
-                <button onClick={downloadHTML} type="button" title="Save to device">Save to device</button>
-                <button type="button" title="Collaboration settings">Collaboration settings</button>
-                <button onClick={changeBlogURL} type="button" title="Change blog URL">Change blog URL</button>
+              </nav>
+              <section id={styles.currentMenu}>
+                <section>
+                  <section>
+                    <button id={styles.fontName} className={styles.dropdown}>
+                      Lexend Deca
+                      <span className="material-icons-round">
+                        expand_more
+                      </span>
+                    </button>
+                    <button className={`${styles.dropdown} ${styles.fontSize}`}>
+                      16
+                      <span className="material-icons-round">
+                        expand_more
+                      </span>
+                    </button>
+                    <button id={styles.headingSelector} className={styles.dropdown}>
+                      Normal text
+                      <span className="material-icons-round">
+                        expand_more
+                      </span>
+                    </button>
+                  </section>
+                  <section>
+                    <button>
+                      <b>B</b>
+                    </button>
+                    <button>
+                      <i>I</i>
+                    </button>
+                    <button>
+                      <u>U</u>
+                    </button>
+                    <button>
+                      <s>S</s>
+                    </button>
+                    <button onClick={() => formatSelection("a")} type="button" title="Link">
+                      <span id={styles.textColor}>C</span>
+                    </button>
+                    <button onClick={() => formatSelection("a")} type="button" title="Link">
+                      🖌️
+                    </button>
+                    <button onClick={() => formatSelection("a")} type="button" title="Link">
+                      <span className="material-icons-round">
+                        link
+                      </span>
+                    </button>
+                  </section>
+                  <section className={styles.formatterLabel}>Font</section>
+                </section>
+                <section>
+                  <section>
+                    <button onClick={() => alignSelection()} type="button" title="Align paragraph to the left">
+                      <span className="material-icons-round">
+                        format_align_left
+                      </span>
+                    </button>
+                    <button onClick={() => alignSelection("center")} type="button" title="Align paragraph to the center">
+                      <span className="material-icons-round">
+                        format_align_center
+                      </span>
+                    </button>
+                    <button onClick={() => alignSelection("right")} type="button" title="Align paragraph to the right">
+                      <span className="material-icons-round">
+                        format_align_right
+                      </span>
+                    </button>
+                    <button onClick={() => alignSelection("justify")} type="button" title="Justify paragraph">
+                      <span className="material-icons-round">
+                        format_align_justify
+                      </span>
+                    </button>
+                  </section>
+                  <section>
+                    <button>
+                      <span className="material-icons-round">
+                        format_line_spacing
+                      </span>
+                    </button>
+                    <button onClick={() => formatSelection("a")} type="button" title="Link">
+                      <span className="material-icons-round">
+                        format_indent_increase
+                      </span>
+                    </button>
+                    <button onClick={() => formatSelection("a")} type="button" title="Link">
+                      <span className="material-icons-round">
+                        format_indent_decrease
+                      </span>
+                    </button>
+                  </section>
+                  <section className={styles.formatterLabel}>Paragraph</section>
+                </section>
+                <section>
+                  <section>
+                    <button>
+                      <span className="material-icons-round">
+                        format_list_bulleted
+                      </span>
+                    </button>
+                    <button>
+                      <span className="material-icons-round">
+                        format_list_numbered
+                      </span>
+                    </button>
+                  </section>
+                  <section className={styles.formatterLabel}>Lists</section>
+                </section>
               </section>
             </section>
           </section>
