@@ -5,6 +5,7 @@ import sanitize from "sanitize-html";
 import Footer from "../Footer";
 import PropTypes from "prop-types";
 import { BlogPost } from "makuwro";
+import LiteratureFormatter from "./literature/LiteratureFormatter";
 
 export default function Literature({ client, shownLocation, setLocation }) {
 
@@ -24,7 +25,9 @@ export default function Literature({ client, shownLocation, setLocation }) {
   const [contentState, setContentState] = useState();
   const [updateTime, setUpdateTime] = useState();
   const [newSlug, setNewSlug] = useState();
+  const [formatterEnabled, setFormatterEnabled] = useState(false);
   const [formatterExpanded, setFormatterExpanded] = useState(false);
+  const [desktopFormatterRef, setDesktopFormatterRef] = useState();
 
   useEffect(() => {
 
@@ -179,8 +182,14 @@ export default function Literature({ client, shownLocation, setLocation }) {
       // Check if we need to toggle edit mode
       if (searchParams.get("mode") === "edit") {
 
-        setEditing(true);
+        // Set the post content. If it doesn't have any, set a default paragraph.
         setContentState(post.content || "<p placeholder=\"You can start drafting by clicking here!\"></p>");
+
+        // Enable edit mode.
+        setEditing(true);
+
+        // Enable the formatter.
+        setFormatterEnabled(true);
 
       } else {
 
@@ -194,7 +203,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
     }
 
-  }, [post, searchParams]);
+  }, [post, searchParams, leaving]);
 
   useEffect(() => {
 
@@ -364,47 +373,6 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
     }
     return paragraphElement;
-
-  }
-
-  /**
-   * 
-   * @param {string} [alignment] 
-   */
-  function alignSelection(alignment = "") {
-
-    // First thing's first: let's get the start and end paragraphs.
-    const selection = window.getSelection();
-    const {startContainer, endContainer} = selection.getRangeAt(0);
-
-    const startParagraph = getParagraphElement(startContainer);
-    const endParagraph = getParagraphElement(endContainer);
-
-    if (startParagraph === endParagraph) {
-
-      startParagraph.style.textAlign = alignment;
-
-    } else {
-
-      const children = Array.from(contentContainer.current.children);
-      const startIndex = children.indexOf(startParagraph);
-      const endIndex = children.indexOf(endParagraph);
-      for (let i = startIndex; endIndex >= i; i++) {
-
-        children[i].style.textAlign = alignment;
-
-      }
-
-    }
-
-  }
-
-  function downloadHTML() {
-
-    const fakeLink = document.createElement("a");
-    fakeLink.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(content.current));
-    fakeLink.setAttribute("download", `${titleRef.current}.html`);
-    fakeLink.click();
 
   }
 
@@ -618,143 +586,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
   }
 
-  async function changeBlogURL() {
-
-    // Get a new slug from the user.
-    let slug;
-    while (!slug) {
-
-      slug = prompt(`The current slug for this blog post is "${post.slug}".\n\nWhat would you like to change it to? Try to only use alphanumeric characters, hyphens, and periods.`);
-      
-      // If the user pressed OK without typing anything, newBlogSlug will be null.
-      // They might've meant to press Cancel.
-      if (!slug || slug === post.slug) {
-        
-        return;
-
-      }
-
-    }
-
-    // Request the server to change the slug.
-    await post.update({slug});
-
-    // Change the URL on the search bar.
-    setNewSlug(slug);
-
-  }
-
-  function requestImage() {
-
-    // Verify that the user is selecting a paragraph.
-    const selection = window.getSelection();
-    const {anchorNode} = selection;
-    
-    if (anchorNode && getParagraphElement(anchorNode)) {
-
-      // Create a fake file input.
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = "image/*";
-
-      input.onchange = async (event) => {
-
-        try {
-          
-          const range = selection.getRangeAt(0);
-          const {startContainer, startOffset, endContainer} = range;
-          const startParagraph = getParagraphElement(startContainer);
-          const endParagraph = getParagraphElement(endContainer);
-
-          if (startParagraph !== endParagraph) {
-
-            // Remove the selection.
-            range.extractContents();
-
-            // Move all end container children to the start container.
-            while (endParagraph.childNodes.length) {
-
-              startParagraph.appendChild(endParagraph.firstChild);
-
-            }
-
-            // Remove the end paragraph.
-            endParagraph.remove();
-
-            // Normalize the start paragraph.
-            startParagraph.normalize();
-
-          }
-
-          // Get the file.
-          const file = event.target.files[0];
-
-          // Upload the file to the server.
-          const {imagePath} = await post.uploadImage(file);
-
-          // Create an img tag.
-          const img = document.createElement("img");
-
-          img.onload = () => {
-
-            // Create a fragment containing the previous nodes, the <img>, and the next text.
-            const fragment = document.createDocumentFragment();
-
-            function getElementBeforeParagraph() {
-
-              let paragraphElement = startContainer;
-              while (paragraphElement.parentNode.tagName !== "P") {
-
-                paragraphElement = paragraphElement.parentNode;
-
-              }
-              return paragraphElement;
-
-            }
-
-            // Make two clones of the element.
-            const elementBeforeParagraph = getElementBeforeParagraph();
-            const left = elementBeforeParagraph.cloneNode(true);
-            const right = elementBeforeParagraph.cloneNode(true);
-
-            // Split the text content.
-            left.textContent = startContainer.textContent.slice(0, startOffset);
-            right.textContent = startContainer.textContent.slice(startOffset);
-
-            // Append the children.
-            fragment.appendChild(left);
-            fragment.appendChild(img);
-            fragment.appendChild(right);
-
-            // Replace the child with the fragment.
-            startParagraph.replaceChild(fragment, startContainer);
-
-          };
-
-          img.onerror = () => {
-
-            
-
-          };
-
-          // Set the <img> source with the image path.
-          img.src = `https://cdn.makuwro.com/${imagePath}`;
-
-        } catch (err) {
-
-          alert(err);
-
-        }
-
-      };
-
-      // Simulate a click on the fake file input in order to request for an image.
-      input.click();
-
-    }
-
-  }
-
+  // Render the component.
   return ready && (
     <main id={styles.post} className={leaving ? "leaving" : ""} onTransitionEnd={() => {
 
@@ -767,227 +599,18 @@ export default function Literature({ client, shownLocation, setLocation }) {
     }}>
       {post ? (
         <>
-          <section id={styles.formatter} className={`${editing ? styles.enabled : ""}${formatterExpanded ? ` ${styles.expanded}` : ""}`}>
-            <section id={styles.mobileFormatter}>
-              <section id={styles.quickOptions}>
-                <section>
-                  <button onClick={() => formatSelection("b")} type="button" title="Bold">
-                    <b>B</b>
-                  </button>
-                  <button onClick={() => formatSelection("i")} type="button" title="Italicize">
-                    <i>I</i>
-                  </button>
-                  <button onClick={() => formatSelection("u")} type="button" title="Underline">
-                    <u>U</u>
-                  </button>
-                  <button onClick={() => formatSelection("strike")} type="button" title="Strikethrough">
-                    <strike>S</strike>
-                  </button>
-                  <button onClick={() => formatSelection("a")} type="button" title="Link">
-                    <span className="material-icons-round">
-                      link
-                    </span>
-                  </button>
-                  <button onClick={() => formatSelection("a")} type="button" title="Link">
-                    <span id={styles.textColor}>C</span>
-                  </button>
-                  <button onClick={() => formatSelection("a")} type="button" title="Link">
-                    🖌️
-                  </button>
-                  <button onClick={() => formatSelection("a")} type="button" title="Link">
-                    <span className="material-icons-round">
-                      format_indent_increase
-                    </span>
-                  </button>
-                  <button onClick={() => formatSelection("a")} type="button" title="Link">
-                    <span className="material-icons-round">
-                      format_indent_decrease
-                    </span>
-                  </button>
-                  <button onClick={requestImage} type="button" title="Link">
-                    <span className="material-icons-round">
-                      add_photo_alternate
-                    </span>
-                  </button>
-                </section>
-                <button id={styles.expansionToggle} onClick={() => setFormatterExpanded((expanded) => !expanded)} type="button" title="Expand">
-                  <span className="material-icons-round">
-                    {`expand_${formatterExpanded ? "more" : "less"}`}
-                  </span>
-                </button>
-              </section>
-              <section id={styles.expandedMenu}>
-                <section id={styles.alignOptions}>
-                  <button onClick={() => alignSelection()} type="button" title="Align paragraph to the left">
-                    <span className="material-icons-round">
-                      format_align_left
-                    </span>
-                  </button>
-                  <button onClick={() => alignSelection("center")} type="button" title="Align paragraph to the center">
-                    <span className="material-icons-round">
-                      format_align_center
-                    </span>
-                  </button>
-                  <button onClick={() => alignSelection("right")} type="button" title="Align paragraph to the right">
-                    <span className="material-icons-round">
-                      format_align_right
-                    </span>
-                  </button>
-                  <button onClick={() => alignSelection("justify")} type="button" title="Justify paragraph">
-                    <span className="material-icons-round">
-                      format_align_justify
-                    </span>
-                  </button>
-                </section>
-                <section id={styles.fontSelection}>
-                  <button>Lexend Deca</button>
-                  <button type="button" className={styles.fontSize} onClick={() => formatSelection("size")}>16</button>
-                </section>
-                <section id={styles.otherOptions}>
-                  <button type="button" title="Change font color">
-                    Change font color
-                  </button>
-                  <button type="button" title="Change highlight color">
-                    Change highlight color
-                  </button>
-                  <button type="button" title="Clear formatting">
-                    Clear formatting
-                  </button>
-                  <button type="button" title="Bullet list">Bullet list</button>
-                  <button type="button" title="Revert to backup">Revert to backup</button>
-                  <button onClick={downloadHTML} type="button" title="Save to device">Save to device</button>
-                  <button type="button" title="Collaboration settings">Collaboration settings</button>
-                  <button onClick={changeBlogURL} type="button" title="Change blog URL">Change blog URL</button>
-                </section>
-              </section>
-            </section>
-            <section id={styles.desktopFormatter}>
-              <nav>
-                <button>
-                  File
-                </button>
-                <button>
-                  Edit
-                </button>
-                <button>
-                  Insert
-                </button>
-                <button>
-                  Collaborate
-                </button>
-                <button>
-                  Help
-                </button>
-              </nav>
-              <section id={styles.currentMenu}>
-                <section>
-                  <section>
-                    <button id={styles.fontName} className={styles.dropdown}>
-                      Lexend Deca
-                      <span className="material-icons-round">
-                        expand_more
-                      </span>
-                    </button>
-                    <button className={`${styles.dropdown} ${styles.fontSize}`}>
-                      16
-                      <span className="material-icons-round">
-                        expand_more
-                      </span>
-                    </button>
-                    <button id={styles.headingSelector} className={styles.dropdown}>
-                      Normal text
-                      <span className="material-icons-round">
-                        expand_more
-                      </span>
-                    </button>
-                  </section>
-                  <section>
-                    <button>
-                      <b>B</b>
-                    </button>
-                    <button>
-                      <i>I</i>
-                    </button>
-                    <button>
-                      <u>U</u>
-                    </button>
-                    <button>
-                      <s>S</s>
-                    </button>
-                    <button onClick={() => formatSelection("a")} type="button" title="Link">
-                      <span id={styles.textColor}>C</span>
-                    </button>
-                    <button onClick={() => formatSelection("a")} type="button" title="Link">
-                      🖌️
-                    </button>
-                    <button onClick={() => formatSelection("a")} type="button" title="Link">
-                      <span className="material-icons-round">
-                        link
-                      </span>
-                    </button>
-                  </section>
-                  <section className={styles.formatterLabel}>Font</section>
-                </section>
-                <section>
-                  <section>
-                    <button onClick={() => alignSelection()} type="button" title="Align paragraph to the left">
-                      <span className="material-icons-round">
-                        format_align_left
-                      </span>
-                    </button>
-                    <button onClick={() => alignSelection("center")} type="button" title="Align paragraph to the center">
-                      <span className="material-icons-round">
-                        format_align_center
-                      </span>
-                    </button>
-                    <button onClick={() => alignSelection("right")} type="button" title="Align paragraph to the right">
-                      <span className="material-icons-round">
-                        format_align_right
-                      </span>
-                    </button>
-                    <button onClick={() => alignSelection("justify")} type="button" title="Justify paragraph">
-                      <span className="material-icons-round">
-                        format_align_justify
-                      </span>
-                    </button>
-                  </section>
-                  <section>
-                    <button>
-                      <span className="material-icons-round">
-                        format_line_spacing
-                      </span>
-                    </button>
-                    <button onClick={() => formatSelection("a")} type="button" title="Link">
-                      <span className="material-icons-round">
-                        format_indent_increase
-                      </span>
-                    </button>
-                    <button onClick={() => formatSelection("a")} type="button" title="Link">
-                      <span className="material-icons-round">
-                        format_indent_decrease
-                      </span>
-                    </button>
-                  </section>
-                  <section className={styles.formatterLabel}>Paragraph</section>
-                </section>
-                <section>
-                  <section>
-                    <button>
-                      <span className="material-icons-round">
-                        format_list_bulleted
-                      </span>
-                    </button>
-                    <button>
-                      <span className="material-icons-round">
-                        format_list_numbered
-                      </span>
-                    </button>
-                  </section>
-                  <section className={styles.formatterLabel}>Lists</section>
-                </section>
-              </section>
-            </section>
-          </section>
+          <LiteratureFormatter 
+            setNewSlug={setNewSlug} 
+            getParagraphElement={getParagraphElement} 
+            title={titleRef.current} 
+            enabled={formatterEnabled} 
+            content={content.current}
+            expanded={formatterExpanded}
+            contentContainer={contentContainer.current} 
+            post={post}
+            setDesktopFormatterRef={setDesktopFormatterRef}
+            onExpansionChange={setFormatterExpanded}
+          />
           <section id={styles.belowFormatter}>
             <section id={styles.metadata}>
               <section id={styles.postInfo}>
@@ -1040,7 +663,17 @@ export default function Literature({ client, shownLocation, setLocation }) {
               onKeyUp={handleInput}
               onCut={(event) => handleInput(event, true)}
               onPaste={handlePaste}
-              onSelect={() => setFormatterExpanded(false)}
+              onSelect={() => {
+                
+                // Check if the desktop formatter is visible.
+                if (window.getComputedStyle(desktopFormatterRef.current).display !== "flex") {
+                  
+                  // If it isn't, close the mobile formatter.
+                  setFormatterExpanded(false);
+
+                }
+
+              }}
               suppressContentEditableWarning
               ref={contentContainer}
               dangerouslySetInnerHTML={{ __html: contentState }}
