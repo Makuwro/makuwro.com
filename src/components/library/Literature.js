@@ -367,7 +367,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
   function getParagraphElement(element) {
 
     let paragraphElement = element;
-    while (paragraphElement && paragraphElement.tagName !== "P") {
+    while (paragraphElement && paragraphElement.parentNode !== contentContainer.current) {
 
       paragraphElement = paragraphElement?.parentNode;
 
