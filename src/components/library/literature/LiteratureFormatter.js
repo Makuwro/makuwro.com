@@ -2,6 +2,20 @@ import React, { useState, useEffect, useRef } from "react";
 import styles from "../../../styles/Literature.module.css";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+import FormatterFileInfoComponent from "./formatter/file/FormatterFileInfoComponent";
+import FormatterFileVersioningComponent from "./formatter/file/FormatterFileVersioningComponent";
+import FormatterFileExportComponent from "./formatter/file/FormatterFileExportComponent";
+import FormatterFileDeleteComponent from "./formatter/file/FormatterFileDeleteComponent";
+import FormatterEditHistoryComponent from "./formatter/edit/FormatterEditHistoryComponent";
+import FormatterEditFontComponent from "./formatter/edit/FormatterEditFontComponent";
+import FormatterEditListsComponent from "./formatter/edit/FormatterEditListsComponent";
+import FormatterEditParagraphComponent from "./formatter/edit/FormatterEditParagraphComponent";
+import FormatterInsertImagesComponent from "./formatter/insert/FormatterInsertImagesComponent";
+import FormatterInsertTemplatesComponent from "./formatter/insert/FormatterInsertTemplatesComponent";
+import FormatterSharePermissionsComponent from "./formatter/share/FormatterSharePermissionsComponent";
+import FormatterHelpCreativeSupportComponent from "./formatter/help/FormatterHelpCreativeSupportComponent";
+import FormatterHelpTechincalSupportComponent from "./formatter/help/FormatterHelpTechnicalSupportComponent";
+import FormatterHelpSafetySecurityComponent from "./formatter/help/FormatterHelpSafetySecurityComponent";
 
 export default function LiteratureFormatter({enabled, expanded, formatSelection, title, content, contentContainer, getParagraphElement, post, onExpansionChange, setNewSlug, setDesktopFormatterRef}) {
   
@@ -257,6 +271,25 @@ export default function LiteratureFormatter({enabled, expanded, formatSelection,
 
   }
 
+  async function deleteLiterature() {
+
+    if (confirm("Are you sure you want to delete this literature? After this, all comments and content, including attached images, will be deleted.\n\nNo takesies-backsies!")) {
+
+      try {
+        
+        await post.delete();
+        navigate(`/${post.owner.username}/blog`);
+
+      } catch ({message}) {
+
+        alert(`Couldn't delete this literature: ${message}`);
+
+      }
+
+    }
+
+  }
+
   useEffect(() => {
 
     if (enabled) {
@@ -264,178 +297,68 @@ export default function LiteratureFormatter({enabled, expanded, formatSelection,
       const menu = {
         "File": [
           {
-            name: "Print"
+            name: "Info",
+            children: <FormatterFileInfoComponent />
+          },
+          {
+            name: "Version history",
+            children: <FormatterFileVersioningComponent />
+          },
+          {
+            name: "Export",
+            children: <FormatterFileExportComponent downloadHTML={downloadHTML} />
+          },
+          {
+            name: "Delete",
+            children: <FormatterFileDeleteComponent deleteLiterature={deleteLiterature} />
           }
         ],
         "Edit": [
           {
+            name: "History",
+            children: <FormatterEditHistoryComponent />
+          },
+          {
             name: "Font",
-            children: (
-              <>
-                <section>
-                  <button id={styles.fontName} className={styles.dropdown}>
-                    Lexend Deca
-                    <span className="material-icons-round">
-                      expand_more
-                    </span>
-                  </button>
-                  <button className={`${styles.dropdown} ${styles.fontSize}`}>
-                    16
-                    <span className="material-icons-round">
-                      expand_more
-                    </span>
-                  </button>
-                  <button id={styles.headingSelector} className={styles.dropdown}>
-                    Normal text
-                    <span className="material-icons-round">
-                      expand_more
-                    </span>
-                  </button>
-                </section>
-                <section>
-                  <button>
-                    <b>B</b>
-                  </button>
-                  <button>
-                    <i>I</i>
-                  </button>
-                  <button>
-                    <u>U</u>
-                  </button>
-                  <button>
-                    <s>S</s>
-                  </button>
-                  <button onClick={() => formatSelection("a")} type="button" title="Link">
-                    <span id={styles.textColor}>C</span>
-                  </button>
-                  <button onClick={() => formatSelection("a")} type="button" title="Link">
-                    🖌️
-                  </button>
-                  <button onClick={() => formatSelection("a")} type="button" title="Link">
-                    <span className="material-icons-round">
-                      link
-                    </span>
-                  </button>
-                </section>
-              </>
-            )
+            children: <FormatterEditFontComponent styles={styles} formatSelection={formatSelection} />
           },
           {
             name: "Paragraph",
-            children: (
-              <>
-                <section>
-                  <button onClick={() => alignSelection()} type="button" title="Align paragraph to the left">
-                    <span className="material-icons-round">
-                      format_align_left
-                    </span>
-                  </button>
-                  <button onClick={() => alignSelection("center")} type="button" title="Align paragraph to the center">
-                    <span className="material-icons-round">
-                      format_align_center
-                    </span>
-                  </button>
-                  <button onClick={() => alignSelection("right")} type="button" title="Align paragraph to the right">
-                    <span className="material-icons-round">
-                      format_align_right
-                    </span>
-                  </button>
-                  <button onClick={() => alignSelection("justify")} type="button" title="Justify paragraph">
-                    <span className="material-icons-round">
-                      format_align_justify
-                    </span>
-                  </button>
-                </section>
-                <section>
-                  <button>
-                    <span className="material-icons-round">
-                      format_line_spacing
-                    </span>
-                  </button>
-                  <button onClick={() => formatSelection("a")} type="button" title="Link">
-                    <span className="material-icons-round">
-                      format_indent_increase
-                    </span>
-                  </button>
-                  <button onClick={() => formatSelection("a")} type="button" title="Link">
-                    <span className="material-icons-round">
-                      format_indent_decrease
-                    </span>
-                  </button>
-                </section>
-              </>
-            )
+            children: <FormatterEditParagraphComponent alignSelection={alignSelection} />
           },
           {
             name: "Lists",
-            children: (
-              <>
-                <section>
-                  <button onClick={() => toggleList("ul")}>
-                    <span className="material-icons-round">
-                      format_list_bulleted
-                    </span>
-                  </button>
-                  <button onClick={() => toggleList("ol")}>
-                    <span className="material-icons-round">
-                      format_list_numbered
-                    </span>
-                  </button>
-                </section>
-              </>
-            )
+            children: <FormatterEditListsComponent toggleList={toggleList} />
           }
         ],
         "Insert": [
           {
             name: "Images",
-            children: null
+            children: <FormatterInsertImagesComponent requestImage={requestImage} />
           },
           {
             name: "Templates",
-            children: null
+            children: <FormatterInsertTemplatesComponent />
           }
         ],
-        "Collaborate": [
+        "Share": [
           {
             name: "Permissions",
-            children: (
-              <>
-                <button className={styles.wordButton} onClick={() => navigate("?mode=edit&action=manage-permissions")}>
-                  <span className="material-icons-round">
-                    manage_accounts
-                  </span>
-                  Manage permissions
-                </button>
-              </>
-            )
+            children: <FormatterSharePermissionsComponent navigate={navigate} />
           }
         ],
         "Help": [
           {
             name: "Creative support",
-            children: (
-              <>
-                <a href="https://den.makuwro.com/join" target="_blank" rel="noreferrer">Visit Da Dragon Den</a>
-              </>
-            )
+            children: <FormatterHelpCreativeSupportComponent />
           },
           {
             name: "Technical support",
-            children: (
-              <>
-                <a href="https://help.makuwro.com/blogs" target="_blank" rel="noreferrer">Visit the help center</a>
-                <a href="https://github.com/Makuwro/makuwro.com/issues/new/choose" target="_blank" rel="noreferrer">Report an issue</a>
-              </>
-            )
+            children: <FormatterHelpTechincalSupportComponent />
           },
           {
-            name: "Moral support",
-            children: (
-              <>
-                <button>Visit the help center</button>
-              </>
-            )
+            name: "Safety & security",
+            children: <FormatterHelpSafetySecurityComponent navigate={navigate} />
           }
         ]
       };

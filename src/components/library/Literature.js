@@ -605,6 +605,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
             title={titleRef.current} 
             enabled={formatterEnabled} 
             content={content.current}
+            formatSelection={formatSelection}
             expanded={formatterExpanded}
             contentContainer={contentContainer.current} 
             post={post}
