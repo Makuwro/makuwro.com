@@ -248,7 +248,6 @@ export default function LiteratureFormatter({enabled, expanded, formatSelection,
         }
 
         // Append the list item to the list container.
-        console.log(item);
         listContainer.appendChild(item);
 
         if (i !== startIndex) {
