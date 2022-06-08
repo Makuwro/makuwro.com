@@ -1,29 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LiteratureDropdown from "../LiteratureDropdown";
 import PropTypes from "prop-types";
 
-export default function FormatterEditFontComponent({styles, formatSelection, changeHeadingType}) {
+export default function FormatterEditFontComponent({styles, formatSelection, changeHeadingType, contentContainerSelected, selectedHeadingTagName = "P"}) {
 
   const [headingSelectorOpen, setHeadingSelectorOpen] = useState(false);
+
+  useEffect(() => {
+
+    if (!contentContainerSelected) {
+
+      setHeadingSelectorOpen(false);
+
+    }
+
+  }, [contentContainerSelected]);
 
   return (
     <>
       <section>
-        <button id={styles.fontName} className={styles.dropdown} disabled title="Can't change the font yet! Sorry">
+        <button id={styles.fontName} className={styles.dropdown} disabled={!contentContainerSelected} title="Can't change the font yet! Sorry">
           Lexend Deca
           <span className="material-icons-round">
             expand_more
           </span>
         </button>
-        <button className={`${styles.dropdown} ${styles.fontSize}`} disabled>
+        <button className={`${styles.dropdown} ${styles.fontSize}`} disabled={!contentContainerSelected}>
           16
           <span className="material-icons-round">
             expand_more
           </span>
         </button>
         <section>
-          <button id={styles.headingSelector} className={styles.dropdown} onClick={() => setHeadingSelectorOpen(!headingSelectorOpen)}>
-            Normal text
+          <button id={styles.headingSelector} disabled={!contentContainerSelected} className={styles.dropdown} onClick={() => setHeadingSelectorOpen(!headingSelectorOpen)}>
+            {{"P": "Normal text", "H1": "Heading 1", "H2": "Heading 2", "H3": "Heading 3"}[selectedHeadingTagName]}
             <span className="material-icons-round">
               expand_more
             </span>
@@ -72,25 +82,25 @@ export default function FormatterEditFontComponent({styles, formatSelection, cha
         </section>
       </section>
       <section>
-        <button disabled>
+        <button disabled={!contentContainerSelected}>
           <b>B</b>
         </button>
-        <button disabled>
+        <button disabled={!contentContainerSelected}>
           <i>I</i>
         </button>
-        <button disabled>
+        <button disabled={!contentContainerSelected}>
           <u>U</u>
         </button>
-        <button disabled>
+        <button disabled={!contentContainerSelected}>
           <s>S</s>
         </button>
-        <button disabled onClick={() => formatSelection("a")} type="button" title="Link">
+        <button disabled={!contentContainerSelected} onClick={() => formatSelection("a")} type="button" title="Link">
           <span id={styles.textColor}>C</span>
         </button>
-        <button disabled onClick={() => formatSelection("a")} type="button" title="Link">
+        <button disabled={!contentContainerSelected} onClick={() => formatSelection("a")} type="button" title="Link">
           🖌️
         </button>
-        <button disabled onClick={() => formatSelection("a")} type="button" title="Link">
+        <button disabled={!contentContainerSelected} onClick={() => formatSelection("a")} type="button" title="Link">
           <span className="material-icons-round">
             link
           </span>

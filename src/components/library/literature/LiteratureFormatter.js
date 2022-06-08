@@ -22,6 +22,8 @@ export default function LiteratureFormatter({enabled, expanded, formatSelection,
   const [formatterExpanded, setFormatterExpanded] = useState(false);
   const [selectedNavKey, setSelectedNavKey] = useState();
   const [formatterConfig, setFormatterConfig] = useState();
+  const [contentContainerSelected, setContentContainerSelected] = useState();
+  const [selectedHeadingTagName, setSelectedHeadingTagName] = useState();
   const desktopFormatterRef = useRef();
   const navigate = useNavigate();
 
@@ -363,15 +365,15 @@ export default function LiteratureFormatter({enabled, expanded, formatSelection,
           },
           {
             name: "Font",
-            children: <FormatterEditFontComponent styles={styles} formatSelection={formatSelection} changeHeadingType={changeHeadingType} />
+            children: <FormatterEditFontComponent selectedHeadingTagName={selectedHeadingTagName} contentContainerSelected={contentContainerSelected} styles={styles} formatSelection={formatSelection} changeHeadingType={changeHeadingType} />
           },
           {
             name: "Paragraph",
-            children: <FormatterEditParagraphComponent alignSelection={alignSelection} />
+            children: <FormatterEditParagraphComponent contentContainerSelected={contentContainerSelected} alignSelection={alignSelection} />
           },
           {
             name: "Lists",
-            children: <FormatterEditListsComponent toggleList={toggleList} />
+            children: <FormatterEditListsComponent contentContainerSelected={contentContainerSelected} toggleList={toggleList} />
           }
         ],
         "Insert": [
@@ -459,7 +461,7 @@ export default function LiteratureFormatter({enabled, expanded, formatSelection,
 
     }
 
-  }, [selectedNavKey, enabled]);
+  }, [selectedNavKey, enabled, contentContainerSelected, selectedHeadingTagName]);
 
   useEffect(() => {
 
@@ -486,6 +488,23 @@ export default function LiteratureFormatter({enabled, expanded, formatSelection,
   useEffect(() => {
 
     setDesktopFormatterRef(desktopFormatterRef);
+
+    document.addEventListener("selectionchange", () => {
+
+      // Check if the new selection is in the content container.
+      const selectedHeadingTagName = getParagraphElement(window.getSelection().anchorNode)?.tagName;
+      if (selectedHeadingTagName) {
+
+        setSelectedHeadingTagName(selectedHeadingTagName);
+        setContentContainerSelected(true);
+
+      } else {
+
+        setContentContainerSelected(false);
+        
+      }
+
+    });
 
   }, []);
 
