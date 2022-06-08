@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import LiteratureDropdown from "../LiteratureDropdown";
 import PropTypes from "prop-types";
 
-export default function FormatterEditFontComponent({styles, formatSelection}) {
+export default function FormatterEditFontComponent({styles, formatSelection, changeHeadingType}) {
+
+  const [headingSelectorOpen, setHeadingSelectorOpen] = useState(false);
 
   return (
     <>
@@ -20,14 +22,52 @@ export default function FormatterEditFontComponent({styles, formatSelection}) {
           </span>
         </button>
         <section>
-          <button id={styles.headingSelector} className={styles.dropdown} disabled>
+          <button id={styles.headingSelector} className={styles.dropdown} onClick={() => setHeadingSelectorOpen(!headingSelectorOpen)}>
             Normal text
             <span className="material-icons-round">
               expand_more
             </span>
           </button>
-          <LiteratureDropdown>
-            Test
+          <LiteratureDropdown open={headingSelectorOpen} onChange={(index) => {
+
+            switch (index) {
+
+              case 0:
+                changeHeadingType("p");
+                break;
+
+              case 1:
+                changeHeadingType("h1");
+                break;
+
+              case 2:
+                changeHeadingType("h2");
+                break;
+
+              case 3:
+                changeHeadingType("h3");
+                break;
+
+              default:
+                // TODO: Send diagnostic data to the developers if the user allows?
+                break;
+
+            }
+            setHeadingSelectorOpen(false);
+
+          }}>
+            <button>
+              Normal text
+            </button>
+            <button>
+              <h1>Heading 1</h1>
+            </button>
+            <button>
+              <h2>Heading 2</h2>
+            </button>
+            <button>
+              <h3>Heading 3</h3>
+            </button>
           </LiteratureDropdown>
         </section>
       </section>

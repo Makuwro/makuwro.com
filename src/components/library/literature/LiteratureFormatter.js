@@ -290,6 +290,50 @@ export default function LiteratureFormatter({enabled, expanded, formatSelection,
 
   }
 
+  function changeHeadingType(headingType) {
+
+    // Verify that the user is selecting a paragraph.
+    const selection = window.getSelection();
+    const {anchorNode} = selection;
+    
+    if (anchorNode && getParagraphElement(anchorNode)) {
+
+      // Get the start and ending paragraph.
+      const range = selection.getRangeAt(0);
+      const {startContainer, endContainer} = range;
+      const startParagraph = getParagraphElement(startContainer);
+      const endParagraph = getParagraphElement(endContainer);
+
+      // Now get the indexes of them.
+      const children = Array.from(contentContainer.children);
+      const startIndex = children.indexOf(startParagraph);
+      const endIndex = children.indexOf(endParagraph);
+
+      // Iterate through each selected paragraph.
+      for (let i = startIndex; endIndex >= i; i++) {
+
+        // Convert the selected elements to the new headings.
+        const element = children[i];
+        const newElement = document.createElement(headingType);
+
+        while (element.childNodes.length) {
+
+          newElement.appendChild(element.firstChild);
+
+        }
+
+        // Insert the new heading before the old element.
+        contentContainer.insertBefore(newElement, element);
+
+        // Delete the old element.
+        element.remove();
+
+      }
+
+    }
+
+  }
+
   useEffect(() => {
 
     if (enabled) {
@@ -320,7 +364,7 @@ export default function LiteratureFormatter({enabled, expanded, formatSelection,
           },
           {
             name: "Font",
-            children: <FormatterEditFontComponent styles={styles} formatSelection={formatSelection} />
+            children: <FormatterEditFontComponent styles={styles} formatSelection={formatSelection} changeHeadingType={changeHeadingType} />
           },
           {
             name: "Paragraph",
