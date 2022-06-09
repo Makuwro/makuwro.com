@@ -5,7 +5,6 @@ header {
   height: 56px;
   padding: 0 1.2rem;
   color: white;
-  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.2));
   box-sizing: border-box;
   transition: 0.3s;
   z-index: 3;
@@ -38,6 +37,10 @@ header > section:first-of-type > section a {
   font-size: 1.1rem;
   position: relative;
   top: 2px;
+}
+
+header button {
+  box-shadow: var(--box-shadow);
 }
 
 #wiki-name {
