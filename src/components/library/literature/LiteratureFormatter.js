@@ -231,18 +231,41 @@ export default function LiteratureFormatter({enabled, expanded, formatSelection,
       const startIndex = children.indexOf(startParagraph);
       const endIndex = children.indexOf(endParagraph);
 
-      // Check if there's a list container before the selection.
-      const listContainer = children[startIndex - 1]?.nodeName === listType.toUpperCase() ? children[startIndex - 1] : document.createElement(listType);
+      // Check if we're removing this container.
+      const removing = startParagraph.nodeName === listType.toUpperCase();
+
+      // Now, let's check how we're going to modify this container.
+      let listContainer;
+
+      if (removing) {
+        
+        // We're removing the list, so let's turn the list items back into paragraphs.
+        // First step: create a fragment container.
+        listContainer = document.createDocumentFragment();
+        
+      } else if (children[startIndex - 1]?.nodeName === listType.toUpperCase()) {
+        
+        // There is a list container before the selection.
+        // We want to merge with that container.
+        listContainer = children[startIndex - 1];
+        
+      } else {
+        
+        // There is no container, and we aren't removing anything, so let's create a new container.
+        listContainer = document.createElement(listType);
+
+      }
 
       // Iterate through each selected paragraph.
       for (let i = startIndex; endIndex >= i; i++) {
 
         // Convert the paragraph to a list.
-        const item = document.createElement("li");
+        let item = document.createElement(removing ? "p" : "li");
         
         // Move all paragraph children to the current container.
         /** @type {Element} */
-        const paragraph = children[i];
+        let paragraph = removing ? children[i].firstChild : children[i];
+
         while (paragraph.childNodes.length) {
 
           item.appendChild(paragraph.firstChild);
