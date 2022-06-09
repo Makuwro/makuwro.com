@@ -388,6 +388,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
   function handleInput(event) {
 
     const selection = window.getSelection();
+    const backspace = event.code === "Backspace";
 
     if (event.type === "keydown" && event.code === "Tab") {
 
@@ -406,7 +407,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
       // Fix the caret.
       range.setStart(startContainer, startOffset + 1);
 
-    } else if (event.code === "Backspace") {
+    } else if (backspace) {
 
       // The user wants to remove content.
       // Check if we're at the beginning of the first paragraph.
@@ -543,7 +544,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
     // Update the text.
     content.current = event.target.innerHTML;
 
-    const ignoredKeys = ["Shift", "CapsLock", "NumLock", "ScrollLock", "Backspace", "Delete", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Pause", "MediaPlayPause", "AudioVolumeUp", "AudioVolumeDown", "AudioVolumeMute", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "Escape", "ContextMenu", "Enter"];
+    const ignoredKeys = ["Shift", "CapsLock", "NumLock", "ScrollLock", "Delete", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Pause", "MediaPlayPause", "AudioVolumeUp", "AudioVolumeDown", "AudioVolumeMute", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "Escape", "ContextMenu", "Enter"];
 
     if (!event.ctrlKey && !event.altKey && !event.metaKey && event.type === "keydown" && !ignoredKeys.find((key) => event.key === key)) {
 
@@ -560,13 +561,17 @@ export default function Literature({ client, shownLocation, setLocation }) {
         // Set up the new entry.
         const timeout = setTimeout(() => {
             
+          if (newEntry.text) {
+
+            // Send this entry to the history.
+            history.push(newEntry);
+
+          }
+
           // Remove this entry.
           setTextHistoryEntry();
 
-          // Send this entry to the history.
-          history.push(newEntry);
-
-        }, 300);
+        }, 500);
         let newEntry = oldEntry ? {
           ...oldEntry,
           timeout
@@ -578,8 +583,38 @@ export default function Literature({ client, shownLocation, setLocation }) {
           timeout
         };
 
-        // Append the new text.
-        newEntry.text += event.code === "Tab" ? "	" : event.key;
+        if (backspace) {
+
+          if (newEntry.type === "addText") {
+          
+            if (newEntry.text) {
+
+              // Remove a character from the text.
+              newEntry.text = newEntry.text.slice(0, newEntry.text.length - 1);
+
+            } else {
+
+              // Flip the entry type.
+              newEntry.type = "removeText";
+
+            }
+
+          }
+
+          if (newEntry.type === "removeText") {
+
+            // Append the new text.
+            newEntry.text = `${selection.anchorNode.textContent.slice(selection.anchorOffset - 1, selection.anchorOffset)}${newEntry.text}`;
+            newEntry.position -= 1;
+
+          }
+
+        } else {
+
+          // Append the new text.
+          newEntry.text += event.code === "Tab" ? "	" : event.key;
+
+        }
 
         // Return the new entry.
         return newEntry;

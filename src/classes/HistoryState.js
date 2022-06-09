@@ -1,11 +1,11 @@
 export default class HistoryState {
 
-  static maxEntries = 50;
-
   index = 0;
   state = [];
   
-  constructor() {
+  constructor(maxEntries = 50) {
+
+    this.maxEntries = maxEntries;
 
   }
 
@@ -48,12 +48,23 @@ export default class HistoryState {
 
       // Get the current history entry.
       const {node, type, position, text} = this.state[this.index];
+      let newCaretPosition = position;
 
       switch (type) {
 
         case "addText":
-          // Erase the text at the position.
-          node.textContent = `${node.textContent.slice(0, position)}${node.textContent.slice(position + text.length)}`
+          node.textContent = `${node.textContent.slice(0, position)}${node.textContent.slice(position + text.length)}`;
+          break;
+
+        case "removeText":
+          node.textContent = `${node.textContent.slice(0, position)}${text}${node.textContent.slice(position)}`;
+          newCaretPosition += text.length;
+          break;
+
+        case "replaceText":
+          break;
+
+        case "mergeParagraphs":
           break;
 
       }
@@ -63,8 +74,8 @@ export default class HistoryState {
 
       // Restore the caret position.
       const range = window.getSelection().getRangeAt(0);
-      range.setStart(node, position);
-      range.setEnd(node, position);
+      range.setStart(node, newCaretPosition);
+      range.setEnd(node, newCaretPosition);
       range.collapse();
 
     }
@@ -78,12 +89,17 @@ export default class HistoryState {
 
       // Get the current history entry.
       const {node, type, position, text} = this.state[this.index - 1];
+      let newCaretPosition = position + text.length;
 
       switch (type) {
 
         case "addText":
-          // Erase the text at the position.
-          node.textContent = `${node.textContent.slice(0, position)}${text}${node.textContent.slice(position + text.length)}`
+          node.textContent = `${node.textContent.slice(0, position)}${text}${node.textContent.slice(position + text.length)}`;
+          break;
+
+        case "removeText":
+          node.textContent = `${node.textContent.slice(0, position)}${node.textContent.slice(position + text.length)}`;
+          newCaretPosition -= text.length;
           break;
 
       }
@@ -93,8 +109,8 @@ export default class HistoryState {
 
       // Restore the caret position.
       const range = window.getSelection().getRangeAt(0);
-      range.setStart(node, position + text.length);
-      range.setEnd(node, position + text.length);
+      range.setStart(node, newCaretPosition);
+      range.setEnd(node, newCaretPosition);
       range.collapse();
       
     }
