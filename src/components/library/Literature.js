@@ -6,6 +6,7 @@ import Footer from "../Footer";
 import PropTypes from "prop-types";
 import { BlogPost } from "makuwro";
 import LiteratureFormatter from "./literature/LiteratureFormatter";
+import HistoryState from "../../classes/HistoryState";
 
 export default function Literature({ client, shownLocation, setLocation }) {
 
@@ -23,14 +24,16 @@ export default function Literature({ client, shownLocation, setLocation }) {
   const navigate = useNavigate();
   const isMounted = useRef(true);
   const [contentState, setContentState] = useState();
-  const [updateTime, setUpdateTime] = useState();
   const [newSlug, setNewSlug] = useState();
   const [formatterEnabled, setFormatterEnabled] = useState(false);
   const [formatterExpanded, setFormatterExpanded] = useState(false);
   const [desktopFormatterRef, setDesktopFormatterRef] = useState();
+  const [history, setHistory] = useState();
+  const [textHistoryEntry, setTextHistoryEntry] = useState();
 
   useEffect(() => {
 
+    // Try to set up IndexedDB.
     console.log("Attempting to use IndexedDB for autosaving...");
     const request = indexedDB.open("Literature");
     request.onsuccess = (event) => {
@@ -73,13 +76,13 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
   useEffect(() => {
 
-    if (db && updateTime && post) {
+    if (db && post) {
 
       db.transaction("blogPosts", "readwrite").objectStore("blogPosts").put({id: post.id, content: content.current});
 
     }
 
-  }, [db, updateTime, post]);
+  }, [db, post]);
 
   useEffect(() => {
 
@@ -187,6 +190,9 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
         // Enable edit mode.
         setEditing(true);
+
+        // Set the history state.
+        setHistory(new HistoryState());
 
         // Enable the formatter.
         setFormatterEnabled(true);
@@ -355,7 +361,6 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
     // Save the changes.
     content.current = contentContainer.current.innerHTML;
-    setUpdateTime(new Date());
 
   }
 
@@ -511,6 +516,14 @@ export default function Literature({ client, shownLocation, setLocation }) {
           alert("Don't worry! We autosave changes to your device.");
           return event.preventDefault();
 
+        case "KeyZ":
+          history.undo();
+          return event.preventDefault();
+
+        case "KeyY":
+          history.redo();
+          return event.preventDefault();
+
       }
 
       if (tagName && !event.shiftKey) {
@@ -525,11 +538,56 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
       }
 
-    }
+    } 
 
+    // Update the text.
     content.current = event.target.innerHTML;
-    setUpdateTime(new Date());
 
+    const ignoredKeys = ["Shift", "CapsLock", "NumLock", "ScrollLock", "Backspace", "Delete", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Pause", "MediaPlayPause", "AudioVolumeUp", "AudioVolumeDown", "AudioVolumeMute", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "Escape", "ContextMenu", "Enter"];
+
+    if (!event.ctrlKey && !event.altKey && !event.metaKey && event.type === "keydown" && !ignoredKeys.find((key) => event.key === key)) {
+
+      // Update the text history entry.
+      setTextHistoryEntry((oldEntry) => {
+
+        // Clear the old timeout, if we have to.
+        if (oldEntry?.timeout) {
+
+          clearTimeout(oldEntry.timeout);
+
+        }
+
+        // Set up the new entry.
+        const timeout = setTimeout(() => {
+            
+          // Remove this entry.
+          setTextHistoryEntry();
+
+          // Send this entry to the history.
+          history.push(newEntry);
+
+        }, 300);
+        let newEntry = oldEntry ? {
+          ...oldEntry,
+          timeout
+        } : {
+          type: "addText",
+          node: selection.anchorNode,
+          position: selection.anchorOffset,
+          text: "",
+          timeout
+        };
+
+        // Append the new text.
+        newEntry.text += event.code === "Tab" ? "	" : event.key;
+
+        // Return the new entry.
+        return newEntry;
+
+      });
+
+    }
+    
   }
 
   /**
