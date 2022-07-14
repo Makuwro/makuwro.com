@@ -64,7 +64,6 @@ export default function Home({setLocation}) {
           <button>Join today</button>
         </section>
       </section>
-      <Footer />
     </main>
   );
 

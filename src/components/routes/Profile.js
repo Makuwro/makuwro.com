@@ -366,7 +366,6 @@ export default function Profile({shownLocation, setLocation, client, notify, upd
           </section>
         )}
       </section>
-      <Footer />
     </main>
   );
 
