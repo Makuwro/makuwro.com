@@ -1,108 +1,77 @@
 import React, { useEffect, useState } from "react";
-import styles from "../../../styles/Profile.module.css";
-import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
-import BlogPreview from "./BlogPreview";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function ProfileBlog({client, owner}) {
+export default function ProfileBlog({client, owner, cache, setCache, styles}) {
 
   const [ready, setReady] = useState(false);
-  const [posts, setPosts] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [collection, setCollection] = useState([]);
   const navigate = useNavigate();
-  const ownProfile = client.user?.username === owner.username;
 
-  async function createEmptyBlogPost(event) {
+  useEffect(() => {
 
-    // Please don't reload the page.
-    event.preventDefault();
+    // Check if we already have the art data.
+    if (!cache.art) {
 
-    if (!submitting) {
+      // Get art data from the server.
 
-      setSubmitting(true);
+      // Save the data to the cache.
+      const blogData = [{
+        title: "Welcome to Makuwro!",
+        tagline: "Let's learn how to use Makuwro!",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/ISS059-E-48038_-_View_of_Earth.jpg/800px-ISS059-E-48038_-_View_of_Earth.jpg?20210422111437",
+        topic: "How to use Makuwro"
+      }, {
+        title: "Test without image",
+        tagline: "Testing testing 123!"
+      }];
+      const newCollection = [];
+      for (let i = 0; blogData.length > i; i++) {
 
-      try {
+        const {title, tagline, image, topic} = blogData[i];
 
-        const {slug} = await client.createBlogPost();
-        navigate(`/${client.user.username}/blog/${slug}?mode=edit`);
-        
-      } catch ({message}) {
-
-        alert(message);
-        setSubmitting(false);
+        newCollection.push(
+          <Link to="#">
+            {image && (
+              <section className={styles.blogBanner}>
+                <img src={image} />
+              </section>
+            )}
+            <section>
+              {topic && (
+                <section className={styles.topic}>{topic}</section>
+              )}
+              <h1>{title}</h1>
+              <p>{tagline}</p>
+            </section>
+          </Link>
+        );
 
       }
+      setCollection(newCollection);
 
     }
 
+    setReady(true);
+
+  }, []);
+
+  function createEmptyBlogPost() {
+
   }
 
-  // Get the blog posts from this user
-  useEffect(() => {
-
-    let mounted = true;
-
-    (async () => {
-
-      try {
-
-        // Get all the blog posts from the server.
-        const posts = await client.getAllBlogPosts(owner.username);
-
-        for (let i = 0; posts.length > i; i++) {
-
-          const {id, owner, title, slug} = posts[i];
-
-          posts[i] = (
-            <BlogPreview
-              key={id}
-              owner={owner}
-              title={title}
-              slug={slug}
-              currentUserIsOwner={client.user?.id === owner.id}
-            />
-          );
-
-        }
-
-        if (mounted) {
-          
-          setPosts(posts);
-          setReady(true);
-
-        }
-  
-      } catch (err) {
-  
-        alert(`Couldn't get blog posts: ${err.message}`);
-  
-      }
-
-    })();
-
-    return () => {
-      
-      mounted = false;
-
-    };
-
-  }, [owner]);
-
-  return ready ? (
-    <section className={styles["profile-card"]} id={styles.blog}>
-      {ownProfile && (
-        <form onSubmit={createEmptyBlogPost}>
-          <section>Making a blog post is a great way to keep the people interested in your work informed.</section>
-          <input type="submit" value="Start drafting!" disabled={submitting} />
-        </form>
+  return (
+    <section>
+      {client.user?.id === owner.id && (
+        <button onClick={createEmptyBlogPost}>Create blog post</button>
       )}
-      {posts || (!ownProfile ? (<p>Huh, looks like they don't have much to say right now. Check back later!</p>) : null)}
+      {collection[0] ? (
+        <section id={styles.blogContainer}>
+          {collection}
+        </section>
+      ) : (
+        <p>{owner.displayName} doesn't have any public art :(</p>
+      )}
     </section>
-  ) : null;
+  )
 
 }
-
-ProfileBlog.propTypes = {
-  owner: PropTypes.object.isRequired,
-  client: PropTypes.object.isRequired
-};
