@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 
 export default function Popup({
   onClose, warnUnfinished, exitMessage = "Are you sure you want to exit? You aren't finished yet!", children,
-  title, unclosable, style = null, className, id = null
+  title, unclosable, className, ...props
 }) {
 
   const [previousPopup, setPreviousPopup] = useState();
@@ -24,7 +24,7 @@ export default function Popup({
 
     }
 
-  }
+  } 
 
   useEffect(() => {
 
@@ -123,7 +123,7 @@ export default function Popup({
             </button>
           )}
         </section>
-        <section id={id} className={`${styles.content}${className ? ` ${className}` : ""}`} style={style}>{children}</section>
+        <section {...props} className={`${styles.content}${className ? ` ${className}` : ""}`}>{children}</section>
       </section>
     </section>
   );
@@ -136,5 +136,6 @@ Popup.propTypes = {
   exitMessage: PropTypes.string,
   children: PropTypes.object,
   title: PropTypes.string,
-  unclosable: PropTypes.bool
+  unclosable: PropTypes.bool,
+  className: PropTypes.string
 };

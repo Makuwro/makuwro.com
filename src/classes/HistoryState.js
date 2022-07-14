@@ -67,6 +67,10 @@ export default class HistoryState {
         case "mergeParagraphs":
           break;
 
+        default:
+          console.warn(`[History State] ${type} is not a valid entry type.`);
+          break;
+
       }
 
       // Increment the current index.
@@ -100,6 +104,13 @@ export default class HistoryState {
         case "removeText":
           node.textContent = `${node.textContent.slice(0, position)}${node.textContent.slice(position + text.length)}`;
           newCaretPosition -= text.length;
+          break;
+
+        case "replaceText":
+          break;
+
+        default:
+          console.warn(`[History State] ${type} is not a valid entry type.`);
           break;
 
       }

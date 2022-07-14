@@ -267,17 +267,17 @@
     padding: 0 10px;
   }
 
-  #desktopFormatter > nav > button {
+  #desktopFormatter nav > button {
     background-color: transparent;
     font-weight: 300;
   }
 
-  #desktopFormatter > nav > button.selected {
+  #desktopFormatter nav > button.selected {
     color: white;
     background-color: #292929;
   }
 
-  :global(.light) #desktopFormatter > nav > button.selected {
+  :global(.light) #desktopFormatter nav > button.selected {
     background-color: var(--text);
   }
 
@@ -392,6 +392,33 @@
     gap: 5px;
     font-size: 0.9rem;
     text-align: left;
+  }
+
+  #onlineCollaborators {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    max-width: 100px;
+  }
+
+  #onlineCollaborators button {
+    width: 25px;
+    height: 25px;
+    border-radius: 100%;
+    padding: 0;
+    border: 2px solid;
+  }
+
+  #onlineCollaborators img {
+    height: 100%;
+    width: 100%;
+    border-radius: 100%;
+  }
+
+  #topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
 }

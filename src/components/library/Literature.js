@@ -388,6 +388,8 @@ export default function Literature({ client, shownLocation, setLocation }) {
   function handleInput(event) {
 
     const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+    const {startContainer, startOffset, endContainer, endOffset} = range;
     const backspace = event.code === "Backspace";
 
     if (event.type === "keydown" && event.code === "Tab") {
@@ -418,8 +420,6 @@ export default function Literature({ client, shownLocation, setLocation }) {
       } else if (event.type === "keydown") {
 
         // Remove the placeholder attribute, if there is one.
-        const range = selection.getRangeAt(0);
-        const {startContainer, startOffset, endContainer} = range;
         const startParagraph = getParagraphElement(startContainer);
         startParagraph.removeAttribute("placeholder");
         
@@ -544,6 +544,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
     // Update the text.
     content.current = event.target.innerHTML;
 
+    // Now, check if we should update the history entry.
     const ignoredKeys = ["Shift", "CapsLock", "NumLock", "ScrollLock", "Delete", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Pause", "MediaPlayPause", "AudioVolumeUp", "AudioVolumeDown", "AudioVolumeMute", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "Escape", "ContextMenu", "Enter"];
 
     if (!event.ctrlKey && !event.altKey && !event.metaKey && event.type === "keydown" && !ignoredKeys.find((key) => event.key === key)) {
@@ -592,6 +593,10 @@ export default function Literature({ client, shownLocation, setLocation }) {
               // Remove a character from the text.
               newEntry.text = newEntry.text.slice(0, newEntry.text.length - 1);
 
+            } else if (startContainer !== endContainer || startOffset !== endOffset) {
+            
+              newEntry.type = "replaceText";
+
             } else {
 
               // Flip the entry type.
@@ -601,11 +606,25 @@ export default function Literature({ client, shownLocation, setLocation }) {
 
           }
 
-          if (newEntry.type === "removeText") {
+          switch (newEntry.type) {
 
-            // Append the new text.
-            newEntry.text = `${selection.anchorNode.textContent.slice(selection.anchorOffset - 1, selection.anchorOffset)}${newEntry.text}`;
-            newEntry.position -= 1;
+            case "replaceText":
+              // TODO: Replace text
+              // ^^ wdfym "replace text"???
+              // my boy thinks js is gonna write itself 🤦
+              // bro what's with the emoji i'm on linux
+              // excuse me, linux is a kernel not an operating system
+              // true, but i am going to put you in the operating room
+              break;
+
+            case "removeText":
+
+              // Append the new text.
+              newEntry.text = `${selection.anchorNode.textContent.slice(selection.anchorOffset - 1, selection.anchorOffset)}${newEntry.text}`;
+
+              // Update the position.
+              newEntry.position -= 1;
+              break;
 
           }
 

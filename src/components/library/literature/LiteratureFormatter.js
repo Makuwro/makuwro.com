@@ -627,9 +627,19 @@ export default function LiteratureFormatter({enabled, expanded, formatSelection,
         </section>
       </section>
       <section ref={desktopFormatterRef} id={styles.desktopFormatter}>
-        <nav>
-          {formatterConfig?.navChildren}
-        </nav>
+        <section id={styles.topbar}>
+          <nav>
+            {formatterConfig?.navChildren}
+          </nav>
+          <section id={styles.onlineCollaborators}>
+            <button>
+              <img src="https://media.discordapp.net/attachments/550486587562131458/983079108563071006/body_new_stars.png" />
+            </button>
+            <button>
+              <img src="https://media.discordapp.net/attachments/550486587562131458/983079108563071006/body_new_stars.png" />
+            </button>
+          </section>
+        </section>
         <section id={styles.currentMenu}>
           {formatterConfig?.currentMenu}
         </section>
