@@ -281,7 +281,7 @@ export default function Submitter({client, art, refreshArt, updated}) {
 
     }
 
-  }, [client, action]);
+  }, [client, action, data]);
 
   return popup;
   
