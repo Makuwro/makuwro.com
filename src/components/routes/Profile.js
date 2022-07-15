@@ -139,6 +139,8 @@ export default function Profile({shownLocation, setLocation, client, setCritical
 
   }, [owner, tabName]);
 
+  const [actionMenuOpen, setActionMenuOpen] = useState(false);
+
   return ready && (
     <main id={styles.profile}>
       <section id={styles.metadata}>
@@ -147,6 +149,26 @@ export default function Profile({shownLocation, setLocation, client, setCritical
         </section>
         <h1>{owner.displayName || `@${owner.username}`}</h1>
         <h2>CEO of Makuwro, LLC</h2>
+        <section id={styles.actions}>
+          <button id={styles.followButton}>Follow</button>
+          <section id={styles.otherActions}>
+            <button onClick={() => setActionMenuOpen(!actionMenuOpen)}>
+              <span className="material-icons-round">
+                more_vert
+              </span>
+            </button>
+            <section id={styles.otherActionsMenu} className={actionMenuOpen ? styles.open : null} onClick={() => setActionMenuOpen(false)}>
+              <section>
+                <button>
+                  Block
+                </button>
+                <button>
+                  Report
+                </button>
+              </section>
+            </section>
+          </section>
+        </section>
       </section>
       <nav>
         {navChildren}
