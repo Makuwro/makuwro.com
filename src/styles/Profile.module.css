@@ -185,6 +185,11 @@
   background-color: #7068de;
 }
 
+/* About container */
+#about {
+  display: flex;
+}
+
 /* Art container */
 #artContainer, #characterContainer, #organizationContainer {
   display: flex;
