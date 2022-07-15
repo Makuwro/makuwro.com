@@ -9,19 +9,21 @@ export default function ProfileArt({client, owner, cache, setCache, styles}) {
 
   useEffect(() => {
 
-    // Check if we already have the art data.
+    // Check if we already have the data.
     if (!cache.art) {
 
-      // Get art data from the server.
+      // Get data from the server.
 
       // Save the data to the cache.
-      const artData = [1];
+      const data = [];
       const newCollection = [];
-      for (let i = 0; artData.length > i; i++) {
+      for (let i = 0; data.length > i; i++) {
+
+        const {slug, imagePath} = data[i];
 
         newCollection.push(
-          <Link to="#">
-
+          <Link to={slug}>
+            <img src={`https://cdn.makuwro.com/${imagePath}`} />
           </Link>
         );
 

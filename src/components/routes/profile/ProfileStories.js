@@ -9,18 +9,18 @@ export default function ProfileStories({client, owner, cache, setCache, styles})
 
   useEffect(() => {
 
-    // Check if we already have the art data.
-    if (!cache.organizations) {
+    // Check if we already have the data.
+    if (!cache.stories) {
 
       // Save the data to the cache.
-      const characterData = []
+      const data = []
       const newCollection = [];
-      for (let i = 0; characterData.length > i; i++) {
+      for (let i = 0; data.length > i; i++) {
 
-        const {name, owner: {username}, image, slug} = characterData[i];
+        const {name, owner: {username}, image, slug} = data[i];
 
         newCollection.push(
-          <Link to={`/${username}/characters/${slug}`}>
+          <Link to={`/${username}/stories/${slug}`}>
             <section className={styles.orgAvatar}>
               <img src={image} />
             </section>
@@ -45,11 +45,11 @@ export default function ProfileStories({client, owner, cache, setCache, styles})
         <button>Create story</button>
       )}
       {collection[0] ? (
-        <section id={styles.organizationContainer}>
+        <section id={styles.storyContainer}>
           {collection}
         </section>
       ) : (
-        <p>{owner.displayName} doesn't have any public memberships :(</p>
+        <p>{owner.displayName} doesn't have any public stories :(</p>
       )}
     </section>
   )

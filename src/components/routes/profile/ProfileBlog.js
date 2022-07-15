@@ -9,10 +9,10 @@ export default function ProfileBlog({client, owner, cache, setCache, styles}) {
 
   useEffect(() => {
 
-    // Check if we already have the art data.
+    // Check if we already have the data.
     if (!cache.art) {
 
-      // Get art data from the server.
+      // Get data from the server.
 
       // Save the data to the cache.
       const blogData = [{

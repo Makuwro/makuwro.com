@@ -9,7 +9,7 @@ export default function ProfileCharacters({client, owner, cache, setCache, style
 
   useEffect(() => {
 
-    // Check if we already have the art data.
+    // Check if we already have the data.
     if (!cache.characters) {
 
       // Get art data from the server.

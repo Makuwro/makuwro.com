@@ -9,32 +9,26 @@ export default function ProfileOrganizations({client, owner, cache, setCache, st
 
   useEffect(() => {
 
-    // Check if we already have the art data.
+    // Check if we already have the data.
     if (!cache.organizations) {
 
       // Save the data to the cache.
-      const characterData = [{
+      const data = [{
         name: "Beastslash",
-        slug: "",
-        image: "",
-        owner: {
-          username: "Christian"
-        }
+        username: "Beastslash",
+        image: ""
       }, {
         name: "Makuwro",
-        slug: "",
-        image: "",
-        owner: {
-          username: "Christian"
-        }
+        username: "Makuwro",
+        image: ""
       }]
       const newCollection = [];
       for (let i = 0; characterData.length > i; i++) {
 
-        const {name, owner: {username}, image, slug} = characterData[i];
+        const {name, image, username} = data[i];
 
         newCollection.push(
-          <Link to={`/${username}/characters/${slug}`}>
+          <Link to={`/${username}`}>
             <section className={styles.orgAvatar}>
               <img src={image} />
             </section>

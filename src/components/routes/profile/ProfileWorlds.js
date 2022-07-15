@@ -9,18 +9,18 @@ export default function ProfileWorlds({client, owner, cache, setCache, styles}) 
 
   useEffect(() => {
 
-    // Check if we already have the art data.
-    if (!cache.organizations) {
+    // Check if we already have the data.
+    if (!cache.worlds) {
 
       // Save the data to the cache.
-      const characterData = []
+      const data = []
       const newCollection = [];
-      for (let i = 0; characterData.length > i; i++) {
+      for (let i = 0; data.length > i; i++) {
 
-        const {name, owner: {username}, image, slug} = characterData[i];
+        const {name, owner: {username}, image, slug} = data[i];
 
         newCollection.push(
-          <Link to={`/${username}/characters/${slug}`}>
+          <Link to={`/${username}/worlds/${slug}`}>
             <section className={styles.orgAvatar}>
               <img src={image} />
             </section>
