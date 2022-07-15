@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { matchPath, useLocation, useParams, Link } from "react-router-dom";
+import { AccountNotFoundError } from "makuwro-errors";
 import PropTypes from "prop-types";
 import styles from "../../styles/Profile.module.css";
 import ProfileAbout from "./profile/ProfileAbout";
@@ -45,11 +46,6 @@ export default function Profile({shownLocation, setLocation, client, setCritical
   
             setOwner(owner);
     
-          } else {
-    
-            document.title = "User not found / Makuwro";
-            setOwner();
-    
           }
     
           if (mounted) {
@@ -60,7 +56,17 @@ export default function Profile({shownLocation, setLocation, client, setCritical
 
         } catch (err) {
 
-          setCriticalError(err);
+          if (err instanceof AccountNotFoundError) {
+
+            document.title = "User not found / Makuwro";
+            setOwner();
+            setReady(true);
+
+          } else {
+
+            setCriticalError(err);
+
+          }
 
         }
   
@@ -144,30 +150,40 @@ export default function Profile({shownLocation, setLocation, client, setCritical
   return ready && (
     <main id={styles.profile}>
       <section id={styles.metadata}>
-        <section id={styles.avatar}>
-          <img src={"https://yt3.ggpht.com/LmbLsIs7VUZ7dJbwW9JBuKXjMrk3qmXB7oiplq5LQER4nrk7px9wcJvnYVpE065dIydMtdjz2Q=s88-c-k-c0x00ffffff-no-rj" || `https://cdn.makuwro.com/${owner.avatarPath}`} />
-        </section>
-        <h1>{owner.displayName || `@${owner.username}`}</h1>
-        <h2>CEO of Makuwro, LLC</h2>
-        <section id={styles.actions}>
-          <button id={styles.followButton}>Follow</button>
-          <section id={styles.otherActions}>
-            <button onClick={() => setActionMenuOpen(!actionMenuOpen)}>
-              <span className="material-icons-round">
-                more_vert
-              </span>
-            </button>
-            <section id={styles.otherActionsMenu} className={actionMenuOpen ? styles.open : null} onClick={() => setActionMenuOpen(false)}>
-              <section>
-                <button>
-                  Block
-                </button>
-                <button>
-                  Report
-                </button>
-              </section>
-            </section>
+        {owner && (
+          <section id={styles.avatar}>
+            <img src={"https://yt3.ggpht.com/LmbLsIs7VUZ7dJbwW9JBuKXjMrk3qmXB7oiplq5LQER4nrk7px9wcJvnYVpE065dIydMtdjz2Q=s88-c-k-c0x00ffffff-no-rj" || `https://cdn.makuwro.com/${owner.avatarPath}`} />
           </section>
+        )}
+        <h1>{owner ? (owner.displayName || `@${owner.username}`) : "User not found"}</h1>
+        <h2>{owner ? "CEO of Makuwro, LLC" : "But don't worry: they'll come around some day."}</h2>
+        <section id={styles.actions}>
+          {owner && owner.id === client.user?.id ? (
+            <button>Edit profile</button>
+          ) : (
+            <>
+              <button id={styles.followButton}>{owner ? "Follow" : "Go home"}</button>
+              {owner && (
+                <section id={styles.otherActions}>
+                  <button onClick={() => setActionMenuOpen(!actionMenuOpen)}>
+                    <span className="material-icons-round">
+                      more_vert
+                    </span>
+                  </button>
+                  <section id={styles.otherActionsMenu} className={actionMenuOpen ? styles.open : null} onClick={() => setActionMenuOpen(false)}>
+                    <section>
+                      <button>
+                        Block
+                      </button>
+                      <button>
+                        Report
+                      </button>
+                    </section>
+                  </section>
+                </section>
+              )}
+            </>
+          )}
         </section>
       </section>
       <nav>
