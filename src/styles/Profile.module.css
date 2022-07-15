@@ -191,6 +191,7 @@
   flex-wrap: wrap;
   gap: 25px;
   margin-top: 25px;
+  justify-content: center;
 }
 
 #artContainer a {
@@ -199,6 +200,16 @@
   background-color: #17161c;
   display: block;
   border-radius: 5px;
+}
+
+@media screen and (min-width: 471px) {
+  
+  #artContainer, #characterContainer, #organizationContainer {
+
+    justify-content: left;
+
+  }
+
 }
 
 /* Blog container */
