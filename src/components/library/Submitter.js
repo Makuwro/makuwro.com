@@ -21,6 +21,7 @@ export default function Submitter({client, art, refreshArt, updated}) {
     contentWarning: "",
     permissions: {
       view: 0,
+      viewOriginal: 0,
       viewComments: 0,
       postComments: 1
     }
