@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import styles from "../../styles/TagInput.module.css";
 
-export default function TagInput({children, onChange}) {
+export default function TagInput({children, onChange, tags}) {
 
   const [childrenComponents, setChildrenComponents] = useState([]);
   const [phrase, setPhrase] = useState("");
@@ -10,19 +10,24 @@ export default function TagInput({children, onChange}) {
 
   useEffect(() => {
 
-    setChildrenComponents(React.Children.map(children, (child) => {
+    // Iterate through the tag names.
+    const childrenComponents = [];
+    for (let i = 0; tags.length > i; i++) {
 
-      return <span onClick={() => {
+      // Add a clickable tag component.
+      const tag = tags[i];
+      childrenComponents.push(
+        <span onClick={() => onChange(tags.filter((tag2) => tag2 !== tag))} key={tag}>
+          {tag}
+        </span>
+      );
 
-        onChange(tags => tags.filter((tag2) => tag2 !== child));
+    }
 
-      }} key={child}>
-        {child}
-      </span>;
+    // Add the tags as React components.
+    setChildrenComponents(childrenComponents);
 
-    }));
-
-  }, [children]);
+  }, [tags]);
 
   function checkSelection(event) {
 
