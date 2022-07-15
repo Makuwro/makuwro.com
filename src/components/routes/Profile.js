@@ -7,6 +7,8 @@ import ProfileArt from "./profile/ProfileArt";
 import ProfileBlog from "./profile/ProfileBlog";
 import ProfileCharacters from "./profile/ProfileCharacters";
 import ProfileOrganizations from "./profile/ProfileOrganizations";
+import ProfileStories from "./profile/ProfileStories";
+import ProfileWorlds from "./profile/ProfileWorlds";
 
 export default function Profile({shownLocation, setLocation, client, setCriticalError}) {
 
@@ -98,8 +100,8 @@ export default function Profile({shownLocation, setLocation, client, setCritical
         blog: <ProfileBlog owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />,
         characters: <ProfileCharacters owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />,
         organizations: <ProfileOrganizations owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />,
-        stories: <ProfileAbout owner={owner} />,
-        worlds: <ProfileAbout owner={owner} />
+        stories: <ProfileStories owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />,
+        worlds: <ProfileWorlds owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />
       }
       setContent(tabs[tabName || "about"]);
 
