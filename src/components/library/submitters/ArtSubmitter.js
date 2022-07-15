@@ -53,10 +53,10 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
           </section>
         </section>
         <section>
-          <label>Description<span style={{
-            color: "var(--text)",
-            marginLeft: "0.5rem"
-          }}>(optional)</span></label>
+          <label>
+            Description
+            <Optional />
+          </label>
           <textarea tabIndex="0" value={data.description} onInput={(event) => setData("description", event.target.value)}></textarea>
         </section>
         <section>
@@ -88,10 +88,10 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
       <section>
         <h1>Organization</h1>
         <section>
-          <label htmlFor="tags">Tags<span style={{
-            color: "var(--text)",
-            marginLeft: "0.5rem"
-          }}>(optional)</span></label>
+          <label htmlFor="tags">
+            Tags
+            <Optional />
+          </label>
           <p>You can use tags to sort your characters and easily find them later.</p>
           <TagInput 
             onChange={(tags) => setData("tags", tags)} 
@@ -99,7 +99,10 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
           />
         </section>
         <section>
-          <label>Folders<Optional /></label>
+          <label>
+            Folders
+            <Optional />
+          </label>
           <p>You can add your character to multiple folders.</p>
           <ContentInput 
             content={data.folders} 
