@@ -101,7 +101,7 @@ export default function Profile({shownLocation, setLocation, client, setCritical
 
       // Select a tab.
       const tabs = {
-        about: <ProfileAbout owner={owner} />,
+        about: <ProfileAbout owner={owner} styles={styles} />,
         art: <ProfileArt owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />,
         blog: <ProfileBlog owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />,
         characters: <ProfileCharacters owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />,
