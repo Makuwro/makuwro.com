@@ -94,7 +94,7 @@
   background-color: rgba(0, 0, 0, 0);
   z-index: 1;
   display: flex;
-  transition: 0.15s;
+  transition: 0.15s, left 0s, width 0s, height 0s;
   justify-content: center;
   pointer-events: none;
 }
