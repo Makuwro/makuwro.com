@@ -115,24 +115,6 @@ export default function Submitter({client, art, refreshArt, updated}) {
               />
             );
 
-            // Set states.
-            setData((oldData) => ({
-              ...oldData,
-              description: art?.description || oldData.description,
-              collaborators: art?.collaborators || oldData.collaborators,
-              tags: art?.tags || oldData.tags,
-              characters: art?.characters || oldData.characters,
-              folders: art?.folders || oldData.folders,
-              worlds: art?.worlds || oldData.worlds,
-              slug: art?.slug || oldData.slug,
-              ageRestrictionLevel: art?.ageRestrictionLevel || oldData.ageRestrictionLevel,
-              contentWarning: art?.contentWarning || oldData.contentWarning,
-              permissions: {
-                ...art?.permissions || oldData.permissions,
-                viewOriginal: art?.permissions.viewOriginal || 0,
-              }
-            }));
-
             // Fix the title.
             document.title = "Upload art to Makuwro";
 
