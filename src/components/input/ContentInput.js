@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import styles from "../../styles/TagInput.module.css";
 import ddStyles from "../../styles/Dropdown.module.css";
 
-export default function ContentInput({content, onChange, client, type}) {
+export default function ContentInput({content, onChange, client, type, allowSelfAdd, ...props}) {
 
   const typeList = ["users", "folders", "worlds", "characters"];
   const [phrase, setPhrase] = useState("");
@@ -201,7 +201,7 @@ export default function ContentInput({content, onChange, client, type}) {
   }
 
   return (
-    <section className={`${ddStyles.list} ${styles.container} ${searchResults ? styles.open : ""}`} ref={inputContainerRef} >
+    <section className={`${ddStyles.list} ${styles.container} ${searchResults ? styles.open : ""}`} ref={inputContainerRef} {...props}>
       <section className={styles.tagInput} onClick={() => inputRef.current.focus()}>
         {childrenComponents}
         <input tabIndex="0" type="text" onKeyDown={checkSelection} value={phrase} onInput={(event) => setPhrase(event.target.value)} ref={inputRef} className={!(content || [])[0] ? styles.none : ""} />
