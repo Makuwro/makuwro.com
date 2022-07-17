@@ -27,7 +27,6 @@ export default function Submitter({client, art, refreshArt, updated}) {
     }
   });
   const [submitting, setSubmitting] = useState(false);
-  const image = useRef();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const action = searchParams.get("action");
@@ -158,7 +157,7 @@ export default function Submitter({client, art, refreshArt, updated}) {
                 const {
                   name, slug = data.name?.toLowerCase().replaceAll(/[^a-zA-Z0-9_]/gm, "-"),
                   collaborators, worlds, characters, folders, description, tags, permissions,
-                  ageRestrictionLevel, contentWarning
+                  ageRestrictionLevel, contentWarning, image
                 } = data;
         
                 // Turn the collaborators array into an array of user IDs
@@ -192,7 +191,7 @@ export default function Submitter({client, art, refreshArt, updated}) {
         
                 // Set up form data
                 const formData = new FormData();
-                formData.append("image", image.current.files[0]);
+                formData.append("image", image);
                 formData.append("description", description);
                 formData.append("tags", JSON.stringify(tags));
                 formData.append("folders", JSON.stringify(folderIds));
