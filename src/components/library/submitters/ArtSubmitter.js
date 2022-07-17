@@ -106,6 +106,7 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
             tags={data.tags} 
           />
         </section>
+        {/*
         <section>
           <label>
             Folders
@@ -139,6 +140,7 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
             onChange={(characters) => setData("characters", characters)} 
           />
         </section>
+        */}
       </section>
       <section>
         <h1>Sharing</h1>
