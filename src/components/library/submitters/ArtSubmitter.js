@@ -86,7 +86,10 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
         {creatorType === 2 && (
           <section>
             <label>Who did you collaborate with?</label>
-            <input tabIndex="0" type="text" required />
+            <TagInput 
+              tags={data.collaborators}
+              onChange={(collaborators) => setData("collaborators", collaborators)}
+            />
           </section>
         )}
       </section>
