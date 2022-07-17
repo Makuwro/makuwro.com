@@ -48,7 +48,9 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
               event.preventDefault();
               image.current.click();
 
-            }}>{imagePath ? "Re-s" : "S"}elect image</button>
+            }}>
+              {imagePath ? "Re-s" : "S"}elect image
+            </button>
             <p>Please only upload content that you have permission to use.</p>
           </section>
         </section>
