@@ -153,6 +153,7 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
             onChange={(slug) => setData("slug", slug)}
             placeholder={data.name.replaceAll(/[^a-zA-Z0-9_-]/gm, "-")} 
             path="art"
+            required
           />
         </section>
         <section>
