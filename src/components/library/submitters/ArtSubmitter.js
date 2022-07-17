@@ -35,11 +35,14 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
         <h1>Basics</h1>
         <section id={styles.fileSelectBackground}>
           <section>
-            <input required={!imagePath} type="file" accept="image/*" style={{display: "none"}} ref={image} onChange={({target: {files: [file]}}) => {
-
-              setData("image", file);
-
-            }} />
+            <input 
+              required={!imagePath} 
+              type="file" 
+              accept="image/*" 
+              style={{display: "none"}} 
+              ref={image} 
+              onChange={({target: {files: [file]}}) => setData("image", file)} 
+            />
             {imagePath && (
               <img src={imagePath} />
             )}
