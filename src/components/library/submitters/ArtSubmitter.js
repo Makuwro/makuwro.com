@@ -218,7 +218,12 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
           />
         </section>
       </section>
-      <input disabled={submitting} tabIndex="0" type="submit" value={update ? "Save" : "Upload art"} />
+      <input 
+        disabled={!imagePath || submitting} 
+        tabIndex="0"
+        type="submit" 
+        value={update ? "Save" : "Upload art"} 
+      />
     </>
   );
 
