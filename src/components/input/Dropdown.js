@@ -50,8 +50,7 @@ export default function Dropdown({index, children, onChange, width, inPopup, tab
       delete newProps._owner;
       delete newProps._store;
       delete newProps.type;
-
-      newProps["$$typeof"] = undefined;
+      delete newProps["$$typeof"];
 
       return React.createElement(child.type, newProps, child.props.children);
   

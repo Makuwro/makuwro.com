@@ -10,6 +10,7 @@ section.tagInput {
   cursor: text;
   padding: 0;
   justify-content: initial;
+  box-shadow: var(--box-shadow);
 }
 
 :global(.light) section.tagInput {

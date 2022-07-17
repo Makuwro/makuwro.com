@@ -5,10 +5,12 @@
   height: 350px;
   justify-content: center;
   margin-top: 1rem;
+  box-shadow: var(--box-shadow);
 }
 
 #fileSelectBackground p {
-  margin: 0;
+  margin: 0 25px;
+  text-align: center;
 }
 
 #fileSelectBackground, #fileSelectBackground > section {

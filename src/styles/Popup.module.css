@@ -55,7 +55,7 @@
   display: flex;
   justify-content: space-between;
   padding: 0 20px;
-  background-color: #232325;
+  background-color: #101010;
 }
 
 .header > h1 {
@@ -63,6 +63,8 @@
   font-size: 1.5rem;
   display: flex;
   align-items: center;
+  font-family: "Lexend Deca";
+  font-weight: 700;
 }
 
 .content {
