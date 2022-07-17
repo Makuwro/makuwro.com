@@ -43,7 +43,7 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
             {imagePath && (
               <img src={imagePath} />
             )}
-            <button tabIndex="0" onClick={(event) => {
+            <button type="button" tabIndex="0" onClick={(event) => {
 
               event.preventDefault();
               image.current.click();
