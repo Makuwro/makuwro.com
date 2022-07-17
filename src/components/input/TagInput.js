@@ -35,31 +35,30 @@ export default function TagInput({children, onChange, tags}) {
     if ((event.keyCode === 9 || event.keyCode === 13) && phrase) {
 
       event.preventDefault();
-      onChange(tags => {
 
-        // Check if the tag already exists
-        if (tags.find((tag) => tag === phrase)) {
+      // Check if the tag already exists.
+      if (tags.find((tag) => tag === phrase)) {
 
-          alert("You already added that tag!");
-          return tags;
+        alert("You already added that tag!");
 
-        }
+      } else {
 
-        return [...tags, phrase];
+        // Add the tag to the list.
+        onChange([...tags, phrase]);
 
-      });
-      setPhrase("");
+        // Reset the tag input.
+        setPhrase("");
+
+      }
 
     } else if (event.keyCode === 8 && inputRef.current.selectionStart === 0 && children[0]) {
 
-      // Check if there's anything
-      onChange(tags => {
+      // Pop the last tag from the list.
+      const tagsCopy = [...tags];
+      tagsCopy.pop();
 
-        const tagsCopy = [...tags];
-        tagsCopy.pop();
-        return tagsCopy;
-
-      });
+      // Save the changes.
+      onChange(tagsCopy);
 
     }
 

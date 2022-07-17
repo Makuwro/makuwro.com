@@ -16,18 +16,18 @@ export default function ContentInput({content, onChange, client, type}) {
 
   useEffect(() => {
 
+    // Iterate through each item.
     const comps = [];
 
     for (let i = 0; (content?.length || 0) > i; i++) {
 
-      comps[i] = <span onClick={() => {
-    
-        onChange(() => content.filter((item2) => item2 !== content[i]));
-
-      }} key={content[i].id}>
-        <img src={`https://cdn.makuwro.com/${content[i].avatarPath || content[i].imagePath}`} />
-        {content[i].name || content[i].displayName || `@${content[i].username}`}
-      </span>;
+      // Add a component to the array for each item
+      comps.push(
+        <span onClick={() => onChange(() => content.filter((item2) => item2 !== content[i]))} key={content[i].id}>
+          <img src={`https://cdn.makuwro.com/${content[i].avatarPath || content[i].imagePath}`} />
+          {content[i].name || content[i].displayName || `@${content[i].username}`}
+        </span>
+      );
 
     }
 
@@ -109,24 +109,20 @@ export default function ContentInput({content, onChange, client, type}) {
               key={item.id} 
               onClick={() => {
 
-                onChange(() => {
+                // Check if the user already exists
+                if (content.find((item2) => item2.id === item.id)) {
 
-                  // Check if the user already exists
-                  if (content.find((item2) => item2.id === item.id)) {
+                  alert("You already added that one!");
+                  return;
 
-                    alert("You already added that one!");
-                    return content;
+                } else if (type === 0 && item.id === client.user.id) {
 
-                  } else if (type === 0 && item.id === client.user.id) {
+                  alert("You can't add yourself!");
+                  return;
 
-                    alert("You can't add yourself!");
-                    return content;
+                }
 
-                  }
-
-                  return [...content, item];
-
-                });
+                onChange([...content, item]);
                 setSearchResults(null);
                 setPhrase("");
 
