@@ -55,7 +55,7 @@
   display: flex;
   justify-content: space-between;
   padding: 0 20px;
-  background-color: #232325;
+  background-color: #101010;
 }
 
 .header > h1 {
@@ -63,6 +63,8 @@
   font-size: 1.5rem;
   display: flex;
   align-items: center;
+  font-family: "Lexend Deca";
+  font-weight: 700;
 }
 
 .content {
@@ -86,7 +88,8 @@
   .container, .open > section.shifting {
     width: 728px;
     border: 1px solid #232325;
-    border-radius: 5px;
+    border-radius: 10px;
+    overflow: hidden;
   }
 
   .open .container {
@@ -99,10 +102,10 @@
 
 }
 
-@supports (backdrop-filter: blur(10px)) {
+@supports (backdrop-filter: blur(5px)) {
 
   .container {
-    backdrop-filter: blur(35px);
+    backdrop-filter: blur(5px);
     background-color: #313237b8;
   }
 

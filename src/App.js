@@ -17,6 +17,7 @@ import Notifications from "./components/Notifications";
 import "./styles/global.css";
 import ImageCropTool from "./components/ImageCropTool";
 import AlertManager from "./components/alerts/AlertManager";
+import Footer from "./components/Footer";
 
 const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 const maintenance = false;
@@ -219,64 +220,67 @@ export default function App() {
               return newAlerts;
             
             })} />
-            <Routes location={shownLocation}>
-              {["/", "/register", "/signin", "/notifications"].map((path, index) => {
+            <section id="scroll-container">
+              <Routes location={shownLocation}>
+                {["/", "/register", "/signin", "/notifications"].map((path, index) => {
 
-                return <Route path={path} key={index} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />;
+                  return <Route path={path} key={index} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />;
 
-              })}
-              <Route path={"/library"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
-              <Route path={"/library/:category"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
-              {[
-                "/:username", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id", "/:username/:tab/:id/:subtab"
-              ].map((path, index) => {
-                
-                return <Route key={index} path={path} element={(
-                  <Profile 
-                    updated={updated} 
-                    shownLocation={shownLocation} 
-                    setLocation={setLocation}
-                    client={client} 
-                    artViewerOpen={artViewerOpen}
-                    setSettingsCache={setSettingsCache}
-                    setCriticalError={setCriticalError}
-                    addAlert={addAlert}
+                })}
+                <Route path={"/library"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
+                <Route path={"/library/:category"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
+                {[
+                  "/:username", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id", "/:username/:tab/:id/:subtab"
+                ].map((path, index) => {
+                  
+                  return <Route key={index} path={path} element={(
+                    <Profile 
+                      updated={updated} 
+                      shownLocation={shownLocation} 
+                      setLocation={setLocation}
+                      client={client} 
+                      artViewerOpen={artViewerOpen}
+                      setSettingsCache={setSettingsCache}
+                      setCriticalError={setCriticalError}
+                      addAlert={addAlert}
+                    />
+                  )} />;
+
+                })}
+                {["/:username/blog/:slug", "/:username/literature/:literatureSlug/chapters/:chapterSlug", "/:username/worlds/:worldSlug/wiki/:articleSlug"].map((path, index) => (
+                  <Route 
+                    key={index} 
+                    path={path} 
+                    element={(
+                      <Literature 
+                        shownLocation={shownLocation} 
+                        setLocation={setLocation} 
+                        client={client} 
+                        setSettingsCache={setSettingsCache}
+                      />
+                    )}
                   />
-                )} />;
-
-              })}
-              {["/:username/blog/:slug", "/:username/literature/:literatureSlug/chapters/:chapterSlug", "/:username/worlds/:worldSlug/wiki/:articleSlug"].map((path, index) => (
-                <Route 
-                  key={index} 
-                  path={path} 
-                  element={(
-                    <Literature 
-                      shownLocation={shownLocation} 
-                      setLocation={setLocation} 
-                      client={client} 
-                      setSettingsCache={setSettingsCache}
-                    />
-                  )}
-                />
-              ))}
-              {["/settings", "/settings/:tab", "/:username/:category/:slug/settings", "/:username/:category/:slug/settings/:tab"].map((path, index) => (
-                <Route 
-                  key={index} 
-                  path={path} 
-                  element={(
-                    <Settings 
-                      client={client} 
-                      shownLocation={shownLocation} 
-                      setLocation={setLocation} 
-                      settingsCache={settingsCache}
-                      setSettingsCache={setSettingsCache}
-                      setImageUrl={setImageUrl}
-                    />
-                  )}
-                />
-              ))}
-              <Route path="search" element={<Search client={client} />} />
-            </Routes>
+                ))}
+                {["/settings", "/settings/:tab", "/:username/:category/:slug/settings", "/:username/:category/:slug/settings/:tab"].map((path, index) => (
+                  <Route 
+                    key={index} 
+                    path={path} 
+                    element={(
+                      <Settings 
+                        client={client} 
+                        shownLocation={shownLocation} 
+                        setLocation={setLocation} 
+                        settingsCache={settingsCache}
+                        setSettingsCache={setSettingsCache}
+                        setImageUrl={setImageUrl}
+                      />
+                    )}
+                  />
+                ))}
+                <Route path="search" element={<Search client={client} />} />
+              </Routes>
+              <Footer />
+            </section>
           </PopupManager>
         )
       }

@@ -21,6 +21,7 @@
   height: 100%;
   align-items: center;
   cursor: pointer;
+  box-shadow: var(--box-shadow);
 }
 
 :global(.light) .toggle, :global(.light) .list li, :global(.light) .list > ul {

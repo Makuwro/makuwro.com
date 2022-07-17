@@ -5,11 +5,13 @@ header {
   height: 56px;
   padding: 0 1.2rem;
   color: white;
-  background-color: var(--header);
-  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.2));
   box-sizing: border-box;
   transition: 0.3s;
   z-index: 3;
+}
+
+:global(.light) header > section:first-of-type > section a {
+  color: var(--text);
 }
 
 header > section {
@@ -37,14 +39,18 @@ header > section:first-of-type > section a {
   top: 2px;
 }
 
-#wiki-name {
-  margin: 0;
-  font-size: 1.5rem;
-  margin-left: 0.75rem;
+header button {
+  box-shadow: var(--box-shadow);
 }
 
-:global(.light) #wiki-name, #wiki-name:hover {
+#wiki-name {
   color: white;
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+:global(.light) #wiki-name {
+  color: var(--text);
 }
 
 #leftLinks {
@@ -178,6 +184,11 @@ input.no-results {
 #notificationsButton {
   background: none;
   display: none;
+  color: white;
+}
+
+:global(.light) #notificationsButton {
+  color: var(--text);
 }
 
 @media only screen and (min-width: 375px) {

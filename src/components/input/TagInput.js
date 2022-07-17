@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import styles from "../../styles/TagInput.module.css";
 
-export default function TagInput({children, onChange}) {
+export default function TagInput({children, onChange, tags}) {
 
   const [childrenComponents, setChildrenComponents] = useState([]);
   const [phrase, setPhrase] = useState("");
@@ -10,19 +10,24 @@ export default function TagInput({children, onChange}) {
 
   useEffect(() => {
 
-    setChildrenComponents(React.Children.map(children, (child) => {
+    // Iterate through the tag names.
+    const childrenComponents = [];
+    for (let i = 0; tags.length > i; i++) {
 
-      return <span onClick={() => {
+      // Add a clickable tag component.
+      const tag = tags[i];
+      childrenComponents.push(
+        <span onClick={() => onChange(tags.filter((tag2) => tag2 !== tag))} key={tag}>
+          {tag}
+        </span>
+      );
 
-        onChange(tags => tags.filter((tag2) => tag2 !== child));
+    }
 
-      }} key={child}>
-        {child}
-      </span>;
+    // Add the tags as React components.
+    setChildrenComponents(childrenComponents);
 
-    }));
-
-  }, [children]);
+  }, [tags]);
 
   function checkSelection(event) {
 
@@ -30,31 +35,30 @@ export default function TagInput({children, onChange}) {
     if ((event.keyCode === 9 || event.keyCode === 13) && phrase) {
 
       event.preventDefault();
-      onChange(tags => {
 
-        // Check if the tag already exists
-        if (tags.find((tag) => tag === phrase)) {
+      // Check if the tag already exists.
+      if (tags.find((tag) => tag === phrase)) {
 
-          alert("You already added that tag!");
-          return tags;
+        alert("You already added that tag!");
 
-        }
+      } else {
 
-        return [...tags, phrase];
+        // Add the tag to the list.
+        onChange([...tags, phrase]);
 
-      });
-      setPhrase("");
+        // Reset the tag input.
+        setPhrase("");
+
+      }
 
     } else if (event.keyCode === 8 && inputRef.current.selectionStart === 0 && children[0]) {
 
-      // Check if there's anything
-      onChange(tags => {
+      // Pop the last tag from the list.
+      const tagsCopy = [...tags];
+      tagsCopy.pop();
 
-        const tagsCopy = [...tags];
-        tagsCopy.pop();
-        return tagsCopy;
-
-      });
+      // Save the changes.
+      onChange(tagsCopy);
 
     }
 

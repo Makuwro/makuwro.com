@@ -35,28 +35,33 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
         <h1>Basics</h1>
         <section id={styles.fileSelectBackground}>
           <section>
-            <input required={!imagePath} type="file" accept="image/*" style={{display: "none"}} ref={image} onChange={({target: {files: [file]}}) => {
-
-              setData("image", file);
-
-            }} />
+            <input 
+              required={!imagePath} 
+              type="file" 
+              accept="image/*" 
+              style={{display: "none"}} 
+              ref={image} 
+              onChange={({target: {files: [file]}}) => setData("image", file)} 
+            />
             {imagePath && (
               <img src={imagePath} />
             )}
-            <button tabIndex="0" onClick={(event) => {
+            <button type="button" tabIndex="0" onClick={(event) => {
 
               event.preventDefault();
               image.current.click();
 
-            }}>{imagePath ? "Re-s" : "S"}elect image</button>
+            }}>
+              {imagePath ? "Re-s" : "S"}elect image
+            </button>
             <p>Please only upload content that you have permission to use.</p>
           </section>
         </section>
         <section>
-          <label>Description<span style={{
-            color: "var(--text)",
-            marginLeft: "0.5rem"
-          }}>(optional)</span></label>
+          <label>
+            Description
+            <Optional />
+          </label>
           <textarea tabIndex="0" value={data.description} onInput={(event) => setData("description", event.target.value)}></textarea>
         </section>
         <section>
@@ -81,25 +86,32 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
         {creatorType === 2 && (
           <section>
             <label>Who did you collaborate with?</label>
-            <input tabIndex="0" type="text" required />
+            <TagInput 
+              tags={data.collaborators}
+              onChange={(collaborators) => setData("collaborators", collaborators)}
+            />
           </section>
         )}
       </section>
       <section>
         <h1>Organization</h1>
         <section>
-          <label htmlFor="tags">Tags<span style={{
-            color: "var(--text)",
-            marginLeft: "0.5rem"
-          }}>(optional)</span></label>
+          <label htmlFor="tags">
+            Tags
+            <Optional />
+          </label>
           <p>You can use tags to sort your characters and easily find them later.</p>
           <TagInput 
             onChange={(tags) => setData("tags", tags)} 
             tags={data.tags} 
           />
         </section>
+        {/*
         <section>
-          <label>Folders<Optional /></label>
+          <label>
+            Folders
+            <Optional />
+          </label>
           <p>You can add your character to multiple folders.</p>
           <ContentInput 
             content={data.folders} 
@@ -128,6 +140,7 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
             onChange={(characters) => setData("characters", characters)} 
           />
         </section>
+        */}
       </section>
       <section>
         <h1>Sharing</h1>
@@ -140,6 +153,7 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
             onChange={(slug) => setData("slug", slug)}
             placeholder={data.name.replaceAll(/[^a-zA-Z0-9_-]/gm, "-")} 
             path="art"
+            required
           />
         </section>
         <section>
@@ -204,7 +218,12 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
           />
         </section>
       </section>
-      <input disabled={submitting} tabIndex="0" type="submit" value={update ? "Save" : "Upload art"} />
+      <input 
+        disabled={!imagePath || submitting} 
+        tabIndex="0"
+        type="submit" 
+        value={update ? "Save" : "Upload art"} 
+      />
     </>
   );
 
