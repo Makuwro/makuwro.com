@@ -9,6 +9,8 @@
   height: 100%;
   overflow: hidden;
   display: flex;
+  max-width: 1107.39px;
+  max-height: 762px;
 }
 
 #imageContainer img {
@@ -34,14 +36,6 @@
   box-sizing: border-box;
 }
 
-#collaborators {
-  margin-top: 50px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
 .collaborator {
   display: flex;
   gap: 10px;
@@ -58,16 +52,73 @@
   color: var(--text);
 }
 
+#tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+#tags span {
+  background-color: var(--article);
+  white-space: nowrap;
+  padding: 0 0.5rem;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 0.5rem;
+  box-sizing: border-box;
+}
+
 @media screen and (min-width: 1024px) {
 
   #viewer {
     display: flex;
-    gap: 25px;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+  }
+
+  #collaborators, #description {
+    background-color: #101010;
+    border: 1px solid #232325;
+    border-radius: 5px;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  #collaborators {
+    margin-top: 150px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  #description {
+    font-weight: 300;
   }
 
   #details {
-    display: block;
+    display: flex;
     width: 400px;
+    gap: 20px;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  #date {
+    margin-top: 10px;
+    color: var(--text);
+  }
+
+}
+
+@supports (backdrop-filter: blur(5px)) {
+
+  #collaborators {
+    backdrop-filter: blur(2px);
+    background-color: #3132374a;
   }
 
 }

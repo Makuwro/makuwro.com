@@ -23,6 +23,19 @@ export default function ArtViewer() {
             displayName="Christian Toney"
             username="Christian"
             title="Developer" />
+          <button>View all collaborators</button>
+        </section>
+        <section id={styles.description}>
+          Aren't they a cutie? 🥰
+          <section id={styles.metadata}>
+            <section id={styles.tags}>
+              <span>pollution</span>
+              <span>your mom</span>
+            </section>
+            <section id={styles.date}>
+              Uploaded on May 14, 2022
+            </section>
+          </section>
         </section>
       </section>
     </section>
