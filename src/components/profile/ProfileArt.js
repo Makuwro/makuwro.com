@@ -37,7 +37,7 @@ export default function ProfileArt({client, owner, cache, setCache, styles}) {
         const {slug, owner, imagePath} = cache.art[i];
 
         newCollection.push(
-          <Link to={`/${owner.username}/${slug}`} key={slug}>
+          <Link to={`/${owner.username}/art/${slug}`} key={slug}>
             <img src={`https://cdn.makuwro.com/${imagePath}`} />
           </Link>
         );
