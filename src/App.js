@@ -138,7 +138,7 @@ export default function App() {
             <ImageCropTool client={client} imageUrl={imageUrl} />
             <Submitter client={client} />
             <Notifications client={client} shownLocation={shownLocation} />
-            <ArtViewer />
+            <ArtViewer client={client} setLocation={setLocation} />
             <Header client={client} systemDark={systemDark} setLocation={setLocation} />
             <AlertManager alerts={alerts} onChange={(index) => setAlerts((oldAlerts) => {
               

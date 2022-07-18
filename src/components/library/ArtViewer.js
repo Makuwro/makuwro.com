@@ -1,39 +1,92 @@
 import styles from "../../styles/ArtViewer.module.css";
 import React, { useEffect, useState } from "react";
 import Collaborator from "../Collaborator";
+import PropTypes from "prop-types";
 
 const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 
-  const [artInfo, setArtInfo] = useState();
+export default function ArtViewer({client}) {
 
-  return (
+  const [artInfo, setArtInfo] = useState();
+  const [collaboratorComponents, setCollaboratorComponents] = useState([]);
+  const [tagComponents, setTagComponents] = useState([]);
+
+  useEffect(() => {
+    // Check if we're looking for an art piece.
+
+    // Get art from the server.
+    try {
+
+      const art = {
+        imagePath: "https://upload.wikimedia.org/wikipedia/commons/5/55/Smokestacks_of_Chemical_Plant_11-1972_%283703566787%29.jpg",
+        description: "Aren't they a cutie? 🥰",
+        owner: {
+          username: "Christian",
+          displayName: "Christian Toney",
+          id: "6276f5c654cb1a7c52b5a7e2",
+          avatarPath: "https://pbs.twimg.com/profile_images/1503878170642104320/hWzBPHQl_400x400.jpg"
+        },
+        uploadedOn: "May 14, 2022",
+        tags: ["pollution", "your mom"]
+      };
+
+      // Iterate through each collaborator.
+      const collaborators = [art.owner];
+      for (let i = 0; collaborators.length > i; i++) {
+
+        // Create a component for each collaborator.
+        const {displayName, username, avatarPath, title} = collaborators[i];
+        collaborators[i] = <Collaborator username={username} displayName={displayName} avatar={avatarPath} title={title} />
+
+      }
+
+      // Now iterate through each tag.
+      const {tags} = art;
+      for (let i = 0; tags.length > i; i++) {
+
+        tags[i] = <span>{tags[i]}</span>;
+
+      }
+
+      // Set the new tag components.
+      setTagComponents(tags);
+
+      // Set the new collaborator components.
+      setCollaboratorComponents(collaborators);
+
+      // We're ready to show what we got!
+      setArtInfo(art);
+
+    } catch (err) {
+
+
+
+    }
+
+  }, []);
+
+  return artInfo ? (
     <section id={styles.viewer}>
       <section id={styles.imageContainer}>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Smokestacks_of_Chemical_Plant_11-1972_%283703566787%29.jpg" />
+        <img src={artInfo.imagePath} />
       </section>
       <section id={styles.details}>
         <section id={styles.collaborators}>
-          <Collaborator 
-            avatar="https://pbs.twimg.com/profile_images/1503878170642104320/hWzBPHQl_400x400.jpg"
-            displayName="Christian Toney"
-            username="Christian"
-            title="Publisher" />
-          <Collaborator 
-            avatar="https://pbs.twimg.com/profile_images/1503878170642104320/hWzBPHQl_400x400.jpg"
-            displayName="Christian Toney"
-            username="Christian"
-            title="Developer" />
-          <button>View all collaborators</button>
+          {collaboratorComponents}
+          {
+            collaboratorComponents[3] && (
+              <button>View all collaborators</button>
+            )
+          }
         </section>
         <section id={styles.description}>
-          Aren't they a cutie? 🥰
+          {artInfo.description}
           <section id={styles.metadata}>
             <section id={styles.tags}>
-              <span>pollution</span>
-              <span>your mom</span>
+              {tagComponents}
             </section>
             <section id={styles.date}>
-              Uploaded on May 14, 2022
+              Uploaded on {artInfo.uploadedOn}
             </section>
           </section>
         </section>
@@ -51,10 +104,10 @@ const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
         </section>
       </section>
     </section>
-  );
+  ) : null;
 
 }
 
 ArtViewer.propTypes = {
-
+  client: PropTypes.object.isRequired
 }
