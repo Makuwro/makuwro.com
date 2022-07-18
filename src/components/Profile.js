@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { matchPath, useLocation, useParams, Link } from "react-router-dom";
 import { AccountNotFoundError } from "makuwro-errors";
 import PropTypes from "prop-types";
-import styles from "../../styles/Profile.module.css";
+import styles from "../styles/Profile.module.css";
 import ProfileAbout from "./profile/ProfileAbout";
 import ProfileArt from "./profile/ProfileArt";
 import ProfileBlog from "./profile/ProfileBlog";

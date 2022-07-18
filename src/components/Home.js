@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import styles from "../../styles/Home.module.css";
+import styles from "../styles/Home.module.css";
 import { useLocation } from "react-router-dom";
-import Footer from "../Footer";
 
 export default function Home({setLocation}) {
 
