@@ -10,9 +10,13 @@ export default function Collaborator({avatar, displayName, username, title}) {
         <section>
           {displayName}
         </section>
-        <section className={styles.title}>
-          {title}
-        </section>
+        {
+          title && (
+            <section className={styles.title}>
+              {title}
+            </section>
+          )
+        }
       </section>
     </a>
   );
