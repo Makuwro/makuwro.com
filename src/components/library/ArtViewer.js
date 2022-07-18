@@ -67,6 +67,10 @@ export default function ArtViewer({client}) {
   
       }
 
+    } else {
+
+      setArtInfo();
+
     }
 
   }, [location]);
