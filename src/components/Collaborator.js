@@ -8,7 +8,7 @@ export default function Collaborator({avatar, displayName, username, title}) {
       <img className={styles.avatar} src={avatar} />
       <section className={styles.collaboratorText}>
         <section>
-          {displayName}
+          {displayName || `@${username}`}
         </section>
         {
           title && (
