@@ -2,7 +2,7 @@ import styles from "../../styles/ArtViewer.module.css";
 import React, { useEffect, useState } from "react";
 import Collaborator from "../Collaborator";
 import PropTypes from "prop-types";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 
@@ -60,10 +60,13 @@ export default function ArtViewer({client}) {
   
         // We're ready to show what we got!
         setArtInfo(art);
+
+        // Change the document title.
+        document.title = `${art.owner.displayName} (${art.owner.username}): ${art.description || "Undescribed art"}`;
   
       } catch (err) {
   
-  
+        console.log(err);
   
       }
 
@@ -75,12 +78,20 @@ export default function ArtViewer({client}) {
 
   }, [location]);
 
+  const navigate = useNavigate();
+  function close() {
+    
+    // Go back to the user's profile.
+    navigate(`/${artInfo.owner.username}/art`);
+
+  }
+
   return artInfo ? (
-    <section id={styles.viewer}>
-      <section id={styles.imageContainer}>
+    <section id={styles.viewer} onClick={close}>
+      <section id={styles.imageContainer} onClick={(event) => event.stopPropagation()}>
         <img src={artInfo.imagePath} />
       </section>
-      <section id={styles.details}>
+      <section id={styles.details} onClick={(event) => event.stopPropagation()}>
         <section id={styles.collaborators}>
           {collaboratorComponents}
           {
