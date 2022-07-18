@@ -1,10 +1,10 @@
 import styles from "../../styles/ArtViewer.module.css";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Collaborator from "../Collaborator";
 
 const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 
-export default function ArtViewer() {
+  const [artInfo, setArtInfo] = useState();
 
   return (
     <section id={styles.viewer}>
@@ -36,6 +36,18 @@ export default function ArtViewer() {
               Uploaded on May 14, 2022
             </section>
           </section>
+        </section>
+        <section id={styles.actions}>
+          {
+            client.user?.id === artInfo.owner.id && (
+              <button id={styles.edit}>Edit</button>
+            )
+          }
+          <button id={styles.like}>Like</button>
+          <button className="destructive" id={styles.report}>Report</button>
+        </section>
+        <section>
+          Comments disabled
         </section>
       </section>
     </section>
