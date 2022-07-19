@@ -98,6 +98,7 @@
 
   .content {
     height: initial;
+    max-height: 500px;
   }
 
 }
