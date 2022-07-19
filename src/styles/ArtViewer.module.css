@@ -68,12 +68,12 @@
 #tags span {
   background-color: var(--article);
   white-space: nowrap;
-  padding: 0 0.5rem;
+  padding: 5px 10px;
   border-radius: 5px;
   display: flex;
   align-items: center;
   cursor: pointer;
-  gap: 0.5rem;
+  box-shadow: var(--box-shadow);
   box-sizing: border-box;
 }
 
