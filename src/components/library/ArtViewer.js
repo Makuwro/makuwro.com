@@ -119,9 +119,11 @@ export default function ArtViewer({client}) {
             )}
           </Popup>
         )}
-        <section id={styles.imageContainer} onClick={(event) => event.stopPropagation()}>
+        <section id={styles.imageContainer}>
           {!contentWarning && (
-            <img src={`https://cdn.makuwro.com/${artInfo.imagePath}`} />
+            <img 
+              src={`https://cdn.makuwro.com/${artInfo.imagePath}`} 
+              onClick={(event) => event.stopPropagation()} />
           )}
         </section>
         <section id={styles.details} onClick={(event) => event.stopPropagation()}>
