@@ -1,35 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { Route, Routes, useSearchParams, useNavigate, useLocation } from "react-router-dom";
-import Home from "./components/routes/Home";
+import { Route, Routes, useSearchParams, useLocation } from "react-router-dom";
+import Home from "./components/Home";
 import PropTypes from "prop-types";
 import Header from "./components/Header";
-import Profile from "./components/routes/Profile";
+import Profile from "./components/Profile";
 import Maintenance from "./components/Maintenance";
-import Art from "./components/library/Art";
+import ArtViewer from "./components/library/ArtViewer";
 import PopupManager from "./components/popups/PopupManager";
 import Authenticator from "./components/Authenticator";
 import Literature from "./components/library/Literature";
 import Settings from "./components/Settings";
 import Submitter from "./components/library/Submitter";
 import ConnectivityCheck from "./components/ConnectivityCheck";
-import Search from "./components/routes/Search";
+import Search from "./components/Search";
 import Notifications from "./components/Notifications";
 import "./styles/global.css";
 import ImageCropTool from "./components/ImageCropTool";
 import AlertManager from "./components/alerts/AlertManager";
 import Footer from "./components/Footer";
 
-const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
-const maintenance = false;
-const mode = "dev";
-const api = {
-  dev: "http://localhost:3001/",
-  prod: "https://api.makuwro.com/"
-}[mode];
-
 export default function App() {
 
   // Check if the website is under maintenance
+  const maintenance = false;
   if (maintenance) return <Maintenance />;
   
   // Set up the states
@@ -37,17 +30,14 @@ export default function App() {
   const [ready, setReady] = useState(false);
   const [searchParams] = useSearchParams();
   const [settingsCache, setSettingsCache] = useState();
-  const navigate = useNavigate();
 
   // Check if we want to create something
   const action = searchParams.get("action");
   const location = useLocation();
   const pathname = location.pathname;
-  const [art] = useState();
   const [updated, setUpdated] = useState(false);
   const [shownLocation, setLocation] = useState(location);
   const [signInOpen, setSignInOpen] = useState(false);
-  const [artViewerOpen, setArtViewerOpen] = useState(false);
   const [criticalError, setCriticalError] = useState();
 
   useEffect(() => {
@@ -55,62 +45,6 @@ export default function App() {
     let mounted = true;
 
     if (client) {
-
-      // Check if we need the art viewer open
-      /*
-      const matchedPath = [...pathname.matchAll(artRegex)];
-      const groups = matchedPath[0] && matchedPath[0].groups;
-      if (groups && (!art || art.refresh || (groups.username !== art.owner.username || groups.slug !== art.slug))) {
-
-        const {username, slug} = groups;
-
-        try {
-
-          const directory = `${username}/${slug}`;
-          let art = artCache[directory];
-          
-          if (!art) {
-
-            const artResponse = await fetch(`${api}contents/art/${directory}`, {headers: token ? {token} : {}});
-            art = await artResponse.json();
-            setArtCache(oldArtCache => {
-              
-              oldArtCache[directory] = art;
-              return oldArtCache;
-              
-            });
-
-          }
-
-          if (art && mounted) {
-
-            setArtViewerOpen(true);
-            setArt(art);
-
-          } else {
-
-            throw new Error("Couldn't get that art");
-
-          }
-
-        } catch ({message}) {
-
-          if (mounted) {
-
-            alert(message);
-            navigate(`/${username}/art`);
-            setLocation(location);
-
-          }
-
-        }
-        
-      } else if (!groups && mounted) {
-
-        setArt();
-
-      }
-      */
 
       if (mounted) {
 
@@ -138,7 +72,7 @@ export default function App() {
 
     return () => mounted = false;
   
-  }, [client, action, pathname, document.cookie, art]);
+  }, [client, action, pathname, document.cookie]);
 
   // Listen for theme changes
   const [systemDark, setSystemDark] = useState(window.matchMedia("(prefers-color-scheme: dark)").matches);
@@ -185,8 +119,7 @@ export default function App() {
 
   return (
     <>
-      <ConnectivityCheck 
-        api={api}
+      <ConnectivityCheck
         authenticated={client?.user !== undefined}
         ready={ready}
         setClient={setClient}
@@ -195,23 +128,10 @@ export default function App() {
         ready && client && (
           <PopupManager>
             <Authenticator open={signInOpen} shownLocation={shownLocation} client={client} />
-            {artViewerOpen && (
-              <Art 
-                client={client}
-                art={art}
-                artRegex={artRegex}
-                artDeleted={() => setUpdated(true)}
-                onClose={() => {
-
-                  navigate(shownLocation);
-                  setArtViewerOpen(false);
-
-                }} 
-              />
-            )}
             <ImageCropTool client={client} imageUrl={imageUrl} />
             <Submitter client={client} />
             <Notifications client={client} shownLocation={shownLocation} />
+            <ArtViewer client={client} setLocation={setLocation} />
             <Header client={client} systemDark={systemDark} setLocation={setLocation} />
             <AlertManager alerts={alerts} onChange={(index) => setAlerts((oldAlerts) => {
               
@@ -238,8 +158,7 @@ export default function App() {
                       updated={updated} 
                       shownLocation={shownLocation} 
                       setLocation={setLocation}
-                      client={client} 
-                      artViewerOpen={artViewerOpen}
+                      client={client}
                       setSettingsCache={setSettingsCache}
                       setCriticalError={setCriticalError}
                       addAlert={addAlert}
