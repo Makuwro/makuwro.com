@@ -8,7 +8,7 @@ import { UnderageError } from "makuwro-errors";
 
 export default function ArtViewer({client}) {
 
-  const [artInfo, setArtInfo] = useState();
+  const [art, setArt] = useState();
   const [ageRestricted, setAgeRestricted] = useState(false);
   const [contentWarning, setContentWarning] = useState();
   const [collaboratorComponents, setCollaboratorComponents] = useState([]);
@@ -62,7 +62,7 @@ export default function ArtViewer({client}) {
           setContentWarning(art.contentWarning);
     
           // We're ready to show what we got!
-          setArtInfo(art);
+          setArt(art);
 
           // Change the document title.
           document.title = `${art.owner.displayName} (${art.owner.username}): ${art.description || "Undescribed art"}`;
@@ -84,7 +84,7 @@ export default function ArtViewer({client}) {
       } else {
 
         setAgeRestricted(false);
-        setArtInfo();
+        setArt();
 
       }
 
@@ -93,28 +93,52 @@ export default function ArtViewer({client}) {
   }, [pathname]);
 
   const navigate = useNavigate();
-  function close() {
+  function closeWindow() {
     
     // Go back to the user's profile.
     navigate(`/${username}/art`);
 
   }
 
-  if (artInfo) {
+  async function deleteArt() {
 
+    if (confirm("Are you sure you want to delete this art? No takesies-backsies!")) {
+
+      try {
+
+        // Delete the art.
+        await art.delete();
+
+        // Close the window.
+        closeWindow();
+
+      } catch (err) {
+
+        alert(err);
+
+      }
+      
+
+    }
+
+  }
+
+  if (art) {
+
+    const isOwner = client.user?.id === art.owner.id;
     return (
-      <section id={styles.viewer} onClick={close}>
+      <section id={styles.viewer} onClick={closeWindow}>
         {contentWarning && (
           <Popup className={styles.warning} 
             title="Content warning"
             options={
               <>
-                <button onClick={close}>Go back</button>
+                <button onClick={closeWindow}>Go back</button>
                 <button className="destructive" onClick={() => setContentWarning()}>View anyway</button>
               </>
             }>
             {contentWarning}
-            {artInfo.ageRestrictionLevel > 0 && (
+            {art.ageRestrictionLevel > 0 && (
               <section className="info">This content may not be appropriate for all ages. Viewer discretion is advised.</section>
             )}
           </Popup>
@@ -122,7 +146,7 @@ export default function ArtViewer({client}) {
         <section id={styles.imageContainer}>
           {!contentWarning && (
             <img 
-              src={`https://cdn.makuwro.com/${artInfo.imagePath}`} 
+              src={`https://cdn.makuwro.com/${art.imagePath}`} 
               onClick={(event) => event.stopPropagation()} />
           )}
         </section>
@@ -136,7 +160,7 @@ export default function ArtViewer({client}) {
             }
           </section>
           <section id={styles.description}>
-            {artInfo.description}
+            {art.description}
             <section id={styles.metadata}>
               {tagComponents[0] && (
                 <section id={styles.tags}>
@@ -144,18 +168,22 @@ export default function ArtViewer({client}) {
                 </section>
               )}
               <section id={styles.date}>
-                Uploaded on {artInfo.uploadedOn}
+                Uploaded on {art.uploadedOn}
               </section>
             </section>
           </section>
           <section id={styles.actions}>
+            <button id={styles.like}>Like</button>
             {
-              client.user?.id === artInfo.owner.id && (
-                <button id={styles.edit}>Edit</button>
+              isOwner ? (
+                <>
+                  <button id={styles.edit}>Edit</button>
+                  <button className="destructive" id={styles.delete} onClick={deleteArt}>Delete</button>
+                </>
+              ) : (
+                <button className="destructive" id={styles.report}>Report</button>
               )
             }
-            <button id={styles.like}>Like</button>
-            <button className="destructive" id={styles.report}>Report</button>
           </section>
           <section>
             Comments disabled
