@@ -6,7 +6,7 @@ import ArtSubmitter from "./submitters/ArtSubmitter";
 import StorySubmitter from "./submitters/StorySubmitter";
 import Popup from "../popups/Popup";
 
-export default function Submitter({client, art, refreshArt, updated}) {
+export default function Submitter({client, art}) {
   
   const [data, setData] = useState({
     name: "",
@@ -225,8 +225,6 @@ export default function Submitter({client, art, refreshArt, updated}) {
                 });
         
                 navigate(`/${client.user.username}/${type}/${slug}`);
-                refreshArt();
-                updated();
         
               } catch ({message}) {
         
@@ -274,6 +272,5 @@ Submitter.propTypes = {
   client: PropTypes.object,
   notify: PropTypes.func,
   art: PropTypes.any,
-  refreshArt: PropTypes.func,
-  updated: PropTypes.func
+  refreshArt: PropTypes.func
 };
