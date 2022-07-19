@@ -56,6 +56,7 @@
   justify-content: space-between;
   padding: 0 20px;
   background-color: #101010;
+  box-shadow: var(--box-shadow);
 }
 
 .header > h1 {
@@ -71,7 +72,7 @@
   overflow-y: auto;
   transition: 0.3s;
   height: calc(100% - 63px);
-  padding: 1rem 20px 0;
+  padding: 20px;
   box-sizing: border-box;
 }
 
@@ -87,22 +88,35 @@
   
   .container, .open > section.shifting {
     width: 728px;
-    border: 1px solid #232325;
     border-radius: 10px;
     overflow: hidden;
   }
 
   .open .container {
-    height: 648px;
+    height: initial;
   }
 
   .content {
-    height: 35rem;
+    height: initial;
   }
 
 }
 
+.options {
+  background-color: #101010;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding-left: 15px;
+  height: 70px;
+}
+
 @supports (backdrop-filter: blur(5px)) {
+
+  .background.open {
+    backdrop-filter: blur(10px);
+    background-color: #000000d6;
+  }
 
   .container {
     backdrop-filter: blur(5px);

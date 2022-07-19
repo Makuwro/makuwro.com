@@ -307,7 +307,7 @@ input[type="submit"] {
   padding: 1rem;
   border-radius: 5px;
   background-color: #292a34;
-  font-weight: 300;
+  box-shadow: var(--box-shadow);
 }
 
 .light .info {

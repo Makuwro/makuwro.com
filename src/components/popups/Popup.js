@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 
 export default function Popup({
   onClose, warnUnfinished, exitMessage = "Are you sure you want to exit? You aren't finished yet!", children,
-  title, unclosable, className, ...props
+  title, unclosable, className, options, ...props
 }) {
 
   const [previousPopup, setPreviousPopup] = useState();
@@ -92,8 +92,7 @@ export default function Popup({
 
         }
 
-      }}
-    >
+      }}>
       <section className={styles.container}
         onMouseDown={(event) => {
         
@@ -124,6 +123,11 @@ export default function Popup({
           )}
         </section>
         <section {...props} className={`${styles.content}${className ? ` ${className}` : ""}`}>{children}</section>
+        {options && (
+          <section className={styles.options}>
+            {options}
+          </section>
+        )}
       </section>
     </section>
   );

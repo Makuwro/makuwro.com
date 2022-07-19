@@ -3,12 +3,15 @@ import React, { useEffect, useState } from "react";
 import Collaborator from "../Collaborator";
 import PropTypes from "prop-types";
 import { useLocation, useNavigate } from "react-router-dom";
+import Popup from "../popups/Popup";
 
 const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
 
 export default function ArtViewer({client}) {
 
   const [artInfo, setArtInfo] = useState();
+  const [ageRestricted, setAgeRestricted] = useState(false);
+  const [warningDismissed, setWarningDismissed] = useState(true);
   const [collaboratorComponents, setCollaboratorComponents] = useState([]);
   const [tagComponents, setTagComponents] = useState([]);
   const location = useLocation();
@@ -88,6 +91,27 @@ export default function ArtViewer({client}) {
 
   return artInfo ? (
     <section id={styles.viewer} onClick={close}>
+      {!warningDismissed && (
+        <Popup className={styles.warning} 
+          title="Content warning"
+          options={
+            <>
+              <button>Go back</button>
+              <button className="destructive">View anyway</button>
+            </>
+          }>
+          <section className="info">This content may not be appropriate for all ages. Viewer discretion is advised.</section>
+        </Popup>
+      )}
+      {ageRestricted && (
+        <Popup 
+          title="Age restricted"
+          options={
+            <button>Go back</button>
+          }>
+          You are not old enough to view this content.
+        </Popup>
+      )}
       <section id={styles.imageContainer} onClick={(event) => event.stopPropagation()}>
         <img src={artInfo.imagePath} />
       </section>
