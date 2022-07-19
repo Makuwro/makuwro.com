@@ -19,16 +19,10 @@ import ImageCropTool from "./components/ImageCropTool";
 import AlertManager from "./components/alerts/AlertManager";
 import Footer from "./components/Footer";
 
-const maintenance = false;
-const mode = "dev";
-const api = {
-  dev: "http://localhost:3001/",
-  prod: "https://api.makuwro.com/"
-}[mode];
-
 export default function App() {
 
   // Check if the website is under maintenance
+  const maintenance = false;
   if (maintenance) return <Maintenance />;
   
   // Set up the states
@@ -125,8 +119,7 @@ export default function App() {
 
   return (
     <>
-      <ConnectivityCheck 
-        api={api}
+      <ConnectivityCheck
         authenticated={client?.user !== undefined}
         ready={ready}
         setClient={setClient}
