@@ -42,7 +42,17 @@ export default function Comments({client, content}) {
 
       const comment = comments[i];
       commentComponents[i] = (
-        <Comment key={comment.id} client={client} object={comment} />
+        <Comment 
+          key={comment.id} 
+          client={client} 
+          object={comment} 
+          onDelete={() => {
+
+            const newComments = [...comments];
+            newComments.splice(i, 1);
+            setComments(newComments);
+
+          }} />
       );
 
     }
