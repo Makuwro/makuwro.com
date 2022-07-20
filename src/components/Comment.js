@@ -1,9 +1,41 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import styles from "../styles/Comment.module.css";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
-export default function Comment({client, object, onDelete}) {
+export default function Comment({client, object, onDelete, onEdit}) {
+
+  const [editing, setEditing] = useState(false);
+  const contentRef = useRef();
+
+  async function editComment() {
+
+    try {
+
+      // Check if the text content is the same.
+      const newText = contentRef.current.textContent;
+      if (newText.trim() !== object.content.trim()) {
+
+        // Request the server to update the comment.
+        await object.update({
+          content: newText
+        });
+
+        // Tell the component's parent that we updated the comment.
+        onEdit(newText);
+
+      }
+
+      // Everything's back to normal.
+      setEditing(false);
+
+    } catch (err) {
+
+      console.error(err);
+
+    }
+    
+  }
 
   async function deleteComment() {
 
@@ -23,9 +55,9 @@ export default function Comment({client, object, onDelete}) {
     <li className={styles.commentContainer}>
       <section className={styles.actions}>
         {isOwner && (
-          <button>
+          <button onClick={() => editing ? editComment() : setEditing(!editing)}>
             <span className="material-icons-round">
-              edit
+              {editing ? "save" : "edit"}
             </span>
           </button>
         )}
@@ -50,8 +82,12 @@ export default function Comment({client, object, onDelete}) {
         </Link>
         <section>
           <h1 className={styles.displayName}>{object.owner.displayName}</h1>
-          <section className={styles.content}>
-            {object.content.text}
+          <section 
+            className={styles.content} 
+            contentEditable={editing}
+            ref={contentRef}
+            suppressContentEditableWarning>
+            {object.content}
           </section>
         </section>
       </section>

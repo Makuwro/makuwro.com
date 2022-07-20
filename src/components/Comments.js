@@ -52,10 +52,20 @@ export default function Comments({client, content}) {
             newComments.splice(i, 1);
             setComments(newComments);
 
-          }} />
+          }}
+          onEdit={(newContent) => {
+
+            const newComments = [...comments];
+            newComments[i].content = newContent;
+            setComments(newComments);
+
+          }}/>
       );
 
     }
+
+    // Reverse the comment order.
+    commentComponents.reverse();
 
     // Save the components to the state.
     setCommentComponents(commentComponents);
@@ -75,15 +85,13 @@ export default function Comments({client, content}) {
           try {
 
             // Try to create the comment.
-            const comment = await content.createComment({
-              text: contentRef.current.textContent
-            });
+            const comment = await content.createComment(contentRef.current.textContent);
 
             // Reset the comment creator.
             contentRef.current.innerHTML = "";
 
             // Add the comment to the start of the list.
-            const newComments = comments;
+            const newComments = [...comments];
             newComments.unshift(comment);
             setComments(newComments);
 
@@ -135,7 +143,7 @@ export default function Comments({client, content}) {
               onKeyUp={checkForText} />
             <section id={styles.actions}>
               <section id={styles.formatter}>
-                <button>
+                <button disabled>
                   <span className="material-icons-round">
                     image
                   </span>
