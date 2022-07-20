@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import Comment from "./Comment";
 import styles from "../styles/Comment.module.css";
@@ -7,6 +7,10 @@ export default function Comments({client, content}) {
 
   const [ready, setReady] = useState(false);
   const [comments, setComments] = useState([]);
+  const [commentComponents, setCommentComponents] = useState([]);
+  const [canSendComment, setCanSendComment] = useState(false);
+  const [sendButtonPressed, setSendButtonPressed] = useState(false);
+  const contentRef = useRef();
 
   useEffect(() => {
 
@@ -15,25 +19,7 @@ export default function Comments({client, content}) {
       try {
 
         // Get the comments from the server.
-        const comments = await content.getAllComments();
-
-        // Convert the comment objects to Comment components.
-        for (let i = 0; comments.length > i; i++) {
-
-          const comment = comments[i];
-          comments[i] = (
-            <Comment
-              displayName={comment.owner.displayName}
-              username={comment.owner.username}
-              ownerId={comment.owner.id}>
-              {comment.content}
-            </Comment>
-          );
-
-        }
-
-        // Save the components to the state.
-        setComments(comments);
+        setComments(await content.getAllComments());
 
       } catch (err) {
 
@@ -44,6 +30,82 @@ export default function Comments({client, content}) {
     })();
 
   }, []);
+
+  useEffect(() => {
+
+    // Convert the comment objects to Comment components.
+    const commentComponents = [];
+    for (let i = 0; comments.length > i; i++) {
+
+      const comment = comments[i];
+      comments[i] = (
+        <Comment
+          displayName={comment.owner.displayName}
+          username={comment.owner.username}
+          ownerId={comment.owner.id}>
+          {comment.content}
+        </Comment>
+      );
+
+    }
+
+    // Save the components to the state.
+    setCommentComponents(commentComponents);
+
+  }, [comments]);
+
+  useEffect(() => {
+
+    (async () => {
+
+      if (sendButtonPressed) {
+
+        // Check if we can send the comment.
+        if (canSendComment) {
+
+          // This can throw an error, so let's catch it so the client won't crash.
+          try {
+
+            // Try to create the comment.
+            const comment = await content.createComment({
+              text: contentRef.current.textContent
+            });
+
+            // Add the comment to the start of the list.
+            const newComments = comments;
+            newComments.unshift(comment);
+            setComments(newComments);
+
+          } catch (err) {
+
+            alert(err);
+
+          }
+
+        }
+
+        setSendButtonPressed(false);
+
+      }
+
+    })();
+
+  }, [sendButtonPressed]);
+
+  function checkForText(event) {
+
+    // Check if there is text.
+    if (event.target.textContent) {
+
+      setCanSendComment(true);
+
+    } else {
+
+      setCanSendComment(false);
+
+    }
+
+  }
 
   return (
     <section id={styles.main}>
@@ -56,13 +118,39 @@ export default function Comments({client, content}) {
               placeholder="This looks really cool!"
               className={styles.content}
               contentEditable 
-              suppressContentEditableWarning />
+              suppressContentEditableWarning
+              ref={contentRef}
+              onKeyDown={checkForText}
+              onKeyUp={checkForText} />
+            <section id={styles.actions}>
+              <section id={styles.formatter}>
+                <button>
+                  <span className="material-icons-round">
+                    image
+                  </span>
+                  <span className={styles.buttonText}>
+                    Attach image
+                  </span>
+                </button>
+              </section>
+              <button 
+                id={styles.send} 
+                disabled={!canSendComment || sendButtonPressed}
+                onClick={() => setSendButtonPressed(true)}>
+                <span className="material-icons-round">
+                  send
+                </span>
+                <span className={styles.buttonText}>
+                  Post
+                </span>
+              </button>
+            </section>
           </section>
         </section>
       )}
-      {comments[0] ? (
+      {commentComponents[0] ? (
         <ul className={styles.comments}>
-          {comments}
+          {commentComponents}
         </ul>
       ) : (
         <p>
