@@ -210,7 +210,11 @@ export default function ArtViewer({client}) {
             {
               isOwner ? (
                 <>
-                  <button id={styles.edit}>Edit</button>
+                  <button 
+                    id={styles.edit} 
+                    onClick={() => navigate(`${pathname}?action=update-art`)}>
+                    Edit
+                  </button>
                   <button className="destructive" id={styles.delete} onClick={deleteArt}>Delete</button>
                 </>
               ) : (
