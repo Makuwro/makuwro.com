@@ -27,6 +27,9 @@ export default function Comments({client, content}) {
 
       }
 
+      // We're ready!
+      setReady(true);
+
     })();
 
   }, []);
@@ -38,13 +41,8 @@ export default function Comments({client, content}) {
     for (let i = 0; comments.length > i; i++) {
 
       const comment = comments[i];
-      comments[i] = (
-        <Comment
-          displayName={comment.owner.displayName}
-          username={comment.owner.username}
-          ownerId={comment.owner.id}>
-          {comment.content}
-        </Comment>
+      commentComponents[i] = (
+        <Comment key={comment.id} client={client} object={comment} />
       );
 
     }
@@ -70,6 +68,9 @@ export default function Comments({client, content}) {
             const comment = await content.createComment({
               text: contentRef.current.textContent
             });
+
+            // Reset the comment creator.
+            contentRef.current.innerHTML = "";
 
             // Add the comment to the start of the list.
             const newComments = comments;
@@ -148,14 +149,16 @@ export default function Comments({client, content}) {
           </section>
         </section>
       )}
-      {commentComponents[0] ? (
-        <ul className={styles.comments}>
-          {commentComponents}
-        </ul>
-      ) : (
-        <p>
-          Would you look at that: there's no comments!{client.user ? " The time is now." : ""}
-        </p>
+      {ready && (
+        commentComponents[0] ? (
+          <ul id={styles.comments}>
+            {commentComponents}
+          </ul>
+        ) : (
+          <p>
+            Would you look at that: there's no comments!{client.user ? " The time is now." : ""}
+          </p>
+        )
       )}
     </section>
   );
