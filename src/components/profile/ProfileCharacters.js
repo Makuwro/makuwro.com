@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function ProfileCharacters({client, owner, cache, setCache, styles}) {
 
   const [ready, setReady] = useState(false);
   const [collection, setCollection] = useState([]);
+  const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -65,7 +66,7 @@ export default function ProfileCharacters({client, owner, cache, setCache, style
   return (
     <section>
       {client.user?.id === owner.id && (
-        <button>Create character profile</button>
+        <button onClick={() => navigate(`${location.pathname}?action=create-character`)}>Create character profile</button>
       )}
       {collection[0] ? (
         <section id={styles.characterContainer}>
