@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import { useLocation, useNavigate } from "react-router-dom";
 import Popup from "../popups/Popup";
 import { UnderageError } from "makuwro-errors";
+import Comments from "../Comments";
 
 export default function ArtViewer({client}) {
 
@@ -13,15 +14,17 @@ export default function ArtViewer({client}) {
   const [contentWarning, setContentWarning] = useState();
   const [collaboratorComponents, setCollaboratorComponents] = useState([]);
   const [tagComponents, setTagComponents] = useState([]);
+  const [commentsVisible, setCommentsVisible] = useState(false);
   const {pathname} = useLocation();
   const [username, setUsername] = useState();
+  const [cache, setCache] = useState();
 
   useEffect(() => {
 
     (async () => {
 
       // Check if we're looking for an art piece.
-      const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?$/gm;
+      const artRegex = /^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/?/gm;
       const [match] = [...pathname.matchAll(artRegex)];
       if (match) {
 
@@ -31,8 +34,11 @@ export default function ArtViewer({client}) {
           const {groups: {username, slug}} = match;
           setUsername(username);
 
-          // Get art from the server.
-          const art = await client.getArt(username, slug);
+          // Get art from the cache or the server.
+          const art = cache?.owner.username === username && cache.slug === slug ? cache : await client.getArt(username, slug);
+          
+          // Save the art for later.
+          setCache(art);
     
           // Iterate through each collaborator.
           const collaborators = [art.owner];
@@ -66,6 +72,13 @@ export default function ArtViewer({client}) {
 
           // Change the document title.
           document.title = `${art.owner.displayName} (${art.owner.username}): ${art.description || "Undescribed art"}`;
+
+          // Check if we should show comments.
+          if (/^\/(?<username>[^/]+)\/art\/(?<slug>[^/]+)\/comments\/?$/gm.test(pathname)) {
+
+            setCommentsVisible(true);
+
+          }
     
         } catch (err) {
     
@@ -100,6 +113,13 @@ export default function ArtViewer({client}) {
 
   }
 
+  function closeComments() {
+
+    setCommentsVisible(false);
+    navigate(`/${username}/art/${art.slug}`)
+
+  }
+
   async function deleteArt() {
 
     if (confirm("Are you sure you want to delete this art? No takesies-backsies!")) {
@@ -129,7 +149,8 @@ export default function ArtViewer({client}) {
     return (
       <section id={styles.viewer} onClick={closeWindow}>
         {contentWarning && (
-          <Popup className={styles.warning} 
+          <Popup 
+            className={styles.warning} 
             title="Content warning"
             options={
               <>
@@ -141,6 +162,15 @@ export default function ArtViewer({client}) {
             {art.ageRestrictionLevel > 0 && (
               <section className="info">This content may not be appropriate for all ages. Viewer discretion is advised.</section>
             )}
+          </Popup>
+        )}
+        {!contentWarning && commentsVisible && (
+          <Popup
+            title="Comments"
+            onClose={closeComments}>
+              <Comments 
+                client={client}
+                content={art} />
           </Popup>
         )}
         <section id={styles.imageContainer}>
@@ -173,7 +203,10 @@ export default function ArtViewer({client}) {
             </section>
           </section>
           <section id={styles.actions}>
-            <button id={styles.like}>Like</button>
+            <button id={styles.like}>Like</button>      
+            <button id={styles.commentButton} onClick={() => navigate(`/${art.owner.username}/art/${art.slug}/comments`)}>
+              Comment
+            </button>
             {
               isOwner ? (
                 <>
@@ -184,9 +217,6 @@ export default function ArtViewer({client}) {
                 <button className="destructive" id={styles.report}>Report</button>
               )
             }
-          </section>
-          <section>
-            Comments disabled
           </section>
         </section>
       </section>

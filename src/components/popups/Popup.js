@@ -71,7 +71,10 @@ export default function Popup({
     <section 
       className={`${styles.background} ${popupOpen ? styles.open : ""}`} 
       onMouseDown={() => setClickedInside(false)} 
-      onClick={() => close()} 
+      onClick={(event) => {
+        event.stopPropagation();
+        close();
+      }} 
       onMouseOver={() => setCursorOverBG(true)} 
       onMouseOut={() => setCursorOverBG(false)}
       onTransitionEnd={() => {

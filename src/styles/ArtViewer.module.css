@@ -1,6 +1,11 @@
 #actions {
   display: flex;
   gap: 15px;
+  flex-direction: column;
+}
+
+#actions button {
+  text-align: left;
 }
 
 #details {
