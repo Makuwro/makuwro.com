@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export default function ProfileStories({client, owner, cache, setCache, styles, profileType}) {
 
   const [ready, setReady] = useState(false);
   const [collection, setCollection] = useState([]);
+  const location = useLocation();
   const navigate = useNavigate();
   const isCharacter = profileType === "character";
   const isOwner = client.user?.id === (owner?.owner || owner).id;
@@ -44,7 +45,7 @@ export default function ProfileStories({client, owner, cache, setCache, styles, 
   return (
     <section>
       {client.user?.id === owner.id && (
-        <button>Create story</button>
+        <button onClick={() => navigate(`${location.pathname}?action=create-story`)}>Create story</button>
       )}
       {
         ready && (
