@@ -30,8 +30,6 @@ export default function Popup({
       // Initialize the popup.
       const checkForEscape = ({key}) => {
 
-        console.log(key);
-
         if (key === "Escape") {
 
           close();
