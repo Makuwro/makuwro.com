@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import TagInput from "../../input/TagInput";
 import ContentInput from "../../input/ContentInput";
 import Optional from "../../Optional";
@@ -6,7 +7,7 @@ import Dropdown from "../../input/Dropdown";
 import PropTypes from "prop-types";
 import styles from "../../../styles/Library.module.css";
 import SlugInput from "../../input/SlugInput";
-import Popup from "../../popups/Popup";
+import Popup from "../../Popup";
 
 export default function ArtSubmitter({client, submitting, data, setData, setPermissions, submitForm}) {
 
@@ -14,7 +15,13 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
   const [imagePath, setImagePath] = useState();
   const [warnUnfinished, setWarnUnfinished] = useState();
   const [canSubmit, setCanSubmit] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const image = useRef();
+  const [searchParams] = useSearchParams();
+  const action = searchParams.get("action");
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
 
@@ -56,7 +63,22 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
 
   }
 
-  return (
+  useEffect(() => {
+
+    if (action === "upload-art") {
+
+      setPopupOpen(true);
+      setMounted(true);
+
+    } else {
+
+      setPopupOpen(false);
+
+    }
+
+  }, [action]);
+
+  return mounted ? (
     <Popup
       title="Upload art"
       warnUnfinished={warnUnfinished}
@@ -66,7 +88,9 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
           onClick={checkBeforeSubmitting}>
           Upload art
         </button>
-      }>
+      }
+      open={popupOpen}
+      onClose={() => setMounted(false) || navigate(location.pathname)}>
       <form onSubmit={checkBeforeSubmitting}>
         <section>
           <h1>Basics</h1>
@@ -257,7 +281,7 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
         </section>
       </form>
     </Popup>
-  );
+  ) : null;
 
 }
 

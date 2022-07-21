@@ -193,7 +193,7 @@ export default function Submitter({client, art}) {
 
       } else {
 
-        navigate(`/signin?redirect=${location.pathname + location.search}`);
+        navigate(`/signin?redirect=${location.pathname}${location.search}`);
 
       }
 

@@ -10,22 +10,30 @@ export default function ProfileCharacters({client, owner, cache, setCache, style
 
   useEffect(() => {
 
-    // Check if we already have the data.
-    if (!cache.characters) {
+    (async () => {
 
-      // Get art data from the server.
+      // Check if we already have the data.
+      let characterData = cache.characters;
+      if (!characterData) {
 
-      // Save the data to the cache.
-      const characterData = [];
+        // Get the data from the server.
+        characterData = await owner.getAllCharacters();
+
+        // Save it to the cache for next time.
+        setCache({...cache, characters: characterData});
+
+      }
+
+      // Turn the objects into components.
       const newCollection = [];
       for (let i = 0; characterData.length > i; i++) {
 
-        const {name, owner: {username}, image, slug} = characterData[i];
+        const {name, owner: {username}, image, slug, id} = characterData[i];
 
         newCollection.push(
-          <Link to={`/${username}/characters/${slug}`}>
+          <Link key={id} to={`/${username}/characters/${slug}`}>
             <section className={styles.characterAvatar}>
-              <img src={image} />
+              <img src={`https://cdn.makuwro.com/${image || "global/pfp.png"}`} />
             </section>
             <section>
               {name}
@@ -36,9 +44,8 @@ export default function ProfileCharacters({client, owner, cache, setCache, style
       }
       setCollection(newCollection);
 
-    }
-
-    setReady(true);
+      setReady(true);
+    })();
 
   }, []);
 
@@ -47,14 +54,16 @@ export default function ProfileCharacters({client, owner, cache, setCache, style
       {client.user?.id === owner.id && (
         <button onClick={() => navigate(`${location.pathname}?action=create-character`)}>Create character profile</button>
       )}
-      {collection[0] ? (
-        <section id={styles.characterContainer}>
-          {collection}
-        </section>
-      ) : (
-        <p>{owner.displayName} doesn't have any public character profiles :(</p>
+      {ready && (
+        collection[0] ? (
+          <section id={styles.characterContainer}>
+            {collection}
+          </section>
+        ) : (
+          <p>{owner.displayName} doesn't have any public character profiles :(</p>
+        )
       )}
     </section>
-  )
+  );
 
 }

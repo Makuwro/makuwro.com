@@ -1,19 +1,41 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import Dropdown from "../../input/Dropdown";
 import TagInput from "../../input/TagInput";
 import Optional from "../../Optional";
 import ContentInput from "../../input/ContentInput";
 import SlugInput from "../../input/SlugInput";
-import Popup from "../../popups/Popup";
+import Popup from "../../Popup";
 
 export default function CharacterSubmitter({client, submitting, data, setData, setPermissions, submitForm}) {
 
   const [creatorType, setCreatorType] = useState(0);
   const [warnUnfinished, setWarnUnfinished] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const avatarInput = useRef();
+  const [searchParams] = useSearchParams();
+  const action = searchParams.get("action");
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  return (
+  useEffect(() => {
+
+    if (action === "create-character") {
+
+      setPopupOpen(true);
+      setMounted(true);
+
+    } else {
+
+      setPopupOpen(false);
+
+    }
+
+  }, [action]);
+
+  return mounted ? (
     <Popup 
       title="Create character"
       warnUnfinished={warnUnfinished}
@@ -23,7 +45,9 @@ export default function CharacterSubmitter({client, submitting, data, setData, s
           onClick={submitForm}>
           Create character
         </button>
-      }>
+      }
+      open={popupOpen}
+      onClose={() => setMounted(false) || navigate(location.pathname)}>
         <form onSubmit={submitForm}>
           <section>
             <h1>Basics</h1>
@@ -155,7 +179,7 @@ export default function CharacterSubmitter({client, submitting, data, setData, s
           </section>
         </form>
     </Popup>
-  );
+  ) : null;
 
 }
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import Popup from "./popups/Popup";
+import Popup from "./Popup";
 import styles from "../styles/ImageCropTool.module.css";
 
 export default function ImageCropTool({imageUrl}) {
