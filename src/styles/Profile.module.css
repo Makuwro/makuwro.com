@@ -289,6 +289,10 @@
   height: 100%;
 }
 
+.characterAvatar + section {
+  text-align: center;
+}
+
 .orgAvatar {
   border-radius: 5px;
 }
