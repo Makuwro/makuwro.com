@@ -6,7 +6,6 @@ import Header from "./components/Header";
 import Profile from "./components/Profile";
 import Maintenance from "./components/Maintenance";
 import ArtViewer from "./components/library/ArtViewer";
-import PopupManager from "./components/popups/PopupManager";
 import Authenticator from "./components/Authenticator";
 import Literature from "./components/library/Literature";
 import Settings from "./components/Settings";
@@ -126,7 +125,7 @@ export default function App() {
       />
       {
         ready && client && (
-          <PopupManager>
+          <>
             <Authenticator open={signInOpen} shownLocation={shownLocation} client={client} />
             <ImageCropTool client={client} imageUrl={imageUrl} />
             <Submitter client={client} />
@@ -200,7 +199,7 @@ export default function App() {
               </Routes>
               <Footer />
             </section>
-          </PopupManager>
+          </>
         )
       }
     </>

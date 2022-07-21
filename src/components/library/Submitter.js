@@ -4,7 +4,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import CharacterSubmitter from "./submitters/CharacterSubmitter";
 import ArtSubmitter from "./submitters/ArtSubmitter";
 import StorySubmitter from "./submitters/StorySubmitter";
-import Popup from "../popups/Popup";
 
 export default function Submitter({client, art}) {
   
@@ -26,7 +25,6 @@ export default function Submitter({client, art}) {
       postComments: 1
     }
   });
-  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const action = searchParams.get("action");
@@ -69,49 +67,99 @@ export default function Submitter({client, art}) {
       // so this won't work if we're not signed in.
       if (client.user) {
 
-        let comp;
         let type;
-        let title;
+        let submitting = false;
+
+        const submitForm = async (event) => {
+
+          event.preventDefault();
+          if (!submitting) {
+            
+            submitting = true;
+            try {
+      
+              const props = {...data, slug: data.slug || data.name?.toLowerCase().replaceAll(/[^a-zA-Z0-9_]/gm, "-")};
+      
+              // Turn the collaborators array into an array of user IDs
+              for (let i = 0; (props.collaborators?.length || 0) > i; i++) {
+      
+                props.collaborators[i] = props.collaborators[i].id;
+      
+              }
+      
+              for (let i = 0; (props.worlds?.length || 0) > i; i++) {
+      
+                data.worlds[i] = data.worlds[i].id;
+      
+              }
+      
+              for (let i = 0; (props.characters?.length || 0) > i; i++) {
+      
+                props.characters[i] = props.characters[i].id;
+      
+              }
+      
+              for (let i = 0; (props.folders?.length || 0) > i; i++) {
+      
+                props.folders[i] = props.folders[i].id;
+      
+              }
+
+              // Now we're ready to submit the request.
+              await client.user[`create${type}`](props.slug, props);
+
+              if (type === "Character") {
+
+                type += "s";
+
+              }
+      
+              navigate(`/${client.user.username}/${type.toLowerCase()}/${props.slug}`);
+              submitting = false;
+      
+            } catch ({message}) {
+      
+              alert(message);
+              submitting = false;
+      
+            }
+      
+          }
+      
+        };
 
         switch (action) {
 
           case "create-character":
 
             // Set the component.
-            comp = (
+            setPopup(
               <CharacterSubmitter 
                 client={client}
                 submitting={submitting}
                 data={data}
                 setData={setDataWrapper}
                 setPermissions={setPermissions}
+                submitForm={submitForm}
               />
             );
 
             // Set up the popup.
-            title = "Create character";
-            setData((oldData) => ({
-              ...oldData
-            }));
-            type = "characters";
+            type = "Character";
             break;
 
           case "update-art":
           case "upload-art": {
 
-            // Set up the popup.
-            const update = art !== undefined;
-            title = `Up${update ? "date" : "load"} art`;
-
             // Set up the comp.
-            comp = (
+            setPopup(
               <ArtSubmitter 
                 client={client}
                 submitting={submitting}
                 data={data}
                 setData={setDataWrapper}
                 setPermissions={setPermissions}
-                update={update}
+                submitForm={submitForm}
               />
             );
 
@@ -119,143 +167,33 @@ export default function Submitter({client, art}) {
             document.title = "Upload art to Makuwro";
 
             // Remember that this is art.
-            type = "art";
-
+            type = "Art";
             break;
 
           }
 
           case "create-story":
-            comp = (
+            setPopup(
               <StorySubmitter 
                 client={client}
                 submitting={submitting}
                 data={data}
                 setData={setDataWrapper}
                 setPermissions={setPermissions}
+                submitForm={submitForm}
               />
             );
-
-            title = "Create a story";
             break;
 
           default:
             break;
 
         }
-
-        if (type) {
-
-          const submitForm = async (event) => {
-
-            event.preventDefault();
-            if (!submitting) {
-              
-              setSubmitting(true);
-              try {
-        
-                const {
-                  name, slug = data.name?.toLowerCase().replaceAll(/[^a-zA-Z0-9_]/gm, "-"),
-                  collaborators, worlds, characters, folders, description, tags, permissions,
-                  ageRestrictionLevel, contentWarning, image
-                } = data;
-        
-                // Turn the collaborators array into an array of user IDs
-                const userIds = [];
-                for (let i = 0; (collaborators?.length || 0) > i; i++) {
-        
-                  userIds[i] = collaborators[i].id;
-        
-                }
-        
-                const worldIds = [];
-                for (let i = 0; (worlds?.length || 0) > i; i++) {
-        
-                  worldIds[i] = worlds[i].id;
-        
-                }
-        
-                const characterIds = [];
-                for (let i = 0; (characters?.length || 0) > i; i++) {
-        
-                  characterIds[i] = characters[i].id;
-        
-                }
-        
-                const folderIds = [];
-                for (let i = 0; (folders?.length || 0) > i; i++) {
-        
-                  folderIds[i] = folders[i].id;
-        
-                }
-        
-                // Set up form data
-                const formData = new FormData();
-                formData.append("image", image);
-                formData.append("description", description);
-                formData.append("tags", JSON.stringify(tags));
-                formData.append("folders", JSON.stringify(folderIds));
-                formData.append("worlds", JSON.stringify(worldIds));
-                formData.append("characters", JSON.stringify(characterIds));
-                formData.append("permissions", JSON.stringify(permissions));
-                formData.append("ageRestrictionBLevel", ageRestrictionLevel);
-                formData.append("contentWarning", contentWarning);
-                formData.append("slug", slug);
-        
-                if (type !== "art") {
-        
-                  formData.append("name", name);
-        
-                }
-        
-                if (type !== "characters") {
-                  
-                  formData.append("collaborators", JSON.stringify(userIds));
-        
-                }
-        
-                // If this isn't false, that means we have to update the content
-                // rather than create new content.
-                const oldSlug = art?.slug;
-        
-                // Now we're ready to submit the request.
-                await client.requestREST(`contents/${type}/${client.user.username}/${oldSlug || slug}`, {
-                  body: formData,
-                  method: oldSlug ? "PATCH" : "POST"
-                });
-        
-                navigate(`/${client.user.username}/${type}/${slug}`);
-        
-              } catch ({message}) {
-        
-                alert(message);
-                setSubmitting(false);
-        
-              }
-        
-            }
-        
-          };
-
-          setPopup(
-            <Popup title={title} warnUnfinished onClose={() => {
-              
-              navigate(location.pathname);
-              setPopup(null);
-            
-            }}>
-              <form onSubmit={submitForm}>
-                {comp}
-              </form>
-            </Popup>
-          );
-
-        }
         
 
       } else {
 
-        navigate(`/signin?redirect=${location.pathname + location.search}`);
+        navigate(`/signin?redirect=${location.pathname}${location.search}`);
 
       }
 

@@ -14,6 +14,7 @@
   --box-shadow: 0 2px 3.6px 0 rgb(0 0 0 / 13%), 0 0px 9px 4px rgb(0 0 0 / 11%);
   --header: #313237;
   --formatter-selected: #4a4a4b;
+  --placeholder: #6c6c6e;
 }
 
 .light {
@@ -248,10 +249,6 @@ u {
   border-bottom: 1px solid;
 }
 
-li {
-  margin-top: 1rem;
-}
-
 p, li, dd, .info {
   color: var(--text);
 }
@@ -343,4 +340,10 @@ button:active:hover, input[type="submit"]:active:hover, input[type="button"]:act
 
 .material-icons-round {
   user-select: none;
+}
+
+[placeholder]:empty::before {
+  content: attr(placeholder);
+  cursor: text;
+  color: var(--placeholder);
 }

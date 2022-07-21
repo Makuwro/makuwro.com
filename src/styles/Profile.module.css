@@ -281,6 +281,12 @@
   background-color: #17161c;
   display: block;
   border-radius: 100%;
+  overflow: hidden;
+}
+
+.characterAvatar img {
+  width: 100%;
+  height: 100%;
 }
 
 .orgAvatar {

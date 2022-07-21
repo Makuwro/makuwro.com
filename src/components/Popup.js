@@ -1,18 +1,15 @@
-import styles from "../../styles/Popup.module.css";
-import React, { useState, useEffect, useContext } from "react";
-import { PopupContext } from "./PopupManager";
+import styles from "../styles/Popup.module.css";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 export default function Popup({
   onClose, warnUnfinished, exitMessage = "Are you sure you want to exit? You aren't finished yet!", children,
-  title, unclosable, className, options, ...props
+  title, unclosable, className, options, open, ...props
 }) {
 
-  const [previousPopup, setPreviousPopup] = useState();
   const [cursorOverBG, setCursorOverBG] = useState(false);
   const [clickedInside, setClickedInside] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
-  const {currentPopup, setCurrentPopup} = useContext(PopupContext);
   const [noLongerNeeded, setNoLongerNeeded] = useState(false);
 
   function close(bypass) {
@@ -24,65 +21,56 @@ export default function Popup({
 
     }
 
-  } 
+  }
 
   useEffect(() => {
 
-    // Initialize the popup.
-    const checkForEscape = ({keyCode}) => {
+    if (open) {
 
-      if (keyCode === 27) {
+      // Initialize the popup.
+      const checkForEscape = ({key}) => {
 
-        close();
+        if (key === "Escape") {
 
-      }
+          close();
 
-    };
+        }
 
-    // Check if there's currently a popup.
-    if (currentPopup) {
+      };
 
-      // Temporarily close that popup, but save it.
-      currentPopup.toggle(false);
-      setPreviousPopup(currentPopup);
+      // Open this popup.
+      setTimeout(() => setPopupOpen(true), 0);
+
+      // Listen for keydown.
+      document.addEventListener("keydown", checkForEscape);
+
+      return () => {
+
+        document.removeEventListener("keydown", checkForEscape);
+
+      };
+
+    } else {
+
+      setPopupOpen(false);
 
     }
 
-    // Set this popup as the current popup, just in case another popup shows up.
-    setCurrentPopup({
-      toggle: (open) => setPopupOpen(open)
-    });
-
-    // Open this popup.
-    setTimeout(() => setPopupOpen(true), 0);
-
-    // Listen for keydown.
-    document.addEventListener("keydown", checkForEscape);
-
-    return () => {
-
-      document.removeEventListener("keydown", checkForEscape);
-
-    };
-
-  }, []);
+  }, [open]);
 
   return (
     <section 
       className={`${styles.background} ${popupOpen ? styles.open : ""}`} 
       onMouseDown={() => setClickedInside(false)} 
-      onClick={() => close()} 
+      onClick={(event) => {
+        event.stopPropagation();
+        close();
+      }} 
       onMouseOver={() => setCursorOverBG(true)} 
       onMouseOut={() => setCursorOverBG(false)}
       onTransitionEnd={() => {
 
         if (!popupOpen && noLongerNeeded) {
-
-          if (previousPopup) {
-    
-            previousPopup.toggle(true);
-            
-          }
 
           if (onClose) {
 
