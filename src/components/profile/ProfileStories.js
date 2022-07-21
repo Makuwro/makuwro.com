@@ -12,11 +12,30 @@ export default function ProfileStories({client, owner, cache, setCache, styles, 
 
   useEffect(() => {
 
-    // Check if we already have the data.
-    if (!cache.stories) {
+    (async () => {
+
+      // Check if we already have the data.
+      let storyData = cache.stories;
+      if (!storyData) {
+
+        try {
+
+          // Get the data from the server.
+          storyData = await owner.getAllStories();
+
+          // Save it to the cache for next time.
+          setCache({...cache, stories: storyData});
+
+        } catch (err) {
+
+          console.error(err);
+
+        }
+
+      }
 
       // Save the data to the cache.
-      const data = owner.stories || [];
+      const data = storyData || [];
       const newCollection = [];
       for (let i = 0; data.length > i; i++) {
 
@@ -35,10 +54,9 @@ export default function ProfileStories({client, owner, cache, setCache, styles, 
 
       }
       setCollection(newCollection);
+      setReady(true);
 
-    }
-
-    setReady(true);
+    })()
 
   }, []);
 
