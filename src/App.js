@@ -150,7 +150,7 @@ export default function App() {
                 <Route path={"/library"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
                 <Route path={"/library/:category"} element={<Home shownLocation={shownLocation} setLocation={setLocation} />} />
                 {[
-                  "/:username", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id", "/:username/:tab/:id/:subtab"
+                  "/:username", "/:username/:tab", "/:username/:tab/:id", "/:username/:tab/:id", "/:username/:tab/:id/:subTab"
                 ].map((path, index) => {
                   
                   return <Route key={index} path={path} element={(

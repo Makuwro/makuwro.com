@@ -13,7 +13,8 @@ import ProfileWorlds from "./profile/ProfileWorlds";
 
 export default function Profile({shownLocation, setLocation, client, setCriticalError}) {
 
-  const {username, tab: tabName, id} = useParams();
+  const {username, tab: tabName, id, subTab: subTabName} = useParams();
+  const [profileType, setProfileType] = useState("user");
   const [owner, setOwner] = useState();
   const [ready, setReady] = useState(false);
   const [content, setContent] = useState(null);
@@ -26,7 +27,7 @@ export default function Profile({shownLocation, setLocation, client, setCritical
     let mounted = true;
     (async () => {
 
-      if (!owner && !matchPath({path: "/:username/art/:id"}, location.pathname)) {
+      if (matchPath({path: "/:username/:tab"}, location.pathname) || matchPath({path: "/:username"}, location.pathname)) {
     
         try {
 
@@ -50,6 +51,7 @@ export default function Profile({shownLocation, setLocation, client, setCritical
     
           if (mounted) {
     
+            setProfileType("user");
             setReady(true);
     
           }
@@ -69,7 +71,27 @@ export default function Profile({shownLocation, setLocation, client, setCritical
           }
 
         }
+
+        return;
   
+      }
+      
+      const params = (matchPath({path: "/:username/characters/:slug"}, location.pathname) || matchPath({path: "/:username/characters/:slug/:subTab"}, location.pathname))?.params;
+      if (params && (profileType !== "character" || (params.slug !== owner.slug || params.username !== owner.owner?.username))) {
+
+        try {
+
+          let character = await client.getCharacter(username, id);
+          setProfileType("character");
+          setOwner(character);
+          setReady(true);
+
+        } catch (err) {
+
+          console.error(err);
+
+        }
+
       }
 
     })();
@@ -80,7 +102,7 @@ export default function Profile({shownLocation, setLocation, client, setCritical
 
     };
 
-  }, [owner, id]);
+  }, [owner, username, id, tabName]);
 
   const currentPathName = location.pathname;
   useEffect(() => {
@@ -109,30 +131,40 @@ export default function Profile({shownLocation, setLocation, client, setCritical
         stories: <ProfileStories owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />,
         worlds: <ProfileWorlds owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />
       }
-      setContent(tabs[tabName || "about"]);
+
+      if (profileType === "character") {
+
+        delete tabs.blog;
+        delete tabs.characters;
+        delete tabs.organizations;
+
+      }
+
+      setContent(tabs[subTabName || tabName || "about"]);
 
       // Let's reset the nav options.
       // First, iterate through the option list.
-      const profileUrlBase = `/${owner.username}`;
-      const navChildren = ["About", "Art", "Blog", "Characters", "Organizations", "Stories", "Worlds"];
+      const isCharacter = profileType === "character";
+      const profileUrlBase = `/${(isCharacter ? owner.owner : owner).username}${isCharacter ? `/characters/${owner.slug}` : ""}`;
+      const navChildren = Object.keys(tabs);
       for (let i = 0; navChildren.length > i; i++) {
 
         // Then replace the string with a Link component.
         const optionText = navChildren[i];
-        const path = `${profileUrlBase}${i !== 0 ? `/${optionText.toLowerCase()}` : ""}`;
+        const path = `${profileUrlBase}${i !== 0 ? `/${optionText}` : ""}`;
         navChildren[i] = (
           <Link
             key={path}
             className={currentPathName === path ? styles.selected : null} 
             to={path}>
-              {optionText}
+              {optionText[0].toUpperCase() + optionText.slice(1)}
           </Link>
         );
 
         if (currentPathName === path) {
 
           // Update the document title.
-          document.title = `${owner.displayName} (${owner.username})${i === 0 ? "" : ` / ${optionText}`}`
+          document.title = `${owner.name || `${owner.displayName} (${owner.username})`}${i === 0 ? "" : ` / ${optionText}`}`
 
         }
 
@@ -143,7 +175,7 @@ export default function Profile({shownLocation, setLocation, client, setCritical
 
     }
 
-  }, [owner, tabName]);
+  }, [owner, tabName, profileType, subTabName]);
 
   const [actionMenuOpen, setActionMenuOpen] = useState(false);
 
@@ -152,10 +184,10 @@ export default function Profile({shownLocation, setLocation, client, setCritical
       <section id={styles.metadata}>
         {owner && (
           <section id={styles.avatar}>
-            <img src={"https://yt3.ggpht.com/LmbLsIs7VUZ7dJbwW9JBuKXjMrk3qmXB7oiplq5LQER4nrk7px9wcJvnYVpE065dIydMtdjz2Q=s88-c-k-c0x00ffffff-no-rj" || `https://cdn.makuwro.com/${owner.avatarPath}`} />
+            <img src={`https://cdn.makuwro.com/${owner.id}/avatar`} />
           </section>
         )}
-        <h1>{owner ? (owner.displayName || `@${owner.username}`) : "User not found"}</h1>
+        <h1>{owner ? (owner.name || owner.displayName || `@${owner.username}`) : "User not found"}</h1>
         <h2>{owner ? "CEO of Makuwro, LLC" : "But don't worry: they'll come around some day."}</h2>
         <section id={styles.actions}>
           {owner && owner.id === client.user?.id ? (
