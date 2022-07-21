@@ -136,13 +136,22 @@ export default function Authenticator({client, open, shownLocation}) {
 
   }, [client.user, pathname, open]);
 
-  return popupOpen ? (
-    <Popup title={`Welcome${!register ? " back" : ""} to Makuwro!`} onClose={() => {
+  return (
+    <Popup 
+      title={`Welcome${!register ? " back" : ""} to Makuwro!`} 
+      onClose={() => {
       
-      setPopupOpen(false);
-      onClose();
+        setPopupOpen(false);
+        onClose();
 
-    }}>
+      }}
+      open={popupOpen}
+      options={
+        <>
+          <button disabled={buttonDisabled} onClick={authenticate}>{register ? "Sign up" : "Sign in"}</button>
+          {register ? <Link to="/signin">I already have an account</Link> : <p>Don't have an account? <Link to="/register">Make one!</Link></p>}
+        </>
+      }>
       <section id={styles.authenticator}>
         <form onSubmit={authenticate}>
           <label htmlFor="username">Username</label>
@@ -166,12 +175,10 @@ export default function Authenticator({client, open, shownLocation}) {
           ) : (
             <p>I forgot my password</p>
           )}
-          <input type="submit" disabled={buttonDisabled} value={register ? "Sign up" : "Sign in"} />
-          {register ? <Link to="/signin">I already have an account</Link> : <p>Don't have an account? <Link to="/register">Make one!</Link></p>}
         </form>
       </section>
     </Popup>
-  ) : null;
+  );
 
 }
 
