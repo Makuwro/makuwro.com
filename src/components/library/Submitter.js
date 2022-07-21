@@ -106,11 +106,16 @@ export default function Submitter({client, art}) {
               }
 
               // Now we're ready to submit the request.
+              console.log(type)
               await client.user[`create${type}`](props.slug, props);
 
               if (type === "Character") {
 
                 type += "s";
+
+              } else if (type === "Story") {
+
+                type = "stories";
 
               }
       
@@ -183,6 +188,9 @@ export default function Submitter({client, art}) {
                 submitForm={submitForm}
               />
             );
+
+            // Remember that this a story.
+            type = "Story";
             break;
 
           default:
