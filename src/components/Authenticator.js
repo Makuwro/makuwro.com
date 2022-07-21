@@ -4,7 +4,7 @@ import styles from "../styles/Authenticator.module.css";
 import BirthdateDropdown from "./input/BirthdateDropdown";
 import Checkbox from "./input/Checkbox";
 import PropTypes from "prop-types"; 
-import Popup from "./popups/Popup";
+import Popup from "./Popup";
 
 export default function Authenticator({client, open, shownLocation}) {
 

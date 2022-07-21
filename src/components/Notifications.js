@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Popup from "./popups/Popup";
+import Popup from "./Popup";
 import PropTypes from "prop-types";
 import Notification from "./Notification";
 

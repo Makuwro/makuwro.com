@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import Popup from "../../popups/Popup";
+import Popup from "../../Popup";
 
 function PermissionManager() {
 

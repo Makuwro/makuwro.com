@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Collaborator from "../Collaborator";
 import PropTypes from "prop-types";
 import { useLocation, useNavigate } from "react-router-dom";
-import Popup from "../popups/Popup";
+import Popup from "../Popup";
 import { UnderageError } from "makuwro-errors";
 import Comments from "../Comments";
 
