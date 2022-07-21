@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function ProfileStories({client, owner, cache, setCache, styles}) {
+export default function ProfileStories({client, owner, cache, setCache, styles, profileType}) {
 
   const [ready, setReady] = useState(false);
   const [collection, setCollection] = useState([]);
   const navigate = useNavigate();
+  const isCharacter = profileType === "character";
+  const isOwner = client.user?.id === (owner?.owner || owner).id;
 
   useEffect(() => {
 
@@ -13,7 +15,7 @@ export default function ProfileStories({client, owner, cache, setCache, styles})
     if (!cache.stories) {
 
       // Save the data to the cache.
-      const data = []
+      const data = owner.stories || [];
       const newCollection = [];
       for (let i = 0; data.length > i; i++) {
 
@@ -44,13 +46,24 @@ export default function ProfileStories({client, owner, cache, setCache, styles})
       {client.user?.id === owner.id && (
         <button>Create story</button>
       )}
-      {collection[0] ? (
-        <section id={styles.storyContainer}>
-          {collection}
-        </section>
-      ) : (
-        <p>{owner.displayName} doesn't have any public stories :(</p>
-      )}
+      {
+        ready && (
+          <>
+            {collection[0] ? (
+              <section id={styles.storyContainer}>
+                {collection}
+              </section>
+            ) : (
+              <p>{owner.name || owner.displayName || `@${owner.username}`} doesn't have any public stories :(</p>
+            )}
+            {
+              isCharacter && isOwner && (
+                <section className="info">To attach stories to this character, upload them from your profile!</section>
+              )
+            }
+          </>
+        )
+      }
     </section>
   )
 

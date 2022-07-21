@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function ProfileWorlds({client, owner, cache, setCache, styles}) {
+export default function ProfileWorlds({client, owner, cache, setCache, styles, profileType}) {
 
   const [ready, setReady] = useState(false);
   const [collection, setCollection] = useState([]);
   const navigate = useNavigate();
+  const isCharacter = profileType === "character";
+  const isOwner = client.user?.id === (owner?.owner || owner).id;
 
   useEffect(() => {
 
@@ -13,7 +15,7 @@ export default function ProfileWorlds({client, owner, cache, setCache, styles}) 
     if (!cache.worlds) {
 
       // Save the data to the cache.
-      const data = []
+      const data = owner.worlds || [];
       const newCollection = [];
       for (let i = 0; data.length > i; i++) {
 
@@ -44,13 +46,26 @@ export default function ProfileWorlds({client, owner, cache, setCache, styles}) 
       {client.user?.id === owner.id && (
         <button>Create world</button>
       )}
-      {collection[0] ? (
-        <section id={styles.organizationContainer}>
-          {collection}
-        </section>
-      ) : (
-        <p>{owner.displayName} doesn't have any public worlds :(</p>
-      )}
+      {
+        ready && (
+          <>
+            {
+              collection[0] ? (
+                <section id={styles.organizationContainer}>
+                  {collection}
+                </section>
+              ) : (
+                <p>{owner.name || owner.displayName || `@${owner.username}`} doesn't have any public worlds :(</p>
+              )
+            }
+            {
+              isCharacter && isOwner && (
+                <section className="info">To attach worlds to this character, upload them from your profile!</section>
+              )
+            }
+          </>
+        )
+      }
     </section>
   )
 

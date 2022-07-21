@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { matchPath, useLocation, useParams, Link } from "react-router-dom";
+import { matchPath, useLocation, useParams, Link, useNavigate } from "react-router-dom";
 import { AccountNotFoundError } from "makuwro-errors";
 import PropTypes from "prop-types";
 import styles from "../styles/Profile.module.css";
@@ -13,22 +13,29 @@ import ProfileWorlds from "./profile/ProfileWorlds";
 
 export default function Profile({shownLocation, setLocation, client, setCriticalError}) {
 
-  const {username, tab: tabName, id} = useParams();
+  const {username, tab: tabName, id, subTab: subTabName} = useParams();
+  const [profileType, setProfileType] = useState("user");
+  const isCharacter = profileType === "character";
   const [owner, setOwner] = useState();
   const [ready, setReady] = useState(false);
   const [content, setContent] = useState(null);
   const [navChildren, setNavChildren] = useState(null);
   const location = useLocation();
   const [cache, setCache] = useState({});
+  const [useDefaultProfilePicture, setUseDefaultProfilePicture] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
 
     let mounted = true;
     (async () => {
 
-      if (!owner && !matchPath({path: "/:username/art/:id"}, location.pathname)) {
+      if (matchPath({path: "/:username/:tab"}, location.pathname) || matchPath({path: "/:username"}, location.pathname)) {
     
         try {
+
+          // Reset this.
+          setUseDefaultProfilePicture(false);
 
           // Get the profile info from the server
           let owner = await client.getUser({username});
@@ -50,6 +57,7 @@ export default function Profile({shownLocation, setLocation, client, setCritical
     
           if (mounted) {
     
+            setProfileType("user");
             setReady(true);
     
           }
@@ -69,7 +77,32 @@ export default function Profile({shownLocation, setLocation, client, setCritical
           }
 
         }
+
+        return;
   
+      }
+      
+      const params = (matchPath({path: "/:username/characters/:slug"}, location.pathname) || matchPath({path: "/:username/characters/:slug/:subTab"}, location.pathname))?.params;
+      if (params && (profileType !== "character" || (params.slug !== owner.slug || params.username !== owner.owner?.username))) {
+
+        // Reset this.
+        setUseDefaultProfilePicture(false);
+        setProfileType("character");
+
+        try {
+
+          let character = await client.getCharacter(username, id);
+          setOwner(character);
+
+        } catch (err) {
+
+          setOwner();
+          console.error(err);
+
+        }
+        
+        setReady(true);
+
       }
 
     })();
@@ -80,7 +113,7 @@ export default function Profile({shownLocation, setLocation, client, setCritical
 
     };
 
-  }, [owner, id]);
+  }, [owner, username, id, tabName]);
 
   const currentPathName = location.pathname;
   useEffect(() => {
@@ -102,37 +135,47 @@ export default function Profile({shownLocation, setLocation, client, setCritical
       // Select a tab.
       const tabs = {
         about: <ProfileAbout owner={owner} styles={styles} />,
-        art: <ProfileArt owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />,
-        blog: <ProfileBlog owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />,
-        characters: <ProfileCharacters owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />,
-        organizations: <ProfileOrganizations owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />,
-        stories: <ProfileStories owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />,
-        worlds: <ProfileWorlds owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} />
+        art: <ProfileArt owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} profileType={profileType} />,
+        blog: <ProfileBlog owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} profileType={profileType} />,
+        characters: <ProfileCharacters owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} profileType={profileType} />,
+        organizations: <ProfileOrganizations owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} profileType={profileType} />,
+        stories: <ProfileStories owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} profileType={profileType} />,
+        worlds: <ProfileWorlds owner={owner} cache={cache} setCache={setCache} client={client} styles={styles} profileType={profileType} />
       }
-      setContent(tabs[tabName || "about"]);
+
+      if (profileType === "character") {
+
+        delete tabs.blog;
+        delete tabs.characters;
+        delete tabs.organizations;
+
+      }
+
+      setContent(tabs[(isCharacter ? subTabName : tabName) || "about"]);
 
       // Let's reset the nav options.
       // First, iterate through the option list.
-      const profileUrlBase = `/${owner.username}`;
-      const navChildren = ["About", "Art", "Blog", "Characters", "Organizations", "Stories", "Worlds"];
+      const profileUrlBase = `/${(isCharacter ? owner.owner : owner).username}${isCharacter ? `/characters/${owner.slug}` : ""}`;
+      const navChildren = Object.keys(tabs);
       for (let i = 0; navChildren.length > i; i++) {
 
         // Then replace the string with a Link component.
         const optionText = navChildren[i];
-        const path = `${profileUrlBase}${i !== 0 ? `/${optionText.toLowerCase()}` : ""}`;
+        const optionTextCapitalized = optionText[0].toUpperCase() + optionText.slice(1);
+        const path = `${profileUrlBase}${i !== 0 ? `/${optionText}` : ""}`;
         navChildren[i] = (
           <Link
             key={path}
             className={currentPathName === path ? styles.selected : null} 
             to={path}>
-              {optionText}
+              {optionTextCapitalized}
           </Link>
         );
 
         if (currentPathName === path) {
 
           // Update the document title.
-          document.title = `${owner.displayName} (${owner.username})${i === 0 ? "" : ` / ${optionText}`}`
+          document.title = `${owner.name || `${owner.displayName} (${owner.username})`}${i === 0 ? "" : ` / ${optionTextCapitalized}`}`
 
         }
 
@@ -143,7 +186,7 @@ export default function Profile({shownLocation, setLocation, client, setCritical
 
     }
 
-  }, [owner, tabName]);
+  }, [owner, tabName, profileType, subTabName]);
 
   const [actionMenuOpen, setActionMenuOpen] = useState(false);
 
@@ -152,13 +195,13 @@ export default function Profile({shownLocation, setLocation, client, setCritical
       <section id={styles.metadata}>
         {owner && (
           <section id={styles.avatar}>
-            <img src={"https://yt3.ggpht.com/LmbLsIs7VUZ7dJbwW9JBuKXjMrk3qmXB7oiplq5LQER4nrk7px9wcJvnYVpE065dIydMtdjz2Q=s88-c-k-c0x00ffffff-no-rj" || `https://cdn.makuwro.com/${owner.avatarPath}`} />
+            <img src={`https://cdn.makuwro.com/${useDefaultProfilePicture ? "global/pfp.png" : `${(owner?.owner || owner).id}${isCharacter ? `/characters/${owner.id}` : ""}/avatar`}`} onError={() => setUseDefaultProfilePicture(true)} />
           </section>
         )}
-        <h1>{owner ? (owner.displayName || `@${owner.username}`) : "User not found"}</h1>
+        <h1>{owner ? (owner.name || owner.displayName || `@${owner.username}`) : `${profileType[0].toUpperCase()}${profileType.slice(1)} not found`}</h1>
         <h2>{owner ? "CEO of Makuwro, LLC" : "But don't worry: they'll come around some day."}</h2>
         <section id={styles.actions}>
-          {owner && owner.id === client.user?.id ? (
+          {owner && ((profileType === "user" ? owner : owner.owner).id === client.user?.id) ? (
             <button>Edit profile</button>
           ) : (
             <>
@@ -172,10 +215,12 @@ export default function Profile({shownLocation, setLocation, client, setCritical
                   </button>
                   <section id={styles.otherActionsMenu} className={actionMenuOpen ? styles.open : null} onClick={() => setActionMenuOpen(false)}>
                     <section>
-                      <button>
-                        Block
-                      </button>
-                      <button>
+                      {!isCharacter && (
+                        <button>
+                          Block
+                        </button>
+                      )}
+                      <button onClick={() => navigate(`${currentPathName}?action=report-abuse`)}>
                         Report
                       </button>
                     </section>
