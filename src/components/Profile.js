@@ -82,7 +82,7 @@ export default function Profile({shownLocation, setLocation, client, setCritical
   
       }
       
-      const params = (matchPath({path: "/:username/characters/:slug"}, location.pathname) || matchPath({path: "/:username/characters/:slug/:subTab"}, location.pathname))?.params;
+      let params = (matchPath({path: "/:username/characters/:slug"}, location.pathname) || matchPath({path: "/:username/characters/:slug/:subTab"}, location.pathname))?.params;
       if (params && (profileType !== "character" || (params.slug !== owner.slug || params.username !== owner.owner?.username))) {
 
         // Reset this.
@@ -96,6 +96,31 @@ export default function Profile({shownLocation, setLocation, client, setCritical
 
         } catch (err) {
 
+          document.title = "Character not found / Makuwro";
+          setOwner();
+          console.error(err);
+
+        }
+        
+        setReady(true);
+
+      }
+
+      params = (matchPath({path: "/:username/stories/:slug"}, location.pathname) || matchPath({path: "/:username/stories/:slug/:subTab"}, location.pathname))?.params;
+      if (params && (profileType !== "story" || (params.slug !== owner.slug || params.username !== owner.owner?.username))) {
+
+        // Reset this.
+        setUseDefaultProfilePicture(false);
+        setProfileType("story");
+
+        try {
+
+          let story = await client.getStory(username, id);
+          setOwner(story);
+
+        } catch (err) {
+
+          document.title = "Story not found / Makuwro";
           setOwner();
           console.error(err);
 
