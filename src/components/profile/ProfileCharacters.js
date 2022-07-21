@@ -16,28 +16,7 @@ export default function ProfileCharacters({client, owner, cache, setCache, style
       // Get art data from the server.
 
       // Save the data to the cache.
-      const characterData = [{
-        name: "Sudobeast",
-        slug: "",
-        image: "",
-        owner: {
-          username: "Christian"
-        }
-      },{
-        name: "Sudobeast",
-        slug: "",
-        image: "",
-        owner: {
-          username: "Christian"
-        }
-      },{
-        name: "Sudobeast",
-        slug: "",
-        image: "",
-        owner: {
-          username: "Christian"
-        }
-      },]
+      const characterData = [];
       const newCollection = [];
       for (let i = 0; characterData.length > i; i++) {
 
