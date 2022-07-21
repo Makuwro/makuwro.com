@@ -155,7 +155,7 @@ export default function Profile({shownLocation, setLocation, client, setCritical
 
       // Let's reset the nav options.
       // First, iterate through the option list.
-      const profileUrlBase = `/${(isCharacter ? owner.owner : owner).username}${isCharacter ? `/characters/${owner.slug}` : ""}`;
+      const profileUrlBase = `/${(owner?.owner || owner).username}${isCharacter ? `/characters/${owner.slug}` : ""}`;
       const navChildren = Object.keys(tabs);
       for (let i = 0; navChildren.length > i; i++) {
 
@@ -201,7 +201,7 @@ export default function Profile({shownLocation, setLocation, client, setCritical
         <h1>{owner ? (owner.name || owner.displayName || `@${owner.username}`) : `${profileType[0].toUpperCase()}${profileType.slice(1)} not found`}</h1>
         <h2>{owner ? "CEO of Makuwro, LLC" : "But don't worry: they'll come around some day."}</h2>
         <section id={styles.actions}>
-          {owner && ((profileType === "user" ? owner : owner.owner).id === client.user?.id) ? (
+          {owner && ((owner?.owner || owner).id === client.user?.id) ? (
             <button>Edit profile</button>
           ) : (
             <>
