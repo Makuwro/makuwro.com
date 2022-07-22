@@ -105,15 +105,20 @@ main {
   box-sizing: border-box;
 }
 
+form h1 {
+  margin: 1rem 0 0;
+  font-size: 16px;
+}
+
 form p {
   margin: 1rem 0 0;
 }
 
-form > section:first-of-type {
+form > section:first-of-type, form > section > section:first-of-type, form h1:first-of-type {
   margin-top: 0;
 }
 
-form > section {
+form > section, form > section > section {
   margin-top: 1rem;
 }
 
