@@ -200,7 +200,7 @@ export default function Submitter({client, art}) {
                 client={client}
                 submitting={submitting}
                 data={data}
-                setData={setData}
+                setData={setDataWrapper}
                 setPermissions={setPermissions}
                 submitForm={submitForm} />
             );
