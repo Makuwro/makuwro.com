@@ -157,16 +157,24 @@
 }
 
 /* Profile navigation bar */
+#navContainer {
+  display: flex;
+  justify-content: center;
+}
+
 #profile nav {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
+  background-color: #1b1b29;
+  border-radius: 50px;
+  padding: 5px;
 }
 
 #profile nav a {
   padding: 10px 15px;
-  border-radius: 25px;
+  border-radius: 50px;
   color: var(--text);
   -webkit-tap-highlight-color: transparent;
 }
@@ -174,11 +182,13 @@
 #profile nav a:hover {
   color: white;
   background-color: #5950cd5e;
+  box-shadow: var(--box-shadow);
 }
 
 #profile .selected {
   background-color: #5950cd;
   color: white;
+  box-shadow: var(--box-shadow);
 }
 
 #profile .selected:hover {

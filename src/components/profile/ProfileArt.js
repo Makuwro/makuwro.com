@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function ProfileArt({client, owner, cache, setCache, styles, profileType}) {
+export default function ProfileArt({client, owner, cache, setCache, styles, isCharacter, isStory}) {
 
   const [ready, setReady] = useState(false);
   const [collection, setCollection] = useState([]);
   const navigate = useNavigate();
-  const isCharacter = profileType === "character";
   const isOwner = client.user?.id === (owner?.owner || owner).id;
 
   useEffect(() => {
@@ -54,7 +53,7 @@ export default function ProfileArt({client, owner, cache, setCache, styles, prof
 
   return (
     <section>
-      {!isCharacter && isOwner && (
+      {!isCharacter && !isStory && isOwner && (
         <button onClick={() => navigate(`/${owner.username}/art?action=upload-art`)}>Upload art</button>
       )}
       {
@@ -65,13 +64,17 @@ export default function ProfileArt({client, owner, cache, setCache, styles, prof
                 {collection}
               </section>
             ) : (
-              <p>{(owner.name || owner.displayName || `@${owner.username}`)} doesn't have any public art :(</p>
+              <>
+                <p>{(owner.title || owner.name || owner.displayName || `@${owner.username}`)} doesn't have any public art :(</p>
+                {
+                  (isStory || isCharacter) && isOwner && (
+                    <section className="info">
+                      To attach art to this {isStory ? "story" : "character"}, upload them from your {isStory ? "chapters" : "profile"}!
+                    </section>
+                  )
+                }
+              </>
             )}
-            {
-              isCharacter && isOwner && (
-                <section className="info">To attach art to this character, upload them from your profile!</section>
-              )
-            }
           </>
         ) : null
       }
