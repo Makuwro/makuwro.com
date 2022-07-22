@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-export default function ProfileWorlds({client, owner, cache, setCache, styles, profileType}) {
+export default function ProfileWorlds({client, owner, cache, setCache, styles, isCharacter, isStory}) {
 
   const [ready, setReady] = useState(false);
   const [collection, setCollection] = useState([]);
-  const navigate = useNavigate();
-  const isCharacter = profileType === "character";
   const isOwner = client.user?.id === (owner?.owner || owner).id;
 
   useEffect(() => {
@@ -55,12 +53,14 @@ export default function ProfileWorlds({client, owner, cache, setCache, styles, p
                   {collection}
                 </section>
               ) : (
-                <p>{owner.name || owner.displayName || `@${owner.username}`} doesn't have any public worlds :(</p>
+                <p>{owner.title || owner.name || owner.displayName || `@${owner.username}`} doesn't have any public worlds :(</p>
               )
             }
             {
-              isCharacter && isOwner && (
-                <section className="info">To attach worlds to this character, upload them from your profile!</section>
+              (isStory || isCharacter) && isOwner && (
+                <section className="info">
+                  To attach worlds to this {isStory ? "story" : "character"}, {isStory ? "add" : "upload"} them from your {isStory ? "world" : "profile"}!
+                </section>
               )
             }
           </>

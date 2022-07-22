@@ -167,7 +167,8 @@ export default function ArtViewer({client}) {
         {!contentWarning && commentsVisible && (
           <Popup
             title="Comments"
-            onClose={closeComments}>
+            onClose={closeComments}
+            open={commentsVisible}>
               <Comments 
                 client={client}
                 content={art} />

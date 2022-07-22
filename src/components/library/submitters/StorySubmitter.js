@@ -38,7 +38,7 @@ export default function StorySubmitter({client, submitting, data, setData, setPe
 
   useEffect(() => {
 
-    if (data.name) {
+    if (data.title) {
 
       setCanSubmit(true);
       
@@ -63,9 +63,9 @@ export default function StorySubmitter({client, submitting, data, setData, setPe
         <section>
           <h1>Basics</h1> 
           <section>
-            <label>Story name</label>
+            <label>Title</label>
             <p>This is the name that'll appear in big, <b>bold</b> text when you go to this story's profile.</p>
-            <input type="text" value={data.name} onInput={(event) => setData("name", event.target.value)} required />
+            <input type="text" value={data.title} onInput={(event) => setData("title", event.target.value)} required />
           </section>
           <section>
             <label>
@@ -142,7 +142,7 @@ export default function StorySubmitter({client, submitting, data, setData, setPe
               username={client.user.username}
               slug={data.slug}
               onChange={(slug) => setData("slug", slug)}
-              placeholder={data.name.replaceAll(/[^a-zA-Z0-9_-]/gm, "-")} 
+              placeholder={data.title.replaceAll(/[^a-zA-Z0-9_-]/gm, "-")} 
               path="stories"
             />
           </section>

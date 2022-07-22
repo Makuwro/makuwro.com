@@ -10,6 +10,7 @@ export default function Submitter({client, art}) {
   const [data, setData] = useState({
     name: "",
     terms: "",
+    title: "",
     description: "",
     collaborators: [],
     tags: [],
@@ -78,7 +79,7 @@ export default function Submitter({client, art}) {
             submitting = true;
             try {
       
-              const props = {...data, slug: data.slug || data.name?.toLowerCase().replaceAll(/[^a-zA-Z0-9_]/gm, "-")};
+              const props = {...data, slug: data.slug || (data.name || data.title)?.toLowerCase().replaceAll(/[^a-zA-Z0-9_]/gm, "-")};
       
               // Turn the collaborators array into an array of user IDs
               for (let i = 0; (props.collaborators?.length || 0) > i; i++) {
@@ -106,7 +107,7 @@ export default function Submitter({client, art}) {
               }
 
               // Now we're ready to submit the request.
-              console.log(type)
+              console.log(props)
               await client.user[`create${type}`](props.slug, props);
 
               if (type === "Character") {

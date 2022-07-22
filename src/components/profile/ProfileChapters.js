@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
-export default function ProfileStories({client, owner, cache, setCache, styles, profileType}) {
+export default function ProfileChapters({client, owner, cache, setCache, styles, profileType}) {
 
   const [ready, setReady] = useState(false);
   const [collection, setCollection] = useState([]);
@@ -62,8 +62,8 @@ export default function ProfileStories({client, owner, cache, setCache, styles, 
 
   return (
     <section>
-      {client.user?.id === owner.id && (
-        <button onClick={() => navigate(`${location.pathname}?action=create-story`)}>Create story</button>
+      {client.user?.id === owner.owner.id && (
+        <button onClick={() => navigate(`${location.pathname}?action=create-story`)}>Create chapter</button>
       )}
       {
         ready && (
@@ -73,13 +73,8 @@ export default function ProfileStories({client, owner, cache, setCache, styles, 
                 {collection}
               </section>
             ) : (
-              <p>{owner.name || owner.displayName || `@${owner.username}`} doesn't have any public stories :(</p>
+              <p>This story doesn't have any chapters. ...yet ;)</p>
             )}
-            {
-              isCharacter && isOwner && (
-                <section className="info">To attach stories to this character, upload them from your profile!</section>
-              )
-            }
           </>
         )
       }
