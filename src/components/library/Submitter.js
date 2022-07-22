@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import CharacterSubmitter from "./submitters/CharacterSubmitter";
 import ArtSubmitter from "./submitters/ArtSubmitter";
 import StorySubmitter from "./submitters/StorySubmitter";
+import WorldSubmitter from "./submitters/WorldSubmitter";
 
 export default function Submitter({client, art}) {
   
@@ -186,12 +187,25 @@ export default function Submitter({client, art}) {
                 data={data}
                 setData={setDataWrapper}
                 setPermissions={setPermissions}
-                submitForm={submitForm}
-              />
+                submitForm={submitForm} />
             );
 
             // Remember that this a story.
             type = "Story";
+            break;
+
+          case "create-world":
+            setPopup(
+              <WorldSubmitter
+                client={client}
+                submitting={submitting}
+                data={data}
+                setData={setData}
+                setPermissions={setPermissions}
+                submitForm={submitForm} />
+            );
+
+            type = "World";
             break;
 
           default:
