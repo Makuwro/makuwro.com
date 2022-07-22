@@ -93,7 +93,6 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
       onClose={() => setMounted(false) || navigate(location.pathname)}>
       <form onSubmit={checkBeforeSubmitting}>
         <section>
-          <h1>Basics</h1>
           <section id={styles.fileSelectBackground}>
             <section>
               <input 
@@ -155,7 +154,6 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
           )}
         </section>
         <section>
-          <h1>Organization</h1>
           <section>
             <label htmlFor="tags">
               Tags
@@ -202,7 +200,6 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
           </section>
         </section>
         <section>
-          <h1>Sharing</h1>
           <section>
             <label htmlFor="url">Art URL</label>
             <p>Only alphanumeric characters, underscores, hyphens, and periods are allowed.</p>

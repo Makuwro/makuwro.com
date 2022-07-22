@@ -9,12 +9,11 @@ import Checkbox from "../../input/Checkbox";
 import SlugInput from "../../input/SlugInput";
 import Popup from "../../Popup";
 
-export default function StorySubmitter({client, submitting, data, setData, setPermissions, submitForm}) {
+export default function WorldSubmitter({client, submitting, data, setData, setPermissions, submitForm}) {
 
   const [warnUnfinished, setWarnUnfinished] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const avatarInput = useRef();
   const [searchParams] = useSearchParams();
   const action = searchParams.get("action");
   const navigate = useNavigate();
@@ -23,7 +22,7 @@ export default function StorySubmitter({client, submitting, data, setData, setPe
 
   useEffect(() => {
 
-    if (action === "create-story") {
+    if (action === "create-world") {
 
       setPopupOpen(true);
       setMounted(true);
@@ -38,7 +37,7 @@ export default function StorySubmitter({client, submitting, data, setData, setPe
 
   useEffect(() => {
 
-    if (data.title) {
+    if (data.name) {
 
       setCanSubmit(true);
       
@@ -52,29 +51,29 @@ export default function StorySubmitter({client, submitting, data, setData, setPe
 
   return mounted ? (
     <Popup
-      title="Create story"
+      title="Create world"
       warnUnfinished={warnUnfinished}
       options={
-        <button onClick={submitForm} disabled={!canSubmit}>Create story</button>
+        <button onClick={submitForm} disabled={!canSubmit}>Create world</button>
       }
       onClose={() => setMounted(false) || navigate(location.pathname)}
       open={popupOpen}>
       <form onSubmit={submitForm}>
         <section>
           <section>
-            <h1>Title</h1>
-            <p>This is the name that'll appear in big, <b>bold</b> text when you go to this story's profile.</p>
-            <input type="text" value={data.title} onInput={(event) => setData("title", event.target.value)} required />
+            <h1>Name</h1>
+            <p>This is the name that'll appear in big, <b>bold</b> text when you go to this world's profile.</p>
+            <input type="text" value={data.name} onInput={(event) => setData("name", event.target.value)} required />
           </section>
           <section>
-            <label htmlFor="url">Story URL</label>
+            <h1>World URL</h1>
             <p>Only alphanumeric characters, underscores, hyphens, and periods are allowed.</p>
             <SlugInput
               username={client.user.username}
               slug={data.slug}
               onChange={(slug) => setData("slug", slug)}
-              placeholder={data.title.replaceAll(/[^a-zA-Z0-9_-]/gm, "-")} 
-              path="stories"
+              placeholder={data.name?.replaceAll(/[^a-zA-Z0-9_-]/gm, "-")} 
+              path="worlds"
             />
           </section>
         </section>
@@ -84,7 +83,7 @@ export default function StorySubmitter({client, submitting, data, setData, setPe
 
 }
 
-StorySubmitter.propTypes = {
+WorldSubmitter.propTypes = {
   data: PropTypes.object,
   client: PropTypes.object,
   submitting: PropTypes.bool,
