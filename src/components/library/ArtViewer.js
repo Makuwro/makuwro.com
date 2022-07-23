@@ -177,7 +177,7 @@ export default function ArtViewer({client}) {
         <section id={styles.imageContainer}>
           {!contentWarning && (
             <img 
-              src={`https://cdn.makuwro.com/${art.imagePath}`} 
+              src={`https://cdn.makuwro.com/${art.owner.id}/art/${art.id}`} 
               onClick={(event) => event.stopPropagation()} />
           )}
         </section>

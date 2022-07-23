@@ -53,11 +53,11 @@ export default function ArtSubmitter({client, submitting, data, setData, setPerm
 
   }, [data.image, data.slug]);
 
-  function checkBeforeSubmitting() {
+  function checkBeforeSubmitting(event) {
 
     if (!submitting && canSubmit) {
 
-      submitForm();
+      submitForm(event);
 
     }
 
