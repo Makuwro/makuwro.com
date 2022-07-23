@@ -1,3 +1,4 @@
+import { Character } from "makuwro";
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -18,7 +19,7 @@ export default function ProfileCharacters({client, owner, cache, setCache, style
       if (!isStory && !characterData) {
 
         // Get the data from the server.
-        characterData = await owner.getAllCharacters();
+        characterData = await owner.getAllContent(Character);
 
         // Save it to the cache for next time.
         setCache({...cache, characters: characterData});

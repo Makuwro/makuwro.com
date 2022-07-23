@@ -111,13 +111,16 @@ export default function Submitter({client, art}) {
               console.log(props)
               await client.user[`create${type}`](props.slug, props);
 
-              if (type === "Character") {
+              switch (type) {
 
-                type += "s";
+                case "World":
+                case "Character":
+                  type += "s";
+                  break;
 
-              } else if (type === "Story") {
-
-                type = "stories";
+                case "Story":
+                  type = "stories";
+                  break;
 
               }
       

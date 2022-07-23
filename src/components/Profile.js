@@ -11,6 +11,7 @@ import ProfileOrganizations from "./profile/ProfileOrganizations";
 import ProfileStories from "./profile/ProfileStories";
 import ProfileWorlds from "./profile/ProfileWorlds";
 import ProfileChapters from "./profile/ProfileChapters";
+import { Character, Story, World } from "makuwro";
 
 export default function Profile({shownLocation, setLocation, client, setCriticalError}) {
 
@@ -18,6 +19,7 @@ export default function Profile({shownLocation, setLocation, client, setCritical
   const [profileType, setProfileType] = useState("user");
   const isCharacter = profileType === "character";
   const isStory = profileType === "story";
+  const isWorld = profileType === "world";
   const [owner, setOwner] = useState();
   const [ready, setReady] = useState(false);
   const [content, setContent] = useState(null);
@@ -95,7 +97,7 @@ export default function Profile({shownLocation, setLocation, client, setCritical
 
         try {
 
-          let character = await client.getCharacter(username, id);
+          let character = await client.getContent(Character, username, id);
           setOwner(character);
 
         } catch (err) {
@@ -119,12 +121,36 @@ export default function Profile({shownLocation, setLocation, client, setCritical
 
         try {
 
-          let story = await client.getStory(username, id);
+          let story = await client.getContent(Story, username, id);
           setOwner(story);
 
         } catch (err) {
 
           document.title = "Story not found / Makuwro";
+          setOwner();
+          console.error(err);
+
+        }
+        
+        setReady(true);
+
+      }
+
+      params = (matchPath({path: "/:username/worlds/:slug"}, location.pathname) || matchPath({path: "/:username/worlds/:slug/:subTab"}, location.pathname))?.params;
+      if (params && (profileType !== "world" || (params.slug !== owner.slug || params.username !== owner.owner?.username))) {
+
+        // Reset this.
+        setUseDefaultProfilePicture(false);
+        setProfileType("world");
+
+        try {
+
+          let world = await client.getContent(World, username, id);
+          setOwner(world);
+
+        } catch (err) {
+
+          document.title = "World not found / Makuwro";
           setOwner();
           console.error(err);
 
@@ -244,11 +270,17 @@ export default function Profile({shownLocation, setLocation, client, setCritical
 
       }
 
-      setContent(tabs[(isCharacter || isStory ? subTabName : tabName) || "about"]);
+      if (!isWorld) {
+
+        // delete tabs.members;
+
+      }
+
+      setContent(tabs[(isCharacter || isStory || isWorld ? subTabName : tabName) || "about"]);
 
       // Let's reset the nav options.
       // First, iterate through the option list.
-      const profileUrlBase = `/${(owner?.owner || owner).username}${isCharacter ? `/characters/${owner.slug}` : ""}${isStory ? `/stories/${owner.slug}` : ""}`;
+      const profileUrlBase = `/${(owner?.owner || owner).username}${isCharacter ? `/characters/${owner.slug}` : ""}${isStory ? `/stories/${owner.slug}` : ""}${isWorld ? `/worlds/${owner.slug}` : ""}`;
       const navChildren = Object.keys(tabs);
       for (let i = 0; navChildren.length > i; i++) {
 
@@ -286,13 +318,13 @@ export default function Profile({shownLocation, setLocation, client, setCritical
   return ready && (
     <main id={styles.profile}>
       <section id={styles.metadata}>
-        {owner && (!useDefaultProfilePicture || !isStory) && (
+        {owner && (!useDefaultProfilePicture || !isStory || !isWorld) && (
           <section id={styles.avatar}>
             <img src={`https://cdn.makuwro.com/${useDefaultProfilePicture ? "global/pfp.png" : `${(owner?.owner || owner).id}${isCharacter ? `/characters/${owner.id}` : (isStory ? `/stories/${owner.id}` : "")}/avatar`}`} onError={() => setUseDefaultProfilePicture(true)} />
           </section>
         )}
         <h1>{owner ? (owner.title || owner.name || owner.displayName || `@${owner.username}`) : `${profileType[0].toUpperCase()}${profileType.slice(1)} not found`}</h1>
-        {!isStory && (
+        {!isWorld && !isStory && (
           <h2>{owner ? "CEO of Makuwro, LLC" : "But don't worry: they'll come around some day."}</h2>
         )}
         <section id={styles.actions}>

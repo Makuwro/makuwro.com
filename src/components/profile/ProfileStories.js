@@ -1,3 +1,4 @@
+import { Story } from "makuwro";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
@@ -21,7 +22,7 @@ export default function ProfileStories({client, owner, cache, setCache, styles, 
         try {
 
           // Get the data from the server.
-          storyData = await owner.getAllStories();
+          storyData = await owner.getAllContent(Story);
 
           // Save it to the cache for next time.
           setCache({...cache, stories: storyData});

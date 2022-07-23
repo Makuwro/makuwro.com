@@ -1,3 +1,4 @@
+import { World } from "makuwro";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
@@ -11,11 +12,27 @@ export default function ProfileWorlds({client, owner, cache, setCache, styles, i
 
   useEffect(() => {
 
-    // Check if we already have the data.
-    if (!cache.worlds) {
+    (async () => {
 
-      // Save the data to the cache.
-      const data = owner.worlds || [];
+      // Check if we already have the data.
+      let data = cache.worlds;
+      if (!data) {
+
+        try {
+
+          // Save the data to the cache.
+          data = await owner.getAllContent(World) || [];
+          setCache({...cache, worlds: data});
+
+        } catch (err) {
+
+          data = [];
+          console.error(err);
+
+        }
+
+      }
+
       const newCollection = [];
       for (let i = 0; data.length > i; i++) {
 
@@ -33,11 +50,11 @@ export default function ProfileWorlds({client, owner, cache, setCache, styles, i
         );
 
       }
+
       setCollection(newCollection);
+      setReady(true);
 
-    }
-
-    setReady(true);
+    })();
 
   }, []);
 
