@@ -133,7 +133,7 @@ export default function Literature({ client, shownLocation, setLocation }) {
         try {
 
           console.log("Getting post from the server...");
-          post = await client.getBlogPost(username, slug);
+          post = await client.getContent(BlogPost, username, slug);
 
         } catch ({ message }) {
 
@@ -792,7 +792,6 @@ export default function Literature({ client, shownLocation, setLocation }) {
               dangerouslySetInnerHTML={{ __html: contentState }}
             >
             </section>
-            <Footer />
           </section>
         </>
       ) : "That one doesn't exist!"}
