@@ -1,11 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
-import Dropdown from "../../input/Dropdown";
 import PropTypes from "prop-types";
-import TagInput from "../../input/TagInput";
-import ContentInput from "../../input/ContentInput";
-import Optional from "../../Optional";
-import Checkbox from "../../input/Checkbox";
 import SlugInput from "../../input/SlugInput";
 import Popup from "../../Popup";
 

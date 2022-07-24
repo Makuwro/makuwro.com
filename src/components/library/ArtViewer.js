@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Popup from "../Popup";
 import { UnderageError } from "makuwro-errors";
 import Comments from "../Comments";
+import { Art } from "makuwro";
 
 export default function ArtViewer({client}) {
 
@@ -35,7 +36,7 @@ export default function ArtViewer({client}) {
           setUsername(username);
 
           // Get art from the cache or the server.
-          const art = cache?.owner.username === username && cache.slug === slug ? cache : await client.getArt(username, slug);
+          const art = cache?.owner.username === username && cache.slug === slug ? cache : await client.getContent(Art, username, slug);
           
           // Save the art for later.
           setCache(art);
@@ -177,7 +178,7 @@ export default function ArtViewer({client}) {
         <section id={styles.imageContainer}>
           {!contentWarning && (
             <img 
-              src={`https://cdn.makuwro.com/${art.imagePath}`} 
+              src={`https://cdn.makuwro.com/${art.owner.id}/art/${art.id}`} 
               onClick={(event) => event.stopPropagation()} />
           )}
         </section>
