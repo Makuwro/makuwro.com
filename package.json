@@ -22,7 +22,7 @@
   "dependencies": {
     "@monaco-editor/react": "^4.3.1",
     "html-react-parser": "^3.0.1",
-    "makuwro": "github:Makuwro/library",
+    "makuwro": "github:makuwro/library",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-router-dom": "^6.3.0",

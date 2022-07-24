@@ -2,7 +2,7 @@ import { Art } from "makuwro";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function ProfileArt({client, owner, cache, setCache, styles, isCharacter, isStory}) {
+export default function ProfileArt({client, owner, cache, setCache, styles, canCreate}) {
 
   const [ready, setReady] = useState(false);
   const [collection, setCollection] = useState([]);
@@ -54,7 +54,7 @@ export default function ProfileArt({client, owner, cache, setCache, styles, isCh
 
   return (
     <section>
-      {!isCharacter && !isStory && isOwner && (
+      {canCreate && isOwner && (
         <button onClick={() => navigate(`/${owner.username}/art?action=upload-art`)}>Upload art</button>
       )}
       {
@@ -66,11 +66,11 @@ export default function ProfileArt({client, owner, cache, setCache, styles, isCh
               </section>
             ) : (
               <>
-                <p>{(owner.title || owner.name || owner.displayName || `@${owner.username}`)} doesn't have any public art :(</p>
+                <p>{(owner.title || owner.name || owner.displayName || `@${owner.username}`)} doesn't have any {!isOwner ? "public" : ""} art :(</p>
                 {
-                  (isStory || isCharacter) && isOwner && (
+                  (!canCreate) && isOwner && (
                     <section className="info">
-                      To attach art to this {isStory ? "story" : "character"}, upload them from your {isStory ? "chapters" : "profile"}!
+                      To put art here, upload them from your profile!
                     </section>
                   )
                 }

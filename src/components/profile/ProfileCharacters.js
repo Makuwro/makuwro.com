@@ -2,27 +2,36 @@ import { Character } from "makuwro";
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-export default function ProfileCharacters({client, owner, cache, setCache, styles, isStory}) {
+export default function ProfileCharacters({client, owner, cache, setCache, styles, canCreate}) {
 
   const [ready, setReady] = useState(false);
   const [collection, setCollection] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
-  const isOwner = client.user?.id === (owner?.owner || owner).id;
 
   useEffect(() => {
 
     (async () => {
 
       // Check if we already have the data.
-      let characterData = isStory ? (owner.characters || []) : cache.characters;
-      if (!isStory && !characterData) {
+      let characterData = cache.characters;
+      if (!characterData) {
 
-        // Get the data from the server.
-        characterData = await owner.getAllContent(Character);
+        // Just in case the request throws an error, we'll be ready.
+        try {
+          
+          // Get data from the server.
+          characterData = owner.characters || await owner.getAllContent(Character);
 
-        // Save it to the cache for next time.
-        setCache({...cache, characters: characterData});
+          // Set the new cache for future reference.
+          setCache({...cache, characters: characterData});
+
+        } catch ({message}) {
+
+          characterData = [];
+          console.warn(`[Profile] Couldn't get ${owner.name || owner.displayName || owner.username}'s (${owner.id}) characters: ${message}`);
+
+        }
 
       }
 
@@ -53,7 +62,7 @@ export default function ProfileCharacters({client, owner, cache, setCache, style
 
   return (
     <section>
-      {!isStory && client.user?.id === owner.id && (
+      {canCreate && client.user?.id === owner.id && (
         <button onClick={() => navigate(`${location.pathname}?action=create-character`)}>Create character profile</button>
       )}
       {ready && (
@@ -62,16 +71,7 @@ export default function ProfileCharacters({client, owner, cache, setCache, style
             {collection}
           </section>
         ) : (
-          <>
-            <p>{owner.title || owner.displayName || `@${owner.username}`} doesn't have any public character profiles :(</p>
-            {
-              isStory && isOwner && (
-                <section className="info">
-                  To attach characters to this story, upload them from your chapters!
-                </section>
-              )
-            }
-          </>
+          <p>{owner.name || owner.title || owner.displayName || `@${owner.username}`} doesn't have any public character profiles :(</p>
         )
       )}
     </section>

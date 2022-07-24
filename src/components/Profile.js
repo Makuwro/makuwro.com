@@ -12,6 +12,7 @@ import ProfileStories from "./profile/ProfileStories";
 import ProfileWorlds from "./profile/ProfileWorlds";
 import ProfileChapters from "./profile/ProfileChapters";
 import { Character, Story, World } from "makuwro";
+import ProfileMembers from "./profile/ProfileMembers";
 
 export default function Profile({shownLocation, setLocation, client, setCriticalError}) {
 
@@ -190,67 +191,38 @@ export default function Profile({shownLocation, setLocation, client, setCritical
 
       // Select a tab.
       const tabs = {
-        about: <ProfileAbout 
-          owner={owner} 
-          styles={styles} 
-          isStory={isStory} />,
-        art: <ProfileArt 
-          owner={owner} 
-          cache={cache} 
-          setCache={setCache} 
-          client={client} 
-          styles={styles} 
-          isStory={isStory}
-          isCharacter={isCharacter} />,
-        blog: <ProfileBlog 
-          owner={owner} 
-          cache={cache} 
-          setCache={setCache} 
-          client={client} 
-          styles={styles} 
-          profileType={profileType} />,
-        chapters: <ProfileChapters 
-          owner={owner} 
-          cache={cache} 
-          setCache={setCache} 
-          client={client} 
-          styles={styles} />,
-        characters: <ProfileCharacters 
-          owner={owner} 
-          cache={cache} 
-          setCache={setCache} 
-          client={client} 
-          styles={styles}
-          isStory={isStory} />,
-        organizations: <ProfileOrganizations 
-          owner={owner} 
-          cache={cache} 
-          setCache={setCache} 
-          client={client} 
-          styles={styles} 
-          profileType={profileType} />,
-        stories: <ProfileStories 
-          owner={owner} 
-          cache={cache} 
-          setCache={setCache} 
-          client={client} 
-          styles={styles} 
-          profileType={profileType} />,
-        worlds: <ProfileWorlds 
-          owner={owner} 
-          cache={cache} 
-          setCache={setCache} 
-          client={client} 
-          styles={styles} 
-          isStory={isStory}
-          isCharacter={isCharacter} />
+        about: ProfileAbout,
+        art: ProfileArt,
+        blog: ProfileBlog,
+        chapters: ProfileChapters,
+        characters: ProfileCharacters,
+        members: ProfileMembers,
+        organizations: ProfileOrganizations,
+        pages: ProfileAbout,
+        stories: ProfileStories,
+        worlds: ProfileWorlds
+      }
+      const tabKeys = Object.keys(tabs);
+      for (let i = 0; tabKeys.length > i; i++) {
+
+        const tabKey = tabKeys[i];
+        tabs[tabKey] = React.createElement(tabs[tabKey], {
+          key: tabKey, 
+          owner, 
+          cache, 
+          setCache, 
+          client,
+          styles, 
+          canCreate: !isStory && !isWorld && !isCharacter
+        }, null);
+
       }
 
       // Delete unused tabs.
       if (isCharacter || isStory) {
 
-        delete tabs.blog;
         delete tabs.organizations;
+        delete tabs.blog;
 
         if (isCharacter) {
 
@@ -263,16 +235,23 @@ export default function Profile({shownLocation, setLocation, client, setCritical
         }
 
       }
-      
-      if (!isStory) {
 
+      if (isWorld) {
+
+        delete tabs.organizations;
+        delete tabs.worlds;
         delete tabs.chapters;
 
-      }
+      } else {
 
-      if (!isWorld) {
+        delete tabs.pages;
+        delete tabs.members;
 
-        // delete tabs.members;
+        if (!isStory) {
+
+          delete tabs.chapters;
+
+        }
 
       }
 
@@ -318,9 +297,9 @@ export default function Profile({shownLocation, setLocation, client, setCritical
   return ready && (
     <main id={styles.profile}>
       <section id={styles.metadata}>
-        {owner && (!useDefaultProfilePicture || !isStory || !isWorld) && (
+        {owner && (!useDefaultProfilePicture || (!isStory && !isWorld)) && (
           <section id={styles.avatar}>
-            <img src={`https://cdn.makuwro.com/${useDefaultProfilePicture ? "global/pfp.png" : `${(owner?.owner || owner).id}${isCharacter ? `/characters/${owner.id}` : (isStory ? `/stories/${owner.id}` : "")}/avatar`}`} onError={() => setUseDefaultProfilePicture(true)} />
+            <img src={`https://cdn.makuwro.com/${useDefaultProfilePicture ? "global/pfp.png" : `${(owner?.owner || owner).id}${isCharacter ? `/characters/${owner.id}` : (isStory ? `/stories/${owner.id}` : isWorld ? `/worlds/${owner.id}` : "")}/avatar`}`} onError={() => setUseDefaultProfilePicture(true)} />
           </section>
         )}
         <h1>{owner ? (owner.title || owner.name || owner.displayName || `@${owner.username}`) : `${profileType[0].toUpperCase()}${profileType.slice(1)} not found`}</h1>
